@@ -11,3 +11,4 @@ cd /usr/src # folder where you want to download src files to
 git clone https://github.com/google/googletest.git
 cd googletest
 cp -r googletest/include/gtest /usr/include/gtest # copy files to lib dir 
+cp -r googlemock/include/gmock /usr/include/gmock
