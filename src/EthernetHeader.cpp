@@ -14,10 +14,9 @@
 #include "EthernetHeader.h"
 #include <stdexcept>
 #include <algorithm>
-
-class IPv4Frame {
-
-};
+#include <list>
+#include "ArrayUtils/ArrayUtils.h"
+#include "MACAdress/MACAdress.h"
 
 //	std::vector<unsigned char> calculate_fcs(std::vector<unsigned char> ethernet_frame) {
 //		uint32_t crc = crc32(0L, Z_NULL, 0);
@@ -39,49 +38,26 @@ class IPv4Frame {
 //		}
 //	}
 
-void EthernetFrame::set_destination_address(std::vector<unsigned char> destination_address) {
-	if (destination_address.size() == DESTINATION_ADDRESS_SIZE) {
-		LLC_PDU::set_destination_address(destination_address);
-	} else {
-		// throw exception
-	}
+
+
+void EthernetFrame::set_destination_address(MACAdressInterface *destination_address) {
+	this->destination_address = destination_address;
 }
 
-void EthernetFrame::set_source_address(std::vector<unsigned char> source_address) {
-	if (source_address.size() == SOURCE_ADDRESS_SIZE) {
-		LLC_PDU::set_source_address(source_address);
-	} else {
-		// throw exception
-	}
+
+void EthernetFrame::set_source_address(MACAdressInterface *source_address) {
+	this->source_address = source_address;
 }
 
-void EthernetFrame::set_ethertype(std::string ethertype) {
-	// make string lowercase
-	std::transform(ethertype.begin(), ethertype.end(), ethertype.begin(),
-			[](unsigned char c){return std::tolower(c);});
-	// check if an ethertype conversion exists, otherwise throw exception
-	auto i = this->ethertype_common_values.find(ethertype);
-	if (i != this->ethertype_common_values.end()) {
-		this->ethertype = i->second;
-	} else {
-		throw std::invalid_argument("Ethertype not in the ethertype_common_values table.");
-	}
-}
+std::vector<std::vector<unsigned char>> EthernetFrame::to_array() {
+	std::vector<std::vector<unsigned char>> header_payload_array = {
+			get_destination_address()->get_address(),
+			get_source_address()->get_address(),
+			this->ethertype->get_ethertype(),
+			get_payload()
+	};
 
-std::vector<unsigned char> EthernetFrame::get_header() {
-	std::vector<std::vector<unsigned char>> header_values = {get_destination_address(), get_source_address(), ethertype};
-	std::vector<unsigned char> header;
-	for (auto i : header_values) {
-		header.insert(header.end(), i.begin(), i.end());
-	}
-
-	return header;
-}
-
-std::vector<unsigned char> EthernetFrame::get_header_payload() {
-	std::vector<unsigned char> header_payload = get_header();
-	header_payload.insert(header_payload.end(), get_payload().begin(), get_payload().end());
-	return header_payload;
+	return header_payload_array;
 }
 
 static const unsigned char pkt1[86] = {
@@ -111,19 +87,42 @@ std::vector<unsigned char> payload = {
 		0x00, 0x00
 };
 
-//int main(int argc, char *argv[]) {
-//////  EthernetFrame f{payload, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x23}, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x24}, {0x08, 0x00}};
-//////  std::vector<unsigned char> pkt = f.get_ethernet_frame();
-//////
-//////  pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
-//////  pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
-//////
-//////  struct pcap_pkthdr pcap_hdr;
-//////  pcap_hdr.caplen = f.get_ethernet_frame_size();
-//////  pcap_hdr.len = pcap_hdr.caplen;
-//////
-//////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
-//////  pcap_dump_close(dumper);
-//
-//	return 0;
-//}
+int main(int argc, char *argv[]) {
+////  EthernetFrame f{payload, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x23}, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x24}, {0x08, 0x00}};
+////  std::vector<unsigned char> pkt = f.get_ethernet_frame();
+////
+////  pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
+////  pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
+////
+////  struct pcap_pkthdr pcap_hdr;
+////  pcap_hdr.caplen = f.get_ethernet_frame_size();
+////  pcap_hdr.len = pcap_hdr.caplen;
+////
+////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
+////  pcap_dump_close(dumper);
+
+	Ethertype e;
+	std::array<unsigned char, 2> ipv4 = {0x01, 0x08};
+	e.set_ethertype(ipv4);
+
+	MACAdress destination;
+	destination.set_address({0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
+
+	MACAdress source;
+	source.set_address({0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
+
+	EthernetFrame f;
+	f.set_ethertype(&e);
+	f.set_destination_address(&destination);
+	f.set_source_address(&source);
+
+	std::vector<std::vector<unsigned char>> print = f.to_array();
+	for (auto v : print) {
+		for (auto c : v) {
+			std::cout << std::dec << c << "    ";
+		}
+		std::cout << std::endl;
+	}
+
+	return 0;
+}
