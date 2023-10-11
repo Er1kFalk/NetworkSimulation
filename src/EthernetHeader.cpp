@@ -106,17 +106,24 @@ int main(int argc, char *argv[]) {
 	e.set_ethertype(ipv4);
 
 	MACAdress destination;
-	destination.set_address({0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
+	destination.set_address((std::array<unsigned char, 6>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
 
 	MACAdress source;
-	source.set_address({0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
+	source.set_address((std::array<unsigned char, 6>){0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
 
-	EthernetFrame f;
-	f.set_ethertype(&e);
-	f.set_destination_address(&destination);
-	f.set_source_address(&source);
+	EthernetFrame f1;
+	f1.set_ethertype(&e);
+	f1.set_destination_address(&destination);
+	f1.set_source_address(&source);
+	f1.set_payload({0x04, 0x02});
 
-	std::vector<std::vector<unsigned char>> print = f.to_array();
+	EthernetFrame f2;
+	f1.set_ethertype(&e);
+	f1.set_destination_address(&destination);
+	f1.set_source_address(&source);
+	f1.set_payload({0x05, 0x06});
+
+	std::vector<std::vector<unsigned char>> print = f1.to_array();
 	for (auto v : print) {
 		for (auto c : v) {
 			std::cout << std::dec << c << "    ";

@@ -18,8 +18,7 @@ private:
 	static const std::map<std::string, std::vector<unsigned char>> ethertype_common_values;
 public:
 	void set_ethertype(std::array<unsigned char, 2> ethertype) override {
-		ArrayUtils<unsigned char, 2> arrutil;
-		this->ethertype = arrutil.to_vector(ethertype);
+		this->ethertype = ArrayUtils::to_vector(ethertype);
 	}
 
 	void set_ethertype(std::string ethertype) override;

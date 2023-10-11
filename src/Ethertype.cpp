@@ -15,8 +15,7 @@ const std::map<std::string, std::vector<unsigned char>> Ethertype::ethertype_com
 };
 
 void Ethertype::set_ethertype(std::string ethertype) {
-	StringUtils strutil;
-	ethertype = strutil.to_lower(ethertype);
+	ethertype = StringUtils::to_lower(ethertype);
 	auto i = this->ethertype_common_values.find(ethertype);
 	if (i != this->ethertype_common_values.end()) {
 		this->ethertype = i->second;
