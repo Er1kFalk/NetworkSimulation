@@ -5,12 +5,12 @@
  *      Author: erik
  */
 
-#include "MACAdressInterface.h"
+#include "MACAddressInterface.h"
 
-#ifndef MACADRESS_H_
-#define MACADRESS_H_
+#ifndef MACADDRESS_H_
+#define MACADDRESS_H_
 
-class MACAdress : public MACAdressInterface {
+class MACAddress : public MACAddressInterface {
 private:
 	std::vector<unsigned char> address;
 	static const int address_char_length;
@@ -25,4 +25,4 @@ public:
 
 
 
-#endif /* MACADRESS_H_ */
+#endif /* MACADDRESS_H_ */

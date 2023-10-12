@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <list>
 #include "ArrayUtils/ArrayUtils.h"
-#include "MACAdress/MACAdress.h"
+#include "MACAddress/MACAddress.h"
 
 //	std::vector<unsigned char> calculate_fcs(std::vector<unsigned char> ethernet_frame) {
 //		uint32_t crc = crc32(0L, Z_NULL, 0);
@@ -40,12 +40,12 @@
 
 
 
-void EthernetFrame::set_destination_address(MACAdressInterface *destination_address) {
+void EthernetFrame::set_destination_address(MACAddressInterface *destination_address) {
 	this->destination_address = destination_address;
 }
 
 
-void EthernetFrame::set_source_address(MACAdressInterface *source_address) {
+void EthernetFrame::set_source_address(MACAddressInterface *source_address) {
 	this->source_address = source_address;
 }
 
@@ -105,10 +105,10 @@ int main(int argc, char *argv[]) {
 	std::array<unsigned char, 2> ipv4 = {0x01, 0x08};
 	e.set_ethertype(ipv4);
 
-	MACAdress destination;
+	MACAddress destination;
 	destination.set_address((std::array<unsigned char, 6>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
 
-	MACAdress source;
+	MACAddress source;
 	source.set_address((std::array<unsigned char, 6>){0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
 
 	EthernetFrame f1;

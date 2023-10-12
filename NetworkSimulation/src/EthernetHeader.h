@@ -27,19 +27,19 @@ private:
 public:
 	~EthernetFrame() {}
 
-	void set_destination_address(MACAdressInterface *destination_address) override;
+	void set_destination_address(MACAddressInterface *destination_address) override;
 
-	void set_source_address(MACAdressInterface *source_address) override;
+	void set_source_address(MACAddressInterface *source_address) override;
 
 	void set_ethertype(EthertypeInterface *ethertype) {
 		this->ethertype = ethertype;
 	}
 
-	MACAdressInterface* get_destination_address() override {
+	MACAddressInterface* get_destination_address() override {
 		return destination_address;
 	}
 
-	MACAdressInterface* get_source_address() override {
+	MACAddressInterface* get_source_address() override {
 		return source_address;
 	}
 

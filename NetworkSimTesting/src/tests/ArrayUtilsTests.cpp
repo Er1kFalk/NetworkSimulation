@@ -26,7 +26,6 @@ TEST (ArrayUtils, to_vector) {
 	EXPECT_THAT(ArrayUtils::to_vector(empty_array), testing::ElementsAreArray(empty_array)) << TestUtils::generate_error_msg("EMPTY ARRAY", errmsg);
 	EXPECT_THAT(ArrayUtils::to_vector(string_array), testing::ElementsAreArray(string_array)) << TestUtils::generate_error_msg("STRING ARRAY", errmsg);
 	EXPECT_THAT(ArrayUtils::to_vector(array_of_arrays), testing::ElementsAreArray(array_of_arrays)) << TestUtils::generate_error_msg("ARRAY OF ARRAYS", errmsg);
-
 }
 
 

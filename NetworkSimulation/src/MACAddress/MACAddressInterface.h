@@ -10,10 +10,10 @@
 #include <string>
 #include <stdexcept>
 
-#ifndef MACADRESSINTERFACE_H_
-#define MACADRESSINTERFACE_H_
+#ifndef MACADDRESSINTERFACE_H_
+#define MACADDRESSINTERFACE_H_
 
-class MACAdressInterface {
+class MACAddressInterface {
 private:
 	std::vector<unsigned char> address;
 public:
@@ -25,4 +25,4 @@ public:
 
 
 
-#endif /* MACADRESSINTERFACE_H_ */
+#endif /* MACADDRESSINTERFACE_H_ */

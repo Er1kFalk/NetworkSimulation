@@ -37,7 +37,7 @@ TEST (StringUtils, is_hex_symbol) {
 	}
 }
 
-// tests if char_repeats_in_string on the strings given by tests
+// tests if char_repeats_in_string on the strings given by tests (helper function for below test)
 // does_repeat specifies the char that repeats in the tests, and repeat_freq specifies the frequency of repetitions
 // does_not_repeat specifies a char that does not repeat
 void char_repeats_in_string_helper_tester(std::string testname, std::vector<std::string> tests, char does_repeat, int repeat_freq, char does_not_repeat) {

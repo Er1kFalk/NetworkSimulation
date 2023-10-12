@@ -5,13 +5,13 @@
  *      Author: erik
  */
 
-#include "MACAdress.h"
+#include "MACAddress.h"
 #include "../ArrayUtils/ArrayUtils.h"
 #include "../StringUtils/StringUtils.h"
 
-const int MACAdress::address_char_length = 17;
+const int MACAddress::address_char_length = 17;
 
-bool MACAdress::is_valid_mac_address(std::string address) {
+bool MACAddress::is_valid_mac_address(std::string address) {
 	if (address.length() != address_char_length) {
 		return false;
 	}
@@ -30,11 +30,11 @@ bool MACAdress::is_valid_mac_address(std::string address) {
 	return true;
 }
 
-void MACAdress::set_address(std::array<unsigned char, 6> address) {
+void MACAddress::set_address(std::array<unsigned char, 6> address) {
 	this->address = ArrayUtils::to_vector(address);
 }
 
-void MACAdress::set_address(std::string address) {
+void MACAddress::set_address(std::string address) {
 	if (!is_valid_mac_address(address)) {
 		throw std::invalid_argument("Invalid MAC address specified. Format should be ff:ff:ff:ff.");
 	}
