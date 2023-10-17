@@ -9,6 +9,7 @@
 
 #include "tests/StringUtilsTests.h"
 #include "tests/ArrayUtilsTests.h"
+#include "tests/MACAddressTests.h"
 
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);

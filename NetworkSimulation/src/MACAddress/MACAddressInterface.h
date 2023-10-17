@@ -18,8 +18,7 @@ private:
 	std::vector<unsigned char> address;
 public:
 	virtual bool is_valid_mac_address(std::string address) = 0;
-	virtual void set_address(std::array<unsigned char, 6> address) = 0;
-	virtual void set_address(std::string address) = 0;
+	virtual void set_address(std::vector<unsigned char> address) = 0;
 	virtual std::vector<unsigned char> get_address() = 0;
 };
 

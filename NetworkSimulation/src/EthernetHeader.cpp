@@ -87,49 +87,49 @@ std::vector<unsigned char> payload = {
 		0x00, 0x00
 };
 
-int main(int argc, char *argv[]) {
-////  EthernetFrame f{payload, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x23}, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x24}, {0x08, 0x00}};
-////  std::vector<unsigned char> pkt = f.get_ethernet_frame();
-////
-////  pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
-////  pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
-////
-////  struct pcap_pkthdr pcap_hdr;
-////  pcap_hdr.caplen = f.get_ethernet_frame_size();
-////  pcap_hdr.len = pcap_hdr.caplen;
-////
-////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
-////  pcap_dump_close(dumper);
+// int main(int argc, char *argv[]) {
+// ////  EthernetFrame f{payload, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x23}, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x24}, {0x08, 0x00}};
+// ////  std::vector<unsigned char> pkt = f.get_ethernet_frame();
+// ////
+// ////  pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
+// ////  pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
+// ////
+// ////  struct pcap_pkthdr pcap_hdr;
+// ////  pcap_hdr.caplen = f.get_ethernet_frame_size();
+// ////  pcap_hdr.len = pcap_hdr.caplen;
+// ////
+// ////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
+// ////  pcap_dump_close(dumper);
 
-	Ethertype e;
-	std::array<unsigned char, 2> ipv4 = {0x01, 0x08};
-	e.set_ethertype(ipv4);
+// 	Ethertype e;
+// 	std::array<unsigned char, 2> ipv4 = {0x01, 0x08};
+// 	e.set_ethertype(ipv4);
 
-	MACAddress destination;
-	destination.set_address((std::array<unsigned char, 6>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
+// 	MACAddress destination;
+// 	destination.set_address((std::array<unsigned char, 6>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
 
-	MACAddress source;
-	source.set_address((std::array<unsigned char, 6>){0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
+// 	MACAddress source;
+// 	source.set_address((std::array<unsigned char, 6>){0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
 
-	EthernetFrame f1;
-	f1.set_ethertype(&e);
-	f1.set_destination_address(&destination);
-	f1.set_source_address(&source);
-	f1.set_payload({0x04, 0x02});
+// 	EthernetFrame f1;
+// 	f1.set_ethertype(&e);
+// 	f1.set_destination_address(&destination);
+// 	f1.set_source_address(&source);
+// 	f1.set_payload({0x04, 0x02});
 
-	EthernetFrame f2;
-	f1.set_ethertype(&e);
-	f1.set_destination_address(&destination);
-	f1.set_source_address(&source);
-	f1.set_payload({0x05, 0x06});
+// 	EthernetFrame f2;
+// 	f1.set_ethertype(&e);
+// 	f1.set_destination_address(&destination);
+// 	f1.set_source_address(&source);
+// 	f1.set_payload({0x05, 0x06});
 
-	std::vector<std::vector<unsigned char>> print = f1.to_array();
-	for (auto v : print) {
-		for (auto c : v) {
-			std::cout << std::dec << c << "    ";
-		}
-		std::cout << std::endl;
-	}
+// 	std::vector<std::vector<unsigned char>> print = f1.to_array();
+// 	for (auto v : print) {
+// 		for (auto c : v) {
+// 			std::cout << std::dec << c << "  ";
+// 		}
+// 		std::cout << std::endl;
+// 	}
 
-	return 0;
-}
+// 	return 0;
+// }

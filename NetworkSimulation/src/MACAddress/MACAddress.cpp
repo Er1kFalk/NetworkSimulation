@@ -8,8 +8,11 @@
 #include "MACAddress.h"
 #include "../ArrayUtils/ArrayUtils.h"
 #include "../StringUtils/StringUtils.h"
+#include <sstream>
+#include <stdexcept>
 
 const int MACAddress::address_char_length = 17;
+const int MACAddress::address_octet_length = 6;
 
 bool MACAddress::is_valid_mac_address(std::string address) {
 	if (address.length() != address_char_length) {
@@ -30,12 +33,13 @@ bool MACAddress::is_valid_mac_address(std::string address) {
 	return true;
 }
 
-void MACAddress::set_address(std::array<unsigned char, 6> address) {
-	this->address = ArrayUtils::to_vector(address);
-}
-
-void MACAddress::set_address(std::string address) {
-	if (!is_valid_mac_address(address)) {
-		throw std::invalid_argument("Invalid MAC address specified. Format should be ff:ff:ff:ff.");
+/*
+PRE: ADDRESS VECTOR HAS 6 ELEMENTS
+POST: THE ADDRESS IN MACADDRESS IS SET TO THE ADDRESS USER INPUTTED
+*/
+void MACAddress::set_address(std::vector<unsigned char> address) {
+	if (address.size() != address_octet_length) {
+		throw std::invalid_argument("Address must have 6 octets (elements).");
 	}
+	this->address = address;
 }
