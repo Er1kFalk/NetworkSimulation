@@ -11,8 +11,8 @@
 #include <stdint.h>
 #include <map>
 #include <string>
-#include "Ethertype.h"
-#include "EthertypeInterface.h"
+#include "Ethertype/Ethertype.h"
+#include "Ethertype/EthertypeInterface.h"
 #include "CommunicationProtocol.h"
 #include "LANProtocol.h"
 
