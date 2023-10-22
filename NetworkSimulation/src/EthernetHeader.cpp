@@ -17,6 +17,11 @@
 #include <list>
 #include "ArrayUtils/ArrayUtils.h"
 #include "MACAddress/MACAddress.h"
+#include "IPv4Packet/IPv4PacketInterface.h"
+#include "IPv4Packet/IPv4Packet.h"
+#include "TrafficClass/TrafficClass.h"
+#include "ProtocolType/ProtocolType.h"
+#include "IPv4Address/IPv4Address.h"
 
 //	std::vector<unsigned char> calculate_fcs(std::vector<unsigned char> ethernet_frame) {
 //		uint32_t crc = crc32(0L, Z_NULL, 0);
@@ -49,14 +54,19 @@ void EthernetFrame::set_source_address(MACAddressInterface *source_address) {
 	this->source_address = source_address;
 }
 
-std::vector<std::vector<unsigned char>> EthernetFrame::to_array() {
-	std::vector<std::vector<unsigned char>> header_payload_array = {
-			get_destination_address()->get_address(),
-			get_source_address()->get_address(),
-			this->ethertype->get_ethertype(),
-			get_payload()
-	};
+std::vector<unsigned char> EthernetFrame::to_array() {
+	std::vector<unsigned char> header_payload_array;
+	for (unsigned char c : get_destination_address()->get_address()) {
+		header_payload_array.push_back(c);
+	}
 
+	for (unsigned char c : get_source_address()->get_address()) {
+		header_payload_array.push_back(c);
+	}
+	
+	for (unsigned char c : ethertype->get_ethertype()) {
+		header_payload_array.push_back(c);
+	}
 	return header_payload_array;
 }
 
@@ -87,49 +97,80 @@ std::vector<unsigned char> payload = {
 		0x00, 0x00
 };
 
-// int main(int argc, char *argv[]) {
-// ////  EthernetFrame f{payload, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x23}, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x24}, {0x08, 0x00}};
-// ////  std::vector<unsigned char> pkt = f.get_ethernet_frame();
-// ////
-// ////  pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
-// ////  pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
-// ////
-// ////  struct pcap_pkthdr pcap_hdr;
-// ////  pcap_hdr.caplen = f.get_ethernet_frame_size();
-// ////  pcap_hdr.len = pcap_hdr.caplen;
-// ////
-// ////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
-// ////  pcap_dump_close(dumper);
+int main(int argc, char *argv[]) {
+////  EthernetFrame f{payload, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x23}, {0x12, 0xAB, 0x12, 0x45, 0xBB, 0x24}, {0x08, 0x00}};
+////  std::vector<unsigned char> pkt = f.get_ethernet_frame();
+////
+////  pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
+////  pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
+////
+////  struct pcap_pkthdr pcap_hdr;
+////  pcap_hdr.caplen = f.get_ethernet_frame_size();
+////  pcap_hdr.len = pcap_hdr.caplen;
+////
+////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
+////  pcap_dump_close(dumper);
+	EthernetFrame etherframe;
+	EthertypeInterface *protocol = new Ethertype;
+	protocol->set_ethertype((std::vector<unsigned char>) {0x08, 0x00});
 
-// 	Ethertype e;
-// 	std::array<unsigned char, 2> ipv4 = {0x01, 0x08};
-// 	e.set_ethertype(ipv4);
+	MACAddressInterface *destination = new MACAddress;
+	destination->set_address((std::vector<unsigned char>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
 
-// 	MACAddress destination;
-// 	destination.set_address((std::array<unsigned char, 6>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
+	MACAddressInterface *source = new MACAddress;
+	source->set_address((std::vector<unsigned char>){0x01, 0x02, 0x03, 0x04, 0x05, 0x06});
 
-// 	MACAddress source;
-// 	source.set_address((std::array<unsigned char, 6>){0x06, 0x05, 0x04, 0x03, 0x02, 0x01});
+	etherframe.set_ethertype(protocol);
+	etherframe.set_destination_address(destination);
+	etherframe.set_source_address(source);
+	
+	IPv4PacketInterface *packet = new IPv4Packet;
+	TrafficClassInterface *tclass = new TrafficClass;
+	tclass->set_ds(0);
+	tclass->set_ecn(0);
 
-// 	EthernetFrame f1;
-// 	f1.set_ethertype(&e);
-// 	f1.set_destination_address(&destination);
-// 	f1.set_source_address(&source);
-// 	f1.set_payload({0x04, 0x02});
+	ProtocolTypeInterface *network_protocol = new ProtocolType;
+	network_protocol->set_protocol(0x01);
 
-// 	EthernetFrame f2;
-// 	f1.set_ethertype(&e);
-// 	f1.set_destination_address(&destination);
-// 	f1.set_source_address(&source);
-// 	f1.set_payload({0x05, 0x06});
+	IPv4AddressInterface *source_ip = new IPv4Address;
+	IPv4AddressInterface *destination_ip = new IPv4Address;
 
-// 	std::vector<std::vector<unsigned char>> print = f1.to_array();
-// 	for (auto v : print) {
-// 		for (auto c : v) {
-// 			std::cout << std::dec << c << "  ";
-// 		}
-// 		std::cout << std::endl;
-// 	}
+	source_ip->set_address({0x01, 0x02, 0x03, 0x04});
+	destination_ip->set_address({0xAB, 0xFF, 0xDD, 0x22});
 
-// 	return 0;
-// }
+	Data data;
+	data.set_data({0x01, 0x02, 0x04});
+	data.set_payload(nullptr);
+
+	packet->set_payload(&data);
+	packet->set_version();
+	packet->set_ihl();
+	packet->set_type_of_service(tclass);
+	packet->set_total_length();
+	packet->set_identification(0);
+	packet->set_df_flag(true);
+	packet->set_mf_flag(false);
+	packet->set_fragment_offset(0);
+	packet->set_time_to_live(64);
+	packet->set_protocol(network_protocol);
+	packet->set_header_checksum();
+	packet->set_source(source_ip);
+	packet->set_destination(destination_ip);
+
+	etherframe.set_payload(packet);
+
+	
+	//std::vector<unsigned char> print = packet->to_array();
+	CommunicationProtocol *print = &etherframe;
+	while(print != nullptr) {
+		std::vector<unsigned char> printarr = print->to_array();
+		for (unsigned char c : printarr) {
+			std::cout << std::hex << (int) c << " ";
+		}
+		std::cout << std::endl;
+
+		print = print->get_payload();
+	}
+
+	return 0;
+}

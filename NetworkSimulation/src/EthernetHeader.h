@@ -43,7 +43,7 @@ public:
 		return source_address;
 	}
 
-	std::vector<std::vector<unsigned char>> to_array() override;
+	std::vector<unsigned char> to_array() override;
 
 };
 

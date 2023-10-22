@@ -6,6 +6,7 @@
  */
 
 #include "MACAddress/MACAddressInterface.h"
+#include "CommunicationProtocol.h"
 
 #ifndef LANPROTOCOL_H_
 #define LANPROTOCOL_H_
