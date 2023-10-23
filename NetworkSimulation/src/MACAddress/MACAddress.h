@@ -12,15 +12,17 @@
 
 class MACAddress : public MACAddressInterface {
 private:
-	std::vector<unsigned char> address;
+	std::array<unsigned char, 6> address;
 	static const int address_char_length;
 	static const int address_octet_length;
 public:
-	bool is_valid_mac_address(std::string address);
-	void set_address(std::vector<unsigned char> address) override;
-	std::vector<unsigned char> get_address() override {
-		return address;
+	MACAddress(std::array<unsigned char, 6> address) {
+		this->address = address;
 	}
+
+	bool is_valid_mac_address(std::string address);
+	void set_address(std::array<unsigned char, 6> address) override {this->address = address;}
+	std::array<unsigned char, 6> get_address() override {return address;}
 };
 
 

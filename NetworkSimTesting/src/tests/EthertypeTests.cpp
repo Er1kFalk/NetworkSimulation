@@ -10,42 +10,19 @@
 #include "Ethertype/Ethertype.h"
 #include "../TestUtils/TestUtils.h"
 
-TEST(EthertypeInterface, userTriesToSetEthertypeWithVectorOfLengthTwo) {
+TEST(EthertypeInterface, userTriesToSetEthertype) {
     EthertypeInterface *e = new Ethertype;
 
-    std::vector<std::vector<unsigned char>> correct_ethertypes = {
+    std::vector<std::array<unsigned char, 2>> correct_ethertypes = {
         {0x01, 0x02},
         {0x11, 0xAB},
         {0x21, 0x0B},
         {0xFF, 0xD2}
     };
 
-    for (std::vector<unsigned char> eth : correct_ethertypes) {
+    for (std::array<unsigned char, 2> eth : correct_ethertypes) {
         e->set_ethertype(eth);
         EXPECT_THAT(e->get_ethertype(), testing::ElementsAreArray(eth)) << TestUtils::generate_error_msg("Correct Ethertype", "Ethertype should have been set, but wasn't");
-    }
-
-    delete e;
-}
-
-TEST(EthertypeInterface, userTriesToSetEthertypeWithVectorThatIsNotLengthTwo) {
-    EthertypeInterface *e = new Ethertype;
-    std::vector<std::vector<unsigned char>> wrong_ethertypes = {
-        {0x01}, // too short
-        {0x01, 0x02, 0x03}, // too long
-        {0x04, 0x05, 0xAB, 0x04} 
-    };
-
-    for (std::vector<unsigned char> eth : wrong_ethertypes) {
-        try {
-            e->set_ethertype(eth);
-            FAIL();
-        } catch (std::invalid_argument exc) {
-            std::ostringstream expected_err;
-            expected_err << "Ethertype should be " << e->get_octet_length() << " octets, but was " << eth.size() << " octets";
-            EXPECT_THAT(exc.what(), testing::StrEq(expected_err.str()));
-            EXPECT_THAT(e->get_ethertype(), testing::Not(testing::ElementsAreArray(eth)));
-        }
     }
 
     delete e;
@@ -81,7 +58,7 @@ TEST(EthertypeInterface, userTriesToSetEthertypeWithStringThatIsACommonEthertype
     for (int i = 0; i < accepted_strings.size(); i++) {
         e->set_ethertype(accepted_strings[i]);
         EXPECT_THAT(e->get_ethertype(), testing::ElementsAreArray(expected_ethertype_values[i]));
-        e->set_ethertype((std::vector<unsigned char>){0x00, 0x00}); // reset ethertype for next test
+        e->set_ethertype((std::array<unsigned char, 2>){0x00, 0x00}); // reset ethertype for next test
     }
 }
 
@@ -96,7 +73,7 @@ TEST(EthertypeInterface, UserTriesToSetEthertypeWithStringThatIsNotACommonEthert
     };
 
     for (std::string s : wrong_strings) {
-        std::vector<unsigned char> get_ether = e->get_ethertype();
+        std::array<unsigned char, 2> get_ether = e->get_ethertype();
         try {
             e->set_ethertype(s);
             FAIL();

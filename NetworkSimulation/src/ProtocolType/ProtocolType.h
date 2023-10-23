@@ -13,11 +13,13 @@
 class ProtocolType : public ProtocolTypeInterface {
 private:
     unsigned char protocol;
-    void set_protocol(unsigned char protocol) override {
-        this->protocol = protocol;
-    }
-    unsigned char get_protocol() {
-        return protocol;
+public:
+    void set_protocol(unsigned char protocol) override {this->protocol = protocol;}
+    std::array<unsigned char, 1> get_protocol_as_array() override {return {protocol};}
+    unsigned char get_protocol_as_char() override {return protocol;}
+
+    ProtocolType(unsigned char protocol) {
+        set_protocol(protocol);
     }
 };
 

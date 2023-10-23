@@ -1,11 +1,13 @@
 #include "IPv4Packet.h"
+#include <stdexcept>
 
 void IPv4Packet::set_version() {
-    this->version = 4;
+    unsigned char wanted_version = 4;
+    this->version_ihl &= wanted_version<<4; // set version at 4 upper bits
 }
 
 void IPv4Packet::set_ihl() {
-    this->ihl = 5; // always 5 w/o options
+    this->version_ihl &= 5; // always 5 w/o options
 }
 
 void IPv4Packet::set_type_of_service(TrafficClassInterface *t) {
@@ -13,7 +15,11 @@ void IPv4Packet::set_type_of_service(TrafficClassInterface *t) {
 }
 
 void IPv4Packet::set_total_length() {
-    int calc_total_length = this->get_payload()->to_array().size() + (int) this->ihl;
+    int calc_total_length = 0;
+    if (this->get_payload()) {
+        calc_total_length = this->get_payload()->to_array().size() + this->get_ihl();
+    }
+
     this->total_length = {
         (unsigned char) calc_total_length, // lower bits
         (unsigned char) (calc_total_length>>8)}; // upper bits
@@ -28,25 +34,28 @@ void IPv4Packet::set_identification(int prev_id) {
 
 void IPv4Packet::set_df_flag(bool b) {
     if (b) {
-        this->df_flag = 1;
+        this->flags |= 1<<1; // set 2nd lsb
     } else {
-        this->df_flag = 0;
+        this->flags &= ~(1<<1); // clear 2nd lsb
     }
 }
 
 void IPv4Packet::set_mf_flag(bool b) {
     if (b) {
-        this->mf_flag = 1;
+        this->flags |= 1; // set 1st lsb
     } else {
-        this->mf_flag = 0;
+        this->flags &= ~1; // clear 1st lsb
     }
 }
 
-void IPv4Packet::set_fragment_offset(int offset) {
-    this->offset = {
-        (unsigned char) offset,
+void IPv4Packet::set_fragment_offset(unsigned int offset) {
+    if (offset > (1<<13)-1) { // i.e. offset > 2^13-1 => more than 13 bits present
+        throw std::invalid_argument("Offset must be between 0 and 8191");
+    }
+    this->fragment_offset = {
+        (unsigned char) (offset >> 16),
         (unsigned char) (offset >> 8),
-        (unsigned char) (offset >> 16)
+        (unsigned char) offset
     };
 }
 
@@ -80,16 +89,19 @@ void IPv4Packet::set_destination(IPv4AddressInterface *address) {
     this->destination = address;
 }
 
+std::array<unsigned char, 3> IPv4Packet::get_flags_fragment_offset() {
+    std::array<unsigned char, 3> get_flags_fragment_offset = this->fragment_offset;
+    get_flags_fragment_offset[0] |= (flags<<5); // move the 3 lsb (where flags are stored) up to the 3 msb of the byte
+    return get_flags_fragment_offset;
+}
+
 std::vector<unsigned char> IPv4Packet::to_array() {
     std::vector<unsigned char> header_arr;
-    unsigned char version_ihl = 0;
-    version_ihl = version_ihl | (((unsigned char) (this->version))<<4);
-    version_ihl = version_ihl | ihl;
     
-    unsigned char flag_offset_tail = (offset[0] | (((unsigned char) df_flag) << 5)) | (((unsigned char) mf_flag) << 6);
+    std::array<unsigned char, 3> flag_offset = get_flags_fragment_offset();
 
-    header_arr.push_back(version_ihl);
-    header_arr.push_back(this->type_of_service->get_ds_ecn());
+    header_arr.push_back(this->version_ihl);
+    header_arr.push_back(this->type_of_service->get_traffic_class_as_char());
     for (unsigned char c : total_length) {
         header_arr.push_back(c);
     }
@@ -97,11 +109,11 @@ std::vector<unsigned char> IPv4Packet::to_array() {
     for (unsigned char c : identification) {
         header_arr.push_back(c);
     }
-    header_arr.push_back(flag_offset_tail);
-    header_arr.push_back(this->offset[1]);
-    header_arr.push_back(this->offset[2]);
+    for (unsigned char c : flag_offset) {
+        header_arr.push_back(c);
+    }
     header_arr.push_back(this->time_to_live);
-    header_arr.push_back(this->protocol->get_protocol());
+    header_arr.push_back(this->protocol->get_protocol_as_char());
     for (unsigned char c : header_checksum) {
         header_arr.push_back(c);
     }

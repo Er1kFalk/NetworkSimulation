@@ -5,6 +5,7 @@ set(SRCDIR_TEST src)
 set(SRCDIR_NETWORKSIM ../NetworkSimulation/src)
 file(GLOB SOURCES_TEST ${SRCDIR_TEST}/*.cpp ${SRCDIR_TEST}/*.h ${SRCDIR_TEST}/*/*.cpp ${SRCDIR_TEST}/*/*.h)
 file(GLOB SOURCES_NETWORKSIM ${SRCDIR_NETWORKSIM}/*.cpp ${SRCDIR_NETWORKSIM}/*.h ${SRCDIR_NETWORKSIM}/*/*.cpp ${SRCDIR_NETWORKSIM}/*/*.h)
+list(FILTER SOURCES_NETWORKSIM EXCLUDE REGEX ".*NetworkSimulator\\.cpp$") # exclude main file in networksimulation application
 
 add_executable(NetworkSimTesting
     ${SOURCES_TEST}

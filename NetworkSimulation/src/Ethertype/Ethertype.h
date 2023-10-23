@@ -15,19 +15,19 @@
 
 class Ethertype : public EthertypeInterface {
 private:
-	std::vector<unsigned char> ethertype;
-	static const std::vector<std::pair<std::string, std::vector<unsigned char>>> ethertype_common_values;
+	std::array<unsigned char, 2> ethertype;
+	static const std::vector<std::pair<std::string, std::array<unsigned char, 2>>> ethertype_common_values;
 public:
-	void set_ethertype(std::vector<unsigned char> ethertype) override;
+	Ethertype(std::array<unsigned char, 2> ethertype) {
+		this->ethertype = ethertype;
+	}
+
+	void set_ethertype(std::array<unsigned char, 2> ethertype) override {this->ethertype = ethertype;}
 
 	void set_ethertype(std::string ethertype) override;
 
-	std::vector<unsigned char> get_ethertype() override {
+	std::array<unsigned char, 2> get_ethertype() override {
 		return ethertype;
-	}
-
-	const int get_octet_length() {
-		return 2;
 	}
 };
 

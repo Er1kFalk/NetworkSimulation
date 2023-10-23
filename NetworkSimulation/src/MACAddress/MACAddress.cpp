@@ -32,14 +32,3 @@ bool MACAddress::is_valid_mac_address(std::string address) {
 	}
 	return true;
 }
-
-/*
-PRE: ADDRESS VECTOR HAS 6 ELEMENTS
-POST: THE ADDRESS IN MACADDRESS IS SET TO THE ADDRESS USER INPUTTED
-*/
-void MACAddress::set_address(std::vector<unsigned char> address) {
-	if (address.size() != address_octet_length) {
-		throw std::invalid_argument("Address must have 6 octets (elements).");
-	}
-	this->address = address;
-}

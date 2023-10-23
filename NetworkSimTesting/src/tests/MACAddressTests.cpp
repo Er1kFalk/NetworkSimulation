@@ -54,33 +54,11 @@ TEST(MACAddressInterface, is_valid_mac_address) {
 }
 
 TEST (MACAddressInterface, userTriesToSetAddressWithVectorOfLengthSix) {
-    std::vector<unsigned char> correct_address = {0x01, 0x02, 0xbb, 0x44, 0xbf, 0x4a};
+    std::array<unsigned char, 6> correct_address = {0x01, 0x02, 0xbb, 0x44, 0xbf, 0x4a};
 
     MACAddressInterface *m = new MACAddress;
 
     // when we set the (correct) address, the getter should return that address back when we call it afterwards
     m->set_address(correct_address);
     EXPECT_THAT(m->get_address(), testing::ElementsAreArray(correct_address));
-}
-
-TEST (MACAddressInterface, userTriesToSetAddressWithVectorOfLengthThatIsNotSix) {
-    std::vector<unsigned char> too_short_address = {0x01, 0x02, 0xbb, 0x44, 0xbf};
-    std::vector<unsigned char> too_long_address = {0x01, 0x02, 0xbb, 0x44, 0xbf, 0x4a, 0x23};
-    MACAddressInterface *m = new MACAddress;
-    // setting too short / too long addresses should give us invalid arg except
-    try {
-         m->set_address(too_short_address);
-         FAIL();
-    } catch (std::invalid_argument e) {
-        EXPECT_THAT(m->get_address(), testing::Not(testing::ElementsAreArray(too_short_address)));
-        EXPECT_STREQ(e.what(), "Address must have 6 octets (elements).");
-    }
-
-    try {
-         m->set_address(too_long_address);
-         FAIL();
-    } catch (std::invalid_argument e) {
-        EXPECT_THAT(m->get_address(), testing::Not(testing::ElementsAreArray(too_long_address)));
-        EXPECT_STREQ(e.what(), "Address must have 6 octets (elements).");
-    }
 }

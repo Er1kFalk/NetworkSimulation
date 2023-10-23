@@ -12,12 +12,13 @@
 
 class IPv4Address : public IPv4AddressInterface {
 private:
-    std::vector<unsigned char> address;
-    static const int address_size;
+    std::array<unsigned char, 4> address;
 public:
-    void set_address(std::vector<unsigned char> address) override;
-    std::vector<unsigned char> get_address() override {
-        return address;
+    void set_address(std::array<unsigned char, 4>  address) override {this->address = address;}
+    std::array<unsigned char, 4> get_address() override {return address;}
+
+    IPv4Address(std::array<unsigned char, 4> address) {
+        set_address(address);
     }
 };
 

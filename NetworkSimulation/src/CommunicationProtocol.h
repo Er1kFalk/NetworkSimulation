@@ -23,6 +23,11 @@ public:
 	CommunicationProtocol* get_payload () {
 		return payload;
 	}
+	
+
+	CommunicationProtocol(CommunicationProtocol *payload = nullptr) {
+		this->payload = payload;
+	}
 };
 
 class Data : public CommunicationProtocol {
@@ -34,6 +39,15 @@ public:
 	}
 	void set_data(std::vector<unsigned char> data) {
 		this->data = data;
+	}
+
+	Data(std::vector<unsigned char> data) {
+		set_data(data);
+	}
+
+	Data(std::vector<unsigned char> data, CommunicationProtocol *payload) {
+		set_data(data);
+		set_payload(payload);
 	}
 };
 
