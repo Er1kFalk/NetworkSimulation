@@ -10,7 +10,7 @@ void IPv4Packet::set_ihl() {
     this->version_ihl &= 5; // always 5 w/o options
 }
 
-void IPv4Packet::set_type_of_service(TrafficClassInterface *t) {
+void IPv4Packet::set_type_of_service(std::shared_ptr<TrafficClassInterface> t) {
     this->type_of_service = t;
 }
 
@@ -63,7 +63,7 @@ void IPv4Packet::set_time_to_live(unsigned char time_to_live) {
     this->time_to_live = time_to_live;
 }
 
-void IPv4Packet::set_protocol(ProtocolTypeInterface *p) {
+void IPv4Packet::set_protocol(std::shared_ptr<ProtocolTypeInterface> p) {
     this->protocol = p;
 }
 
@@ -81,11 +81,11 @@ void IPv4Packet::set_header_checksum() {
     this->header_checksum = {0x10, 0x20}; 
 }
 
-void IPv4Packet::set_source(IPv4AddressInterface *address) {
+void IPv4Packet::set_source(std::shared_ptr<IPv4AddressInterface> address) {
     this->source = address;
 }
 
-void IPv4Packet::set_destination(IPv4AddressInterface *address) {
+void IPv4Packet::set_destination(std::shared_ptr<IPv4AddressInterface> address) {
     this->destination = address;
 }
 
@@ -101,6 +101,7 @@ std::vector<unsigned char> IPv4Packet::to_array() {
     std::array<unsigned char, 3> flag_offset = get_flags_fragment_offset();
 
     header_arr.push_back(this->version_ihl);
+
     header_arr.push_back(this->type_of_service->get_traffic_class_as_char());
     for (unsigned char c : total_length) {
         header_arr.push_back(c);

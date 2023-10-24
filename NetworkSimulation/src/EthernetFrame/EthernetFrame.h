@@ -15,6 +15,8 @@
 #include "Ethertype/EthertypeInterface.h"
 #include "../CommunicationProtocol.h"
 #include "EthernetFrameInterface.h"
+#include <cassert>
+#include <memory>
 
 class EthernetFrame : public EthernetFrameInterface {
 private:
@@ -22,35 +24,35 @@ private:
 	static inline const uint8_t SOURCE_ADDRESS_SIZE = 6;
 	static inline const uint8_t ETHERTYPE_SIZE = 2;
 
-	MACAddressInterface *destination_address;
-	MACAddressInterface *source_address;
-	EthertypeInterface *ethertype;
+	std::shared_ptr<MACAddressInterface> destination_address;
+	std::shared_ptr<MACAddressInterface> source_address;
+	std::shared_ptr<EthertypeInterface> ethertype;
 
 public:
 	~EthernetFrame() {}
 
 	
 
-	void set_destination_address(MACAddressInterface *destination_address) override;
+	void set_destination_address(std::shared_ptr<MACAddressInterface> destination_address) override;
 
-	void set_source_address(MACAddressInterface *source_address) override;
+	void set_source_address(std::shared_ptr<MACAddressInterface> source_address) override;
 
-	void set_ethertype(EthertypeInterface *ethertype) override {
+	void set_ethertype(std::shared_ptr<EthertypeInterface> ethertype) override {
 		this->ethertype = ethertype;
 	}
 
-	MACAddressInterface* get_destination_address() override {
-		return destination_address;
+	std::shared_ptr<MACAddressInterface> get_destination_address() override {
+		return this->destination_address;
 	}
 
-	MACAddressInterface* get_source_address() override {
+	std::shared_ptr<MACAddressInterface> get_source_address() override {
 		return source_address;
 	}
 
-	EthernetFrame(MACAddressInterface *destination_address, MACAddressInterface *source_address, EthertypeInterface *ethertype, CommunicationProtocol *payload) {
-		set_destination_address(destination_address);
-		set_source_address(source_address);
-		set_ethertype(ethertype);
+	EthernetFrame(std::shared_ptr<MACAddressInterface> destination_address, std::shared_ptr<MACAddressInterface> source_address, std::shared_ptr<EthertypeInterface> ethertype, std::shared_ptr<CommunicationProtocol> payload) {
+		this->destination_address = destination_address;
+		this->source_address = source_address;
+		this->ethertype = ethertype;
 		set_payload(payload);
 	}
 

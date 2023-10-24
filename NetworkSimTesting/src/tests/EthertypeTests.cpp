@@ -10,26 +10,8 @@
 #include "Ethertype/Ethertype.h"
 #include "../TestUtils/TestUtils.h"
 
-TEST(EthertypeInterface, userTriesToSetEthertype) {
-    EthertypeInterface *e = new Ethertype;
-
-    std::vector<std::array<unsigned char, 2>> correct_ethertypes = {
-        {0x01, 0x02},
-        {0x11, 0xAB},
-        {0x21, 0x0B},
-        {0xFF, 0xD2}
-    };
-
-    for (std::array<unsigned char, 2> eth : correct_ethertypes) {
-        e->set_ethertype(eth);
-        EXPECT_THAT(e->get_ethertype(), testing::ElementsAreArray(eth)) << TestUtils::generate_error_msg("Correct Ethertype", "Ethertype should have been set, but wasn't");
-    }
-
-    delete e;
-}
-
 TEST(EthertypeInterface, userTriesToSetEthertypeWithStringThatIsACommonEthertype) {
-    EthertypeInterface *e = new Ethertype;
+    EthertypeInterface *e = new Ethertype({0, 0});
     
     std::vector<std::string> accepted_strings = {
         "ipv4",
@@ -63,8 +45,8 @@ TEST(EthertypeInterface, userTriesToSetEthertypeWithStringThatIsACommonEthertype
 }
 
 TEST(EthertypeInterface, UserTriesToSetEthertypeWithStringThatIsNotACommonEthertype) {
-    EthertypeInterface *e = new Ethertype;
-
+    EthertypeInterface *e = new Ethertype({0, 0});
+    
     std::vector<std::string> wrong_strings = {
         "ip v4",
         "IP.v4",

@@ -45,12 +45,12 @@
 
 
 
-void EthernetFrame::set_destination_address(MACAddressInterface *destination_address) {
+void EthernetFrame::set_destination_address(std::shared_ptr<MACAddressInterface> destination_address) {
 	this->destination_address = destination_address;
 }
 
 
-void EthernetFrame::set_source_address(MACAddressInterface *source_address) {
+void EthernetFrame::set_source_address(std::shared_ptr<MACAddressInterface> source_address) {
 	this->source_address = source_address;
 }
 

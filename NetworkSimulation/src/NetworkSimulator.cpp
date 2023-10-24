@@ -26,21 +26,23 @@ int main(int argc, char *argv[]) {
 ////
 ////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
 ////  pcap_dump_close(dumper);
-	EthernetFrameInterface *etherframe = new EthernetFrame(
-		new MACAddress({0x01, 0x02, 0x03, 0x04, 0x05, 0x06}),
-		new MACAddress({0x01, 0x02, 0x03, 0x04, 0x05, 0x06}),
-		new Ethertype({0x08, 0x00}),
-		new IPv4Packet(
-			new TrafficClass(0, 0),
+	std::shared_ptr<EthernetFrameInterface> etherframe(new EthernetFrame(
+		std::shared_ptr<MACAddressInterface>(new MACAddress({0x01, 0x02, 0x03, 0x04, 0x05, 0x06})),
+		std::shared_ptr<MACAddressInterface>(new MACAddress({0x01, 0x02, 0x03, 0x04, 0x05, 0x06})),
+		std::shared_ptr<EthertypeInterface>(new Ethertype({0x08, 0x00})),
+		std::shared_ptr<IPv4PacketInterface>(new IPv4Packet(
+			std::shared_ptr<TrafficClassInterface>(new TrafficClass(0, 0)),
 			0, // identification
 			false,
 			false,
 			0, // offset
 			64, // time_to_live
-			new ProtocolType(0x01),
-			new IPv4Address({0x01, 0x02, 0x03, 0x04}),
-			new IPv4Address({0xAB, 0xFF, 0xDD, 0x22}),
-			new Data({0x01, 0x02, 0x04})
+			std::shared_ptr<ProtocolTypeInterface>(new ProtocolType(0x01)),
+			std::shared_ptr<IPv4AddressInterface>(new IPv4Address({0x01, 0x02, 0x03, 0x04})),
+			std::shared_ptr<IPv4AddressInterface>(new IPv4Address({0xAB, 0xFF, 0xDD, 0x22})),
+			std::shared_ptr<CommunicationProtocol>(new Data({0x01, 0x02, 0x04}))
+		)
+		)
 	)
 	);
 	// EthertypeInterface *protocol = new Ethertype;
@@ -72,7 +74,7 @@ int main(int argc, char *argv[]) {
 	// etherframe->set_payload(packet);
 
 	
-	CommunicationProtocol *print = etherframe;
+	std::shared_ptr<CommunicationProtocol> print(etherframe);
 	while(print != nullptr) {
 		std::vector<unsigned char> printarr = print->to_array();
 		for (unsigned char c : printarr) {

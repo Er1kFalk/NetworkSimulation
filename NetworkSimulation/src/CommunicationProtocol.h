@@ -6,27 +6,23 @@
  */
 
 #include <vector>
+#include <memory>
 
 #ifndef COMMUNICATIONPROTOCOL_H_
 #define COMMUNICATIONPROTOCOL_H_
 
 class CommunicationProtocol {
 private:
-	CommunicationProtocol *payload;
+	std::shared_ptr<CommunicationProtocol> payload;
 public:
 	virtual ~CommunicationProtocol() = default;
 
 	virtual std::vector<unsigned char> to_array() = 0;
-	void set_payload(CommunicationProtocol *payload) {
+	void set_payload(std::shared_ptr<CommunicationProtocol> payload) {
 		this->payload = payload;
 	}
-	CommunicationProtocol* get_payload () {
+	std::shared_ptr<CommunicationProtocol> get_payload () {
 		return payload;
-	}
-	
-
-	CommunicationProtocol(CommunicationProtocol *payload = nullptr) {
-		this->payload = payload;
 	}
 };
 
@@ -45,7 +41,7 @@ public:
 		set_data(data);
 	}
 
-	Data(std::vector<unsigned char> data, CommunicationProtocol *payload) {
+	Data(std::vector<unsigned char> data, std::shared_ptr<CommunicationProtocol> payload) {
 		set_data(data);
 		set_payload(payload);
 	}

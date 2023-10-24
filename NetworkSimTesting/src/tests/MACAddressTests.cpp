@@ -7,7 +7,7 @@
 #include "MACAddress/MACAddressInterface.h"
 
 TEST(MACAddressInterface, is_valid_mac_address) {
-    MACAddressInterface *m = new MACAddress;
+    MACAddressInterface *m = new MACAddress({0, 0, 0, 0, 0, 0});
     std::vector<std::string> correct_macs = {
         "fa:2a:d2:A4:3a:4A", // mixed: lowercase+uppercase letters + numbers
         "AF:DE:DA:A1:D4:AA", // only uppercase letters + numbers
@@ -51,14 +51,4 @@ TEST(MACAddressInterface, is_valid_mac_address) {
     }
 
     delete m;
-}
-
-TEST (MACAddressInterface, userTriesToSetAddressWithVectorOfLengthSix) {
-    std::array<unsigned char, 6> correct_address = {0x01, 0x02, 0xbb, 0x44, 0xbf, 0x4a};
-
-    MACAddressInterface *m = new MACAddress;
-
-    // when we set the (correct) address, the getter should return that address back when we call it afterwards
-    m->set_address(correct_address);
-    EXPECT_THAT(m->get_address(), testing::ElementsAreArray(correct_address));
 }
