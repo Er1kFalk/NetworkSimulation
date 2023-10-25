@@ -1,15 +1,8 @@
 #include "EthernetFrame/EthernetFrameInterface.h"
 #include "EthernetFrame/EthernetFrame.h"
-#include "MACAddress/MACAddressInterface.h"
-#include "MACAddress/MACAddress.h"
 #include "IPv4Packet/IPv4PacketInterface.h"
 #include "IPv4Packet/IPv4Packet.h"
-#include "TrafficClass/TrafficClassInterface.h"
-#include "TrafficClass/TrafficClass.h"
-#include "ProtocolType/ProtocolTypeInterface.h"
-#include "ProtocolType/ProtocolType.h"
-#include "IPv4Address/IPv4AddressInterface.h"
-#include "IPv4Address/IPv4Address.h"
+#include "ProtocolConstants/ProtocolConstants.h"
 
 #include <iostream>
 
@@ -26,24 +19,25 @@ int main(int argc, char *argv[]) {
 ////
 ////  pcap_dump((u_char *)dumper, &pcap_hdr, pkt.data());
 ////  pcap_dump_close(dumper);
+
 	std::shared_ptr<EthernetFrameInterface> etherframe(new EthernetFrame(
-		std::shared_ptr<MACAddressInterface>(new MACAddress({0x01, 0x02, 0x03, 0x04, 0x05, 0x06})),
-		std::shared_ptr<MACAddressInterface>(new MACAddress({0x01, 0x02, 0x03, 0x04, 0x05, 0x06})),
-		std::shared_ptr<EthertypeInterface>(new Ethertype({0x08, 0x00})),
+		{0x01, 0x02, 0x03, 0x04, 0x05, 0x06},
+		{0x01, 0x02, 0x03, 0x04, 0x05, 0x06},
+		EthertypeConstants::IPv4,
 		std::shared_ptr<IPv4PacketInterface>(new IPv4Packet(
-			std::shared_ptr<TrafficClassInterface>(new TrafficClass(0, 0)),
-			0, // identification
+			0, // dscp
+			0, // ecn
+			0,
 			false,
 			false,
-			0, // offset
-			64, // time_to_live
-			std::shared_ptr<ProtocolTypeInterface>(new ProtocolType(0x01)),
-			std::shared_ptr<IPv4AddressInterface>(new IPv4Address({0x01, 0x02, 0x03, 0x04})),
-			std::shared_ptr<IPv4AddressInterface>(new IPv4Address({0xAB, 0xFF, 0xDD, 0x22})),
-			std::shared_ptr<CommunicationProtocol>(new Data({0x01, 0x02, 0x04}))
+			0,
+			64,
+			0x01,
+			{0x01, 0x02, 0x03, 0x04},
+			{0x01, 0x02, 0x03, 0x04},
+			std::shared_ptr<CommunicationProtocol>(new Data({0x11, 0x12, 0x13}))
 		)
-		)
-	)
+	))
 	);
 	// EthertypeInterface *protocol = new Ethertype;
 	// protocol->set_ethertype((std::array<unsigned char, 2>) {0x08, 0x00});

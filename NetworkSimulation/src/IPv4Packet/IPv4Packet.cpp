@@ -1,5 +1,7 @@
 #include "IPv4Packet.h"
 #include <stdexcept>
+#include <cassert>
+#include <algorithm>
 
 void IPv4Packet::set_version() {
     unsigned char wanted_version = 4;
@@ -10,8 +12,25 @@ void IPv4Packet::set_ihl() {
     this->version_ihl &= 5; // always 5 w/o options
 }
 
-void IPv4Packet::set_type_of_service(std::shared_ptr<TrafficClassInterface> t) {
-    this->type_of_service = t;
+void IPv4Packet::set_dscp(unsigned char dscp) {
+    if (dscp > (1<<6)-1) { // dscp values are between 0-63
+        throw std::invalid_argument("DSCP values must be between 0-63");
+    }
+    assert(dscp <= (1<<6)-1);
+
+    this->dscp_ecn &= ~(((1<<6)-1)<<2); // clear upper 6 bits
+    this->dscp_ecn |= (dscp << 2); // set upper 6 bits
+}
+
+void IPv4Packet::set_ecn(unsigned char ecn) {
+    if (ecn > (1<<2)-1) { // dscp values are between 0-3
+        // throw exception
+    }
+    assert(ecn <= (1<<2)-1);
+
+    this->dscp_ecn |= ecn; // dscp occupy upper 6 bits
+
+    assert(dscp_ecn & ((1<<2)-1) == ecn); // reading the two lower bits should give ecn
 }
 
 void IPv4Packet::set_total_length() {
@@ -34,17 +53,17 @@ void IPv4Packet::set_identification(int prev_id) {
 
 void IPv4Packet::set_df_flag(bool b) {
     if (b) {
-        this->flags |= 1<<1; // set 2nd lsb
+        this->flags_fragment_offset[0] |= 1<<6; // set 6th lsb
     } else {
-        this->flags &= ~(1<<1); // clear 2nd lsb
+        this->flags_fragment_offset[0] &= ~(1<<6); // clear 6th lsb
     }
 }
 
 void IPv4Packet::set_mf_flag(bool b) {
     if (b) {
-        this->flags |= 1; // set 1st lsb
+        this->flags_fragment_offset[0] |= 1<<5; // set 6th lsb
     } else {
-        this->flags &= ~1; // clear 1st lsb
+        this->flags_fragment_offset[0] &= ~(1<<5); // clear 6th lsb
     }
 }
 
@@ -52,8 +71,10 @@ void IPv4Packet::set_fragment_offset(unsigned int offset) {
     if (offset > (1<<13)-1) { // i.e. offset > 2^13-1 => more than 13 bits present
         throw std::invalid_argument("Offset must be between 0 and 8191");
     }
-    this->fragment_offset = {
-        (unsigned char) (offset >> 16),
+    flags_fragment_offset[0] &= ~((1<<5)-1);
+
+    this->flags_fragment_offset = {
+        (unsigned char) ((offset >> 16) | flags_fragment_offset[0]),
         (unsigned char) (offset >> 8),
         (unsigned char) offset
     };
@@ -63,8 +84,8 @@ void IPv4Packet::set_time_to_live(unsigned char time_to_live) {
     this->time_to_live = time_to_live;
 }
 
-void IPv4Packet::set_protocol(std::shared_ptr<ProtocolTypeInterface> p) {
-    this->protocol = p;
+void IPv4Packet::set_protocol(unsigned char protocol) {
+    this->protocol = protocol;
 }
 
 void IPv4Packet::set_header_checksum() {
@@ -81,48 +102,30 @@ void IPv4Packet::set_header_checksum() {
     this->header_checksum = {0x10, 0x20}; 
 }
 
-void IPv4Packet::set_source(std::shared_ptr<IPv4AddressInterface> address) {
-    this->source = address;
+unsigned char IPv4Packet::get_dscp() {
+    return this->dscp_ecn >> 2;
 }
 
-void IPv4Packet::set_destination(std::shared_ptr<IPv4AddressInterface> address) {
-    this->destination = address;
-}
-
-std::array<unsigned char, 3> IPv4Packet::get_flags_fragment_offset() {
-    std::array<unsigned char, 3> get_flags_fragment_offset = this->fragment_offset;
-    get_flags_fragment_offset[0] |= (flags<<5); // move the 3 lsb (where flags are stored) up to the 3 msb of the byte
-    return get_flags_fragment_offset;
+unsigned char IPv4Packet::get_ecn() {
+    return this->dscp_ecn & ((1<<2)-1); // return 2 lsb
 }
 
 std::vector<unsigned char> IPv4Packet::to_array() {
-    std::vector<unsigned char> header_arr;
-    
-    std::array<unsigned char, 3> flag_offset = get_flags_fragment_offset();
+    std::vector<unsigned char> header;
 
-    header_arr.push_back(this->version_ihl);
+	auto add_to_header = [&header](unsigned char elem) -> void {
+		header.push_back(elem);
+	};
+    add_to_header(version_ihl);
+    add_to_header(dscp_ecn);
+    std::for_each(this->total_length.begin(), this->total_length.end(), add_to_header);
+    std::for_each(this->identification.begin(), this->identification.end(), add_to_header);
+    std::for_each(this->flags_fragment_offset.begin(), this->flags_fragment_offset.end(), add_to_header);
+    add_to_header(this->time_to_live);
+    add_to_header(this->protocol);
+    std::for_each(this->header_checksum.begin(), this->header_checksum.end(), add_to_header);
+    std::for_each(this->source.begin(), this->source.end(), add_to_header);
+    std::for_each(this->destination.begin(), this->destination.end(), add_to_header);
 
-    header_arr.push_back(this->type_of_service->get_traffic_class_as_char());
-    for (unsigned char c : total_length) {
-        header_arr.push_back(c);
-    }
-
-    for (unsigned char c : identification) {
-        header_arr.push_back(c);
-    }
-    for (unsigned char c : flag_offset) {
-        header_arr.push_back(c);
-    }
-    header_arr.push_back(this->time_to_live);
-    header_arr.push_back(this->protocol->get_protocol_as_char());
-    for (unsigned char c : header_checksum) {
-        header_arr.push_back(c);
-    }
-    for (unsigned char c : source->get_address()) {
-        header_arr.push_back(c);
-    }
-    for (unsigned char c : destination->get_address()) {
-        header_arr.push_back(c);
-    }
-    return header_arr;
+    return header;
 }

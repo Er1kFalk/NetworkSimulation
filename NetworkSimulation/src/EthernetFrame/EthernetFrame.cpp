@@ -15,13 +15,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include <list>
-#include "ArrayUtils/ArrayUtils.h"
-#include "MACAddress/MACAddress.h"
-#include "IPv4Packet/IPv4PacketInterface.h"
-#include "IPv4Packet/IPv4Packet.h"
-#include "TrafficClass/TrafficClass.h"
-#include "ProtocolType/ProtocolType.h"
-#include "IPv4Address/IPv4Address.h"
 
 //	std::vector<unsigned char> calculate_fcs(std::vector<unsigned char> ethernet_frame) {
 //		uint32_t crc = crc32(0L, Z_NULL, 0);
@@ -43,31 +36,30 @@
 //		}
 //	}
 
-
-
-void EthernetFrame::set_destination_address(std::shared_ptr<MACAddressInterface> destination_address) {
-	this->destination_address = destination_address;
-}
-
-
-void EthernetFrame::set_source_address(std::shared_ptr<MACAddressInterface> source_address) {
-	this->source_address = source_address;
-}
-
 std::vector<unsigned char> EthernetFrame::to_array() {
-	std::vector<unsigned char> header_payload_array;
-	for (unsigned char c : get_destination_address()->get_address()) {
-		header_payload_array.push_back(c);
-	}
+	std::vector<unsigned char> header;
 
-	for (unsigned char c : get_source_address()->get_address()) {
-		header_payload_array.push_back(c);
-	}
+	auto add_to_header = [&header](unsigned char elem) -> void {
+		header.push_back(elem);
+	};
+
+	std::for_each(this->destination_address.begin(), this->destination_address.end(), add_to_header);
+	std::for_each(this->source_address.begin(), this->source_address.end(), add_to_header);
+	std::for_each(this->ethertype.begin(), this->ethertype.end(), add_to_header);
+
+
+	// for (unsigned char c : this->destination_address) {
+	// 	header_payload_array.push_back(c);
+	// }
+
+	// for (unsigned char c : this->source_address) {
+	// 	header_payload_array.push_back(c);
+	// }
 	
-	for (unsigned char c : ethertype->get_ethertype()) {
-		header_payload_array.push_back(c);
-	}
-	return header_payload_array;
+	// for (unsigned char c : this->ethertype) {
+	// 	header_payload_array.push_back(c);
+	// }
+	return header;
 }
 
 static const unsigned char pkt1[86] = {

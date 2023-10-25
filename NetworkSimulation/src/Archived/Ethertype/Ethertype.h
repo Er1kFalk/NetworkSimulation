@@ -16,7 +16,7 @@
 class Ethertype : public EthertypeInterface {
 private:
 	std::array<unsigned char, 2> ethertype;
-	static const std::vector<std::pair<std::string, std::array<unsigned char, 2>>> ethertype_common_values;
+	// static const std::vector<std::pair<ProtocolConstants::EthertypeName, std::array<unsigned char, 2>>> ethertype_common_values;
 public:
 	Ethertype(std::array<unsigned char, 2> ethertype) {
 		this->ethertype = ethertype;
@@ -24,7 +24,7 @@ public:
 
 	void set_ethertype(std::array<unsigned char, 2> ethertype) override {this->ethertype = ethertype;}
 
-	void set_ethertype(std::string ethertype) override;
+	// void set_ethertype(ProtocolConstants::EthertypeName ethertype) override;
 
 	std::array<unsigned char, 2> get_ethertype() override {
 		return ethertype;
