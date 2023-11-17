@@ -5,8 +5,9 @@
  *      Author: erik
  */
 
-#include "CommunicationProtocol.h"
+#include "../CommunicationProtocol.h"
 #include <memory>
+#include <stdint.h>
 
 #ifndef ETHERNETFRAMEINTERFACE_H_
 #define ETHERNETFRAMEINTERFACE_H_
@@ -20,6 +21,7 @@ public:
 	virtual void set_ethertype(std::array<unsigned char, 2> ethertype) = 0;
 	virtual std::array<unsigned char, 6> get_destination_address() = 0;
 	virtual std::array<unsigned char, 6> get_source_address() = 0;
+	virtual std::shared_ptr<EthernetFrameInterface> copy() = 0;
 };
 
 #endif /* ETHERNETFRAMEINTERFACE_H_ */

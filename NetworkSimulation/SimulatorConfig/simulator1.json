@@ -1,0 +1,28 @@
+{
+    "NODE_1" : {
+        "INIT_CONNECTION" : true,
+        "END_CONNECTION" : true,
+        "IP_ADDRESS" : "192.168.1.100",
+        "IP_INFO" : {
+            "TTL" : 128
+        },
+        "TCP_INFO" : {
+            "SOURCE_PORT" : "random",
+            "MSS" : 1460,
+            "PACKETS_SENT" : 8
+        }
+    },
+    "NODE_2" : {
+        "INIT_CONNECTION" : false,
+        "END_CONNECTION" : false,
+        "IP_ADDRESS" : "40.113.10.67",
+        "IP_INFO" : {
+            "TTL" : 64
+        },
+        "TCP_INFO" : {
+            "SOURCE_PORT" : 443,
+            "MSS" : 1440,
+            "PACKETS_SENT" : 10
+        }
+    }
+}

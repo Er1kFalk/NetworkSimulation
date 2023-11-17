@@ -26,6 +26,8 @@ private:
 	std::array<unsigned char, 6> source_address;
 	std::array<unsigned char, 2> ethertype;
 
+	std::shared_ptr<CommunicationProtocol> payload;
+
 public:
 	~EthernetFrame() {}
 
@@ -38,15 +40,21 @@ public:
 	std::array<unsigned char, 6> get_destination_address() override {return this->destination_address;}
 	std::array<unsigned char, 6> get_source_address() override {return source_address;}
 
-	EthernetFrame(std::array<unsigned char, 6> destination_address, std::array<unsigned char, 6> source_address, std::array<unsigned char, 2> ethertype, std::shared_ptr<CommunicationProtocol> payload = nullptr) {
-		this->destination_address = destination_address;
-		this->source_address = source_address;
-		this->ethertype = ethertype;
-		set_payload(payload);
+	EthernetFrame() {
+		this->destination_address = {0, 0, 0, 0, 0, 0};
+		this->source_address = {0, 0, 0, 0, 0, 0};
+		this->ethertype = {0, 0};
+		this->payload = nullptr;
 	}
 
-	std::vector<unsigned char> to_array() override;
+	std::vector<unsigned char> header_to_array() override;
+	std::vector<unsigned char> header_payload_to_array() override;
 
+	void set_payload(std::shared_ptr<CommunicationProtocol> payload) override {this->payload = payload;}
+    std::shared_ptr<CommunicationProtocol> get_payload() override {return this->payload;}
+	void recalculate_fields() override {}
+
+	std::shared_ptr<EthernetFrameInterface> copy() {return std::make_shared<EthernetFrame>(*this);}
 };
 
 
