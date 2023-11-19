@@ -26,15 +26,24 @@ unsigned char BitOperations::read_n_upper_bits (unsigned char byte, unsigned cha
 }
 
 unsigned char BitOperations::reset_n_lower_bits(unsigned char byte_to_change, unsigned char lower_bit_amount) {
+    if (lower_bit_amount > __CHAR_BIT__) {
+        throw std::invalid_argument("lower_bit_amount too large (>8)");
+    }
     return byte_to_change & ~((1<<lower_bit_amount)-1);
 }
 
 unsigned char BitOperations::set_n_lower_bits(unsigned char byte_to_change, unsigned char value_to_set, unsigned char lower_bit_amount) {
+    if (value_to_set > ((1 << lower_bit_amount)-1)) {
+        throw std::invalid_argument("Value too large for selected amount of bits");
+    }
     byte_to_change = reset_n_lower_bits(byte_to_change, lower_bit_amount);
     return byte_to_change | value_to_set;
 }
 
 unsigned char BitOperations::read_n_lower_bits (unsigned char byte, unsigned char lower_bit_amount) {
+    if (lower_bit_amount > __CHAR_BIT__) {
+        throw std::invalid_argument("at most 8 bits can be read from a char");
+    }
     return byte & ((1<<lower_bit_amount)-1);
 }
 
