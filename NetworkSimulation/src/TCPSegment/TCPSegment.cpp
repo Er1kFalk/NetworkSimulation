@@ -12,22 +12,22 @@ void TCPSegment::set_ipv4_pseudo_header(std::array<unsigned char, 4> source_ip_a
 
 void TCPSegment::set_source_port(uint16_t port) {
     // sets elements 0-1 to source port value
-    this->tcp_header = BitOperations::int16_to_char_vector(port, this->tcp_header, 0);
+    this->tcp_header = BitOperations::int16_into_char_vector(port, this->tcp_header, 0);
 }
 
 void TCPSegment::set_destination_port(uint16_t port) {
     // sets elements 2-3 to destination port value
-    this->tcp_header = BitOperations::int16_to_char_vector(port, this->tcp_header, 2);
+    this->tcp_header = BitOperations::int16_into_char_vector(port, this->tcp_header, 2);
 }
 
 void TCPSegment::set_sequence_nr(uint32_t seq) {
     // sets elements 4-7 to seq value
-    this->tcp_header = BitOperations::int32_to_char_vector(seq, this->tcp_header, 4);
+    this->tcp_header = BitOperations::int32_into_char_vector(seq, this->tcp_header, 4);
 }
 
 void TCPSegment::set_ack_nr(uint32_t ack) {
     // sets elements 8-11 to ack value
-    this->tcp_header = BitOperations::int32_to_char_vector(ack, this->tcp_header, 8);
+    this->tcp_header = BitOperations::int32_into_char_vector(ack, this->tcp_header, 8);
 }
 
 void TCPSegment::set_data_offset() {
@@ -83,7 +83,7 @@ void TCPSegment::set_fin_flag(bool b) {
 
 void TCPSegment::set_window_size(uint16_t wsize) {
     // set index 14-15 to window size
-    this->tcp_header = BitOperations::int16_to_char_vector(wsize, this->tcp_header, 14);
+    this->tcp_header = BitOperations::int16_into_char_vector(wsize, this->tcp_header, 14);
 }
 
 void TCPSegment::set_checksum() {
@@ -92,7 +92,7 @@ void TCPSegment::set_checksum() {
     for (unsigned char c : destination_ip_address) {pseudo_header.push_back(c);}
     pseudo_header.push_back(0);
     pseudo_header.push_back(0x06);
-    std::vector<unsigned char> tcplength = BitOperations::int16_to_char_vector(header_payload_to_array().size(), {0,0}, 0);
+    std::vector<unsigned char> tcplength = BitOperations::int16_into_char_vector(header_payload_to_array().size(), {0,0}, 0);
     for (unsigned char c : tcplength) {pseudo_header.push_back(c);}
 
 
@@ -101,12 +101,12 @@ void TCPSegment::set_checksum() {
         payload_arr = this->payload->header_payload_to_array();
     }
 
-    this->tcp_header = BitOperations::int16_to_char_vector(ProtocolUtils::calculate_internet_checksum(pseudo_header) + ProtocolUtils::calculate_internet_checksum(tcp_header) + ProtocolUtils::calculate_internet_checksum(payload_arr), this->tcp_header, 16);
+    this->tcp_header = BitOperations::int16_into_char_vector(ProtocolUtils::calculate_internet_checksum(pseudo_header) + ProtocolUtils::calculate_internet_checksum(tcp_header) + ProtocolUtils::calculate_internet_checksum(payload_arr), this->tcp_header, 16);
 }
 
 void TCPSegment::set_urgent_pointer(uint16_t urgent_pointer) {
     // set index 18-19 to urgent pointer
-    this->tcp_header = BitOperations::int16_to_char_vector(urgent_pointer, this->tcp_header, 18);
+    this->tcp_header = BitOperations::int16_into_char_vector(urgent_pointer, this->tcp_header, 18);
 
 }
 

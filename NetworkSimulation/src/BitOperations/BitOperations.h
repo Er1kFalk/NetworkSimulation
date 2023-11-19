@@ -33,9 +33,9 @@ namespace BitOperations {
 
     std::array<unsigned char, 4> int32_to_char_arr (uint32_t n);
     
-    std::vector<unsigned char> int16_to_char_vector (uint16_t n, std::vector<unsigned char> vec, uint32_t start_index);
+    std::vector<unsigned char> int16_into_char_vector (uint16_t n, std::vector<unsigned char> vec, uint32_t start_index);
 
-    std::vector<unsigned char> int32_to_char_vector (uint16_t n, std::vector<unsigned char> vec, uint32_t start_index);
+    std::vector<unsigned char> int32_into_char_vector (uint32_t n, std::vector<unsigned char> vec, uint32_t start_index);
 
     uint16_t char_arr_to_int16 (std::array<unsigned char, 2> arr);
 
