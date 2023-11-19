@@ -10,7 +10,7 @@ double RandomUtils::generate_uniform_number() {
     return unif(generator);
 }
 
-double RandomUtils::generate_normal_number(int mean, int stddev) {
+double RandomUtils::generate_normal_number(double mean, double stddev) {
     std::normal_distribution<double> norm(mean, stddev);
     return norm(generator);
 }

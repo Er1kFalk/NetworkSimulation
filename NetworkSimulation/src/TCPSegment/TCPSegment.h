@@ -16,6 +16,11 @@ class TCPSegment : public TCPSegmentInterface {
     std::vector<unsigned char> tcp_header;
     std::shared_ptr<CommunicationProtocol> payload;
 
+
+    /*For IPv4 pseudo header*/
+    std::array<unsigned char, 4> source_ip_address;
+    std::array<unsigned char, 4> destination_ip_address;
+
 public:
     TCPSegment() {
         this->tcp_header.resize(20); // default header size
@@ -27,6 +32,9 @@ public:
             assert(c == 0);
         }
     }
+
+    void set_ipv4_pseudo_header(std::array<unsigned char, 4> source_ip_address, std::array<unsigned char, 4> destination_ip_address) override;
+
 
     /*Setters*/
     void set_source_port(uint16_t port) override;

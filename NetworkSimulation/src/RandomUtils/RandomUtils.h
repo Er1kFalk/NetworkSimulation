@@ -10,7 +10,7 @@ public:
     RandomUtils();
 
     double generate_uniform_number();
-    double generate_normal_number(int mean, int stddev);
+    double generate_normal_number(double mean, double stddev);
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 #include "ProtocolConstants/ProtocolConstants.h"
 #include "BitOperations/BitOperations.h"
+#include "../../../NetworkSimulation/src/ProtocolUtils/ProtocolUtils.h"
 
 IPv4PacketHelper packet_helper;
 
@@ -95,11 +96,12 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithoutOptions) {
     ASSERT_EQ(args.payload->header_to_array().size(), 625);
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
+    stdpacket->recalculate_fields();
+
     // std header without options => no padding, ihl is always 5
     EXPECT_EQ(stdpacket->get_options().size(), 0); 
-    EXPECT_EQ(stdpacket->get_padding().size(), 0); 
     EXPECT_EQ(stdpacket->get_ihl(), 5);
-    EXPECT_THAT(stdpacket->get_total_length(), testing::ElementsAreArray({0x02, 0x85}));
+    EXPECT_THAT(stdpacket->get_total_length(), 0x0285);
 }
 
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsAMultipleOfFourOctets) {
@@ -111,11 +113,12 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsAMul
 
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
+    stdpacket->recalculate_fields();
+
     // std header without options => no padding, ihl is always 5
     EXPECT_THAT(stdpacket->get_options(), testing::ElementsAreArray({0x01, 0x02, 0x03, 0x04}));
-    EXPECT_EQ(stdpacket->get_padding().size(), 0); 
     EXPECT_EQ(stdpacket->get_ihl(), 6);
-    EXPECT_THAT(stdpacket->get_total_length(), testing::ElementsAreArray({0x02, 0x89}));
+    EXPECT_THAT(stdpacket->get_total_length(), 0x0289);
 }
 
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsNotAMultipleOfFourOctets) {
@@ -126,13 +129,12 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsNotA
     ASSERT_EQ(args.options.size(), 5); 
     
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
-
+    stdpacket->recalculate_fields();
 
     // std header without options => no padding, ihl is always 5
-    EXPECT_THAT(stdpacket->get_options(), testing::ElementsAreArray({0x01, 0x02, 0x03, 0x04, 0x05, 0x00}));
-    EXPECT_THAT(stdpacket->get_padding(), testing::ElementsAreArray({0x00, 0x00}));
+    EXPECT_THAT(stdpacket->get_options(), testing::ElementsAreArray({0x01, 0x02, 0x03, 0x04, 0x05, 0x00, 0x00, 0x00}));
     EXPECT_EQ(stdpacket->get_ihl(), 7);
-    EXPECT_THAT(stdpacket->get_total_length(), testing::ElementsAreArray({0x02, 0x8D}));
+    EXPECT_THAT(stdpacket->get_total_length(), 0x028D);
 }
 
 /*IDENTIFICATION USE CASES */
@@ -142,7 +144,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithIdentification62
     args.identfication_id = 625;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
-    EXPECT_THAT(stdpacket->get_identification(), testing::ElementsAreArray({0x02, 0x71}));
+    EXPECT_THAT(stdpacket->get_identification(), 0x0271);
 }
 
 
@@ -153,7 +155,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFTrueAndMFFalse
     args.mf = false;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
 
-    unsigned char flags = stdpacket->get_flags_fragment_offset()[0];
+    unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 6), 1); // df
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 5), 0); // mf
@@ -165,7 +167,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFFalseAndMFTrue
     args.mf = true;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
-    unsigned char flags = stdpacket->get_flags_fragment_offset()[0];
+    unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 6), 0); // df
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 5), 1); // mf
@@ -177,7 +179,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFFalseAndMFFals
     args.mf = false;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
-    unsigned char flags = stdpacket->get_flags_fragment_offset()[0];
+    unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 6), 0); // df
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 5), 0); // mf
@@ -189,7 +191,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFTrueAndMFTrue)
     args.mf = true;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
-    unsigned char flags = stdpacket->get_flags_fragment_offset()[0];
+    unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 6), 1); // df
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 5), 1); // mf
@@ -203,7 +205,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithMinFragmentOffse
     args.offset = IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MIN;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
-    EXPECT_THAT(stdpacket->get_flags_fragment_offset(), testing::ElementsAreArray({0x00, 0x00}));
+    EXPECT_EQ(stdpacket->get_fragment_offset(), 0);
 }
 
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithMaxFragmentOffsetAndNoSetFlags) {
@@ -213,7 +215,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithMaxFragmentOffse
     args.offset = IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX;
     std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
-    EXPECT_THAT(stdpacket->get_flags_fragment_offset(), testing::ElementsAreArray({0x1F, 0xFF}));
+    EXPECT_EQ(stdpacket->get_fragment_offset(), 0x1FFF);
 }
 
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithGreaterThanMaxFragmentOffsetAndNoSetFlags) {
@@ -231,4 +233,14 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithGreaterThanMaxFr
         EXPECT_STREQ(e.what(), "Offset must be between 0 and 8191");
     }
         
+}
+
+TEST(IPv4PacketInterface, userInitializesIPv4PacketAndChecksumIsCorrect) {
+    defaultPacketArgs args;
+
+    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+
+    stdpacket->recalculate_fields();
+
+    EXPECT_TRUE(ProtocolUtils::verify_internet_checksum(stdpacket->header_to_array(), 0)); // putting 0 here, since the checksum is included in header_to_array
 }

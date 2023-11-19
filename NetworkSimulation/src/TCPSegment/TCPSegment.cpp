@@ -1,6 +1,12 @@
 #include "TCPSegment.h"
 #include "../BitOperations/BitOperations.h"
 #include <iostream>
+#include "../ProtocolUtils/ProtocolUtils.h"
+
+void TCPSegment::set_ipv4_pseudo_header(std::array<unsigned char, 4> source_ip_address, std::array<unsigned char, 4> destination_ip_address) {
+    this->source_ip_address = source_ip_address;
+    this->destination_ip_address = destination_ip_address;
+}
 
 /*Setters*/
 
@@ -81,11 +87,25 @@ void TCPSegment::set_window_size(uint16_t wsize) {
 }
 
 void TCPSegment::set_checksum() {
+    std::vector<unsigned char> pseudo_header;
+    for (unsigned char c : source_ip_address) {pseudo_header.push_back(c);}
+    for (unsigned char c : destination_ip_address) {pseudo_header.push_back(c);}
+    pseudo_header.push_back(0);
+    pseudo_header.push_back(0x06);
+    std::vector<unsigned char> tcplength = BitOperations::int16_to_char_vector(header_payload_to_array().size(), {0,0}, 0);
+    for (unsigned char c : tcplength) {pseudo_header.push_back(c);}
 
+
+    std::vector<unsigned char> payload_arr = {};   
+    if (payload != nullptr) {
+        payload_arr = this->payload->header_payload_to_array();
+    }
+
+    this->tcp_header = BitOperations::int16_to_char_vector(ProtocolUtils::calculate_internet_checksum(pseudo_header) + ProtocolUtils::calculate_internet_checksum(tcp_header) + ProtocolUtils::calculate_internet_checksum(payload_arr), this->tcp_header, 16);
 }
 
 void TCPSegment::set_urgent_pointer(uint16_t urgent_pointer) {
-    // set index 16-17 to urgent pointer
+    // set index 18-19 to urgent pointer
     this->tcp_header = BitOperations::int16_to_char_vector(urgent_pointer, this->tcp_header, 18);
 
 }
@@ -182,5 +202,6 @@ std::shared_ptr<TCPSegmentInterface> TCPSegment::copy() {
 }
 
 void TCPSegment::recalculate_fields() {
+    set_data_offset();
     set_checksum();
 }

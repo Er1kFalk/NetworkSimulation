@@ -26,6 +26,8 @@ namespace IPv4Constants {
         const unsigned char ECN_MAX = 3;
         const uint16_t FRAGMENT_OFFSET_MAX = 8191;
         const uint16_t FRAGMENT_OFFSET_MIN = 0;
+        const uint16_t TOTAL_LENGTH_MAX = 65535;
+        const uint16_t TOTAL_LENGTH_MIN = 0;
     }
 }
 

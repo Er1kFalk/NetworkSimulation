@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <map>
 #include "../../IPv4Packet/IPv4PacketInterface.h"
 #include "../../CommunicationProtocol.h"
 #include "IPv4SimulatorTypeDefs.h"
@@ -17,6 +18,7 @@ protected:
     std::vector<IPv4EventRulePtr> event_rules;
     std::shared_ptr<IPv4PacketInterface> ipv4_packet;
     LinkLayer llayer;
+    static std::map<LinkLayer, IPv4EventRulePtr> pass_to_layer;
 public:
     void set_ipv4_packet(std::shared_ptr<IPv4PacketInterface> ipv4_packet, LinkLayer llayer) {
         this->ipv4_packet = ipv4_packet;

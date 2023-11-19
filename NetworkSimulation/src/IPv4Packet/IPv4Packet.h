@@ -7,48 +7,48 @@
 
 #include "IPv4PacketInterface.h"
 #include <stdint.h>
+#include <cassert>
 
 #ifndef IPV4PACKET_H_
 #define IPV4PACKET_H_
 
 class IPv4Packet : public IPv4PacketInterface {
 private:
-    unsigned char version_ihl;
-    unsigned char dscp_ecn; // type of service
-    std::array<unsigned char, 2> total_length;
-    std::array<unsigned char, 2> identification;
-    std::array<unsigned char, 2> flags_fragment_offset;
-    unsigned char time_to_live;
-    unsigned char protocol;
-    std::array<unsigned char, 2> header_checksum;
-    std::array<unsigned char, 4> source;
-    std::array<unsigned char, 4> destination;
-    std::vector<unsigned char> options;
-    std::vector<unsigned char> padding;
 
+    std::vector<unsigned char> ip_header;
+    std::vector<unsigned char> options;
     std::shared_ptr<CommunicationProtocol> payload;
 
     static const unsigned char default_header_size;
     static const unsigned char ip_version;
 public:
-    
+    IPv4Packet() {
+        this->ip_header.resize(20); // default header size
+        for (unsigned char& c : ip_header) {
+            c = 0;
+        }
+        
+        for (const unsigned char c : ip_header) {
+            assert(c == 0);
+        }
+    }
     std::vector<unsigned char> header_to_array() override;
 
-    unsigned char get_version() override {return this->version_ihl>>4;}
-    unsigned char get_ihl() override {return 0b1111 & this->version_ihl;}
-    unsigned char  get_dscp_ecn() override {return this->dscp_ecn;}
+    unsigned char get_version() override;
+    unsigned char get_ihl() override;
     unsigned char get_dscp() override;
     unsigned char get_ecn() override;
-    std::array<unsigned char, 2> get_total_length() override {return this->total_length;}
-    std::array<unsigned char, 2> get_identification() override {return this->identification;}
-    std::array<unsigned char, 2> get_flags_fragment_offset() override {return this->flags_fragment_offset;}
-    unsigned char get_time_to_live() override {return this->time_to_live;}
-    unsigned char get_protocol() override {return this->protocol;}
-    std::array<unsigned char, 2> get_header_checksum() override {return this->header_checksum;}
-    std::array<unsigned char, 4> get_source() override {return this->source;}
-    std::array<unsigned char, 4> get_destination() override {return this->destination;}
+    uint16_t get_total_length() override;
+    uint16_t get_identification() override;
+    bool get_df_flag() override;
+    bool get_mf_flag() override;
+    uint16_t get_fragment_offset() override;
+    unsigned char get_time_to_live() override;
+    unsigned char get_protocol() override;
+    uint16_t get_header_checksum() override;
+    std::vector<unsigned char> get_source() override;
+    std::vector<unsigned char> get_destination() override;
     std::vector<unsigned char> get_options() {return this->options;}
-    std::vector<unsigned char> get_padding() {return this->padding;}
 
     void set_version() override;
     void set_ihl() override;
@@ -64,8 +64,8 @@ public:
     void set_fragment_offset(uint16_t offset) override;
     void set_time_to_live(unsigned char time_to_live) override;
     void set_protocol(unsigned char protocol) override;
-    void set_source(std::array<unsigned char, 4> source) {this->source = source;}
-    void set_destination(std::array<unsigned char, 4> destination) {this->destination = destination;}
+    void set_source(std::vector<unsigned char> source) override;
+    void set_destination(std::vector<unsigned char> destination) override;
     void set_options(std::vector<unsigned char> options) override;
 
     void set_payload(std::shared_ptr<CommunicationProtocol> payload) override {

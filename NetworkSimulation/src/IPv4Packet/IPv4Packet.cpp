@@ -3,107 +3,181 @@
 #include <cassert>
 #include <algorithm>
 #include "../BitOperations/BitOperations.h"
+#include <iostream>
+#include "../ProtocolUtils/ProtocolUtils.h"
+#include "../ProtocolConstants/ProtocolConstants.h"
 
 const unsigned char IPv4Packet::default_header_size = 20; // IHL w/o options+padding (in octets, not in 32-bit blocks as IHL is measured in)
 const unsigned char IPv4Packet::ip_version = 4;
 void IPv4Packet::set_version() {
     // set upper 4 bits to wanted version
-    this->version_ihl = BitOperations::set_n_upper_bits(this->version_ihl, ip_version, 4);
+    this->ip_header[0] = BitOperations::set_n_upper_bits(this->ip_header[0], ip_version, 4);
+}
+
+unsigned char IPv4Packet::get_version() {
+    return BitOperations::read_n_upper_bits(this->ip_header[0], 4);
 }
 
 void IPv4Packet::set_ihl() {
-    int octet_amount = this->default_header_size + this->options.size() + this->padding.size();
+    int octet_amount = this->ip_header.size() + this->options.size();
     assert(octet_amount % 4 == 0); // header should ALWAYS be a multiple 32 bits / 4 octets - if not, something is wrong
     // set 4 lower bits to the amount of 4-octet / 32bit values
-    this->version_ihl = BitOperations::set_n_lower_bits(this->version_ihl, octet_amount/4, 4);
+    this->ip_header[0] = BitOperations::set_n_lower_bits(this->ip_header[0], octet_amount/4, 4);
+}
+
+unsigned char IPv4Packet::get_ihl() {
+    return BitOperations::read_n_lower_bits(this->ip_header[0], 4);
 }
 
 void IPv4Packet::set_dscp(unsigned char dscp) {
-    if (dscp > (1<<6)-1) { // dscp values are between 0-63
+    if (dscp > IPv4Constants::BoundaryConstants::DSCP_MAX) { // dscp values are between 0-63
         throw std::invalid_argument("DSCP values must be between 0-63");
     }
-    assert(dscp <= 63);
+    assert(dscp <= IPv4Constants::BoundaryConstants::DSCP_MAX);
 
     // set 6 upper bits to dscp
-    this->dscp_ecn = BitOperations::set_n_upper_bits(this->dscp_ecn, dscp, 6);
+    this->ip_header[1] = BitOperations::set_n_upper_bits(this->ip_header[1], dscp, 6);
+}
+
+unsigned char IPv4Packet::get_dscp() {
+    return BitOperations::read_n_upper_bits(this->ip_header[1], 6);
 }
 
 void IPv4Packet::set_ecn(unsigned char ecn) {
-    if (ecn > (1<<2)-1) { // dscp values are between 0-3
+    if (ecn > IPv4Constants::BoundaryConstants::ECN_MAX) { // ecn values are between 0-3
         throw std::invalid_argument("ECN values must be between 0-3");
     }
-    assert(ecn <= (1<<2)-1);
+    assert(ecn <= IPv4Constants::BoundaryConstants::ECN_MAX);
 
     // set 2 lower bits to ecn
-    this->dscp_ecn = BitOperations::set_n_lower_bits(this->dscp_ecn, ecn, 2);
+    this->ip_header[1] = BitOperations::set_n_lower_bits(this->ip_header[1], ecn, 2);
+    assert(BitOperations::read_n_lower_bits(this->ip_header[1], 2) == ecn); // reading the two lower bits should give ecn
+}
 
-    assert(dscp_ecn & ((1<<2)-1) == ecn); // reading the two lower bits should give ecn
+unsigned char IPv4Packet::get_ecn() {
+    return BitOperations::read_n_lower_bits(this->ip_header[1], 2);
 }
 
 void IPv4Packet::set_total_length() {
     // it is at least the header size
-    int calc_total_length = this->default_header_size + this->options.size() + this->padding.size();
+    int calc_total_length = this->default_header_size + this->options.size();
     if (this->get_payload()) { // plus the size of the data
         calc_total_length += this->get_payload()->header_payload_to_array().size();
     }
-    assert(calc_total_length <= (1<<16)-1); // should not be bigger than 2^16-1 (this cannot be stored in 2 octets)
+    assert(calc_total_length <= IPv4Constants::BoundaryConstants::TOTAL_LENGTH_MAX); // should not be bigger than 2^16-1 (this cannot be stored in 2 octets)
 
-    this->total_length = BitOperations::int16_to_char_arr(calc_total_length);
+    std::array<unsigned char, 2> total_length = BitOperations::int16_to_char_arr(calc_total_length);
+
+    ip_header[2] = total_length[0];
+    ip_header[3] = total_length[1];
+}
+
+uint16_t IPv4Packet::get_total_length() {
+    return BitOperations::char_vector_to_int16({ip_header[2], ip_header[3]}, 0);
 }
 
 void IPv4Packet::set_identification(uint16_t prev_id) {
-    this->identification = BitOperations::int16_to_char_arr(prev_id);
+    std::array<unsigned char, 2> identification = BitOperations::int16_to_char_arr(prev_id);
+
+    this->ip_header[4] = identification[0];
+    this->ip_header[5] = identification[1];
+}
+
+uint16_t IPv4Packet::get_identification() {
+    return BitOperations::char_vector_to_int16({ip_header[4], ip_header[5]}, 0);
 }
 
 void IPv4Packet::set_df_flag(bool b) {
-    this->flags_fragment_offset[0] = BitOperations::set_nth_lsb(this->flags_fragment_offset[0], 6, b); // set 2nd msb to 1 or 0 (depending on b)
+    this->ip_header[6] = BitOperations::set_nth_lsb(this->ip_header[6], 6, b); // set 2nd msb to 1 or 0 (depending on b)
+}
+
+bool IPv4Packet::get_df_flag() {
+    return BitOperations::read_nth_lsb(this->ip_header[6], 6);
 }
 
 void IPv4Packet::set_mf_flag(bool b) {
-    this->flags_fragment_offset[0] = BitOperations::set_nth_lsb(this->flags_fragment_offset[0], 5, b);
+    this->ip_header[6] = BitOperations::set_nth_lsb(this->ip_header[6], 5, b);
+}
+
+bool IPv4Packet::get_mf_flag() {
+    return BitOperations::read_nth_lsb(this->ip_header[6], 5);
 }
 
 void IPv4Packet::set_fragment_offset(uint16_t offset) {
-    if (offset > (1<<13)-1) { // i.e. offset > 2^13-1 => more than 13 bits present
+    if (offset > IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX) { // i.e. offset > 2^13-1 => more than 13 bits present
         throw std::invalid_argument("Offset must be between 0 and 8191");
     }
     // set 5 lower bits to value of 8 upper bits of offset
-    this->flags_fragment_offset[0] = (unsigned char) BitOperations::set_n_lower_bits(flags_fragment_offset[0], offset >> 8, 5);
-    this->flags_fragment_offset[1] = (unsigned char) offset;
+    this->ip_header[6] = (unsigned char) BitOperations::set_n_lower_bits(ip_header[6], offset >> 8, 5);
+    this->ip_header[7]  = (unsigned char) offset;
+}
+
+uint16_t IPv4Packet::get_fragment_offset() {
+    uint16_t fragment_offset = BitOperations::char_arr_to_int16({BitOperations::read_n_lower_bits(this->ip_header[6], 5), this->ip_header[7]});
+    
+    if (fragment_offset > IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX) {
+        throw std::invalid_argument("Offset must be between 0 and 8191");
+    }
+
+    return fragment_offset;
 }
 
 void IPv4Packet::set_time_to_live(unsigned char time_to_live) {
-    this->time_to_live = time_to_live;
+    this->ip_header[8] = time_to_live;
+}
+
+unsigned char IPv4Packet::get_time_to_live() {
+    return this->ip_header[8];
 }
 
 void IPv4Packet::set_protocol(unsigned char protocol) {
-    this->protocol = protocol;
+    this->ip_header[9] = protocol;
+}
+
+unsigned char IPv4Packet::get_protocol() {
+    return this->ip_header[9];
 }
 
 void IPv4Packet::set_header_checksum() {
+    this->ip_header[10] = 0; // make sure the checksum is 0 before we calculate the checksum over the entire header
+    this->ip_header[11] = 0; // otherwise an old checksum may be included in the calculation (!!)
+
     std::vector<unsigned char> header_arr = header_to_array();
-    unsigned int count = header_arr.size();
-    assert(count % 2 == 0); // it should be a multiple of 16 bytes
-    unsigned long int sum = 0;
-    unsigned int addr = 0;
-    while( count > 1 )  {
-        unsigned short val16bit = ((unsigned short) header_arr[addr])<<8 + header_arr[++addr];
-        /*  This is the inner loop */
-        sum += val16bit;
-        addr++;
-        count -= 2;
+    std::array<unsigned char, 2> checksum = BitOperations::int16_to_char_arr(ProtocolUtils::calculate_internet_checksum(header_arr));
+    this->ip_header[10] = checksum[0];
+    this->ip_header[11] = checksum[1];
+}
+
+uint16_t IPv4Packet::get_header_checksum() {
+    return BitOperations::char_arr_to_int16({ip_header[10], ip_header[11]});
+}
+
+void IPv4Packet::set_source(std::vector<unsigned char> source) {
+    if (source.size() != 4) {
+        throw std::invalid_argument("Source address must be of length 4");
     }
+    this->ip_header[12] = source[0];
+    this->ip_header[13] = source[1];
+    this->ip_header[14] = source[2];
+    this->ip_header[15] = source[3];
+}
 
-    /*  Fold 32-bit sum to 16 bits */
-    while (sum>>16)
-        sum = (sum & 0xffff) + (sum >> 16);
+std::vector<unsigned char> IPv4Packet::get_source() {
+    return {this->ip_header[12], this->ip_header[13], this->ip_header[14], this->ip_header[15]};
+}
 
-    sum = ~sum;
-    
-    this->header_checksum = {
-        (unsigned char) (sum >> 8),
-        (unsigned char) sum
-    };
+void IPv4Packet::set_destination(std::vector<unsigned char> destination) {
+    if (destination.size() != 4) {
+        throw std::invalid_argument("Source address must be of length 4");
+    }
+    this->ip_header[16] = destination[0];
+    this->ip_header[17] = destination[1];
+    this->ip_header[18] = destination[2];
+    this->ip_header[19] = destination[3];
+}
+
+std::vector<unsigned char> IPv4Packet::get_destination() {
+    return {this->ip_header[16], this->ip_header[17], this->ip_header[18], this->ip_header[19]};
 }
 
 void IPv4Packet::set_options(std::vector<unsigned char> options) {
@@ -116,38 +190,17 @@ void IPv4Packet::set_options(std::vector<unsigned char> options) {
 void IPv4Packet::set_padding() {
     unsigned char rest = this->options.size() % 4;
     for (unsigned char i = 0; i < rest; i++) {
-        this->padding.push_back(0); // add padding until a multiple of 32 bits
+        this->options.push_back(0); // add padding until a multiple of 32 bits
     }
     assert(this->header_to_array().size() % 4 == 0); // the header should be a multiple of 32 bits after adding padding
 }
 
-unsigned char IPv4Packet::get_dscp() {
-    return BitOperations::read_n_upper_bits(this->dscp_ecn, 6);
-}
 
-unsigned char IPv4Packet::get_ecn() {
-    return BitOperations::read_n_lower_bits(this->dscp_ecn, 2);
-}
 
 std::vector<unsigned char> IPv4Packet::header_to_array() {
-    std::vector<unsigned char> header;
-
-	auto add_to_header = [&header](unsigned char elem) -> void {
-		header.push_back(elem);
-	};
-    add_to_header(version_ihl);
-    add_to_header(dscp_ecn);
-    std::for_each(this->total_length.begin(), this->total_length.end(), add_to_header);
-    std::for_each(this->identification.begin(), this->identification.end(), add_to_header);
-    std::for_each(this->flags_fragment_offset.begin(), this->flags_fragment_offset.end(), add_to_header);
-    add_to_header(this->time_to_live);
-    add_to_header(this->protocol);
-    std::for_each(this->header_checksum.begin(), this->header_checksum.end(), add_to_header);
-    std::for_each(this->source.begin(), this->source.end(), add_to_header);
-    std::for_each(this->destination.begin(), this->destination.end(), add_to_header);
-    std::for_each(this->options.begin(), this->options.end(), add_to_header);
-    std::for_each(this->padding.begin(), this->padding.end(), add_to_header);
-    return header;
+    std::vector<unsigned char> ip_header_with_options = ip_header;
+    for (unsigned char c : options) {ip_header_with_options.push_back(c);}
+    return ip_header_with_options;
 }
 
 std::vector<unsigned char> IPv4Packet::header_payload_to_array() {

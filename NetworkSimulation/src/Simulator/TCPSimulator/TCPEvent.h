@@ -3,6 +3,8 @@
 
 #include <tuple>
 #include <memory>
+#include <map>
+
 #include "../../TCPSegment/TCPSegmentInterface.h"
 #include "../../TCPSegment/TCPSegment.h"
 #include "../BaseScheduler/Event.h"
@@ -52,6 +54,7 @@ protected:
     std::shared_ptr<TCPState> current_server_state;
     NetworkLayer nlayer; // network protocol to pass TCP data to
     Transmitter tx; // indicates whether client or server is transmitting
+    static std::map<std::tuple<NetworkLayer, Transmitter>, TCPEventRulePtr> pass_to_layer;
 public:
     TCPEvent(std::shared_ptr<TCPState> current_client_state, std::shared_ptr<TCPState> current_server_state, NetworkLayer nlayer) {
         this->current_client_state = current_client_state;

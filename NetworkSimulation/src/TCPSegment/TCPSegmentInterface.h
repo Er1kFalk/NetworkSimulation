@@ -16,6 +16,8 @@ class TCPSegmentInterface : public CommunicationProtocol {
 private:
 
 public:
+    virtual void set_ipv4_pseudo_header(std::array<unsigned char, 4> source_address, std::array<unsigned char, 4> destination_address) = 0;
+
     /*Setters*/
     virtual void set_source_port(uint16_t port) = 0;
     virtual void set_destination_port(uint16_t port) = 0;
