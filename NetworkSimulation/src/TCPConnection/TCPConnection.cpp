@@ -14,12 +14,12 @@ TCPConnection::TCPConnection(uint16_t client_source_port, uint16_t client_destin
 
 	client_state->set_source_port(client_source_port); // random
 	client_state->set_destination_port(client_destination_port);
-	client_state->set_seq_nr(231321); // random
+	client_state->set_sequence_nr(231321); // random
     client_state->set_window_size(65465);
 
 	server_state->set_source_port(client_destination_port);
 	server_state->set_destination_port(client_source_port);
-	server_state->set_seq_nr(231321); // random
+	server_state->set_sequence_nr(231321); // random
     server_state->set_window_size(65465);
 }
 
@@ -51,7 +51,7 @@ void TCPConnection::set_syn_ack_packet() {
 
 void TCPConnection::set_ack_packet() {
 	client_state->set_ack_nr(server_state->get_sequence_nr() + 1);
-    client_state->set_seq_nr(client_state->get_sequence_nr() + 1);
+    client_state->set_sequence_nr(client_state->get_sequence_nr() + 1);
 	client_state->set_syn_flag(false);
 	client_state->set_ack_flag(true);
 }
@@ -85,7 +85,7 @@ void TCPConnection::three_way_handshake() {
 void TCPConnection::send_data(int packetnr_client, int packetnr_server) {
 	double packet_failure_prob = 0.01;
 	for (int i = 0; i < packetnr_client; i++) {
-        client_state->set_seq_nr(server_state->get_ack_nr());
+        client_state->set_sequence_nr(server_state->get_ack_nr());
         set_data_packet(client_state);
 		add_segment_to_client_trace(client_state);
 
@@ -96,7 +96,7 @@ void TCPConnection::send_data(int packetnr_client, int packetnr_server) {
 	}
 
 	for (int i = 0; i < packetnr_server; i++) {
-        server_state->set_seq_nr(client_state->get_ack_nr());
+        server_state->set_sequence_nr(client_state->get_ack_nr());
 		set_data_packet(server_state);
 		add_segment_to_server_trace(server_state);
 

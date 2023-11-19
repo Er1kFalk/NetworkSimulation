@@ -31,4 +31,11 @@ namespace IPv4Constants {
     }
 }
 
+namespace TCPConstants {
+    namespace BoundaryConstants {
+        const char DATA_OFFSET_MIN = 0;
+        const char DATA_OFFSET_MAX = 15;
+    }
+}
+
 #endif /* PROTOCOLCONSTANTS_H_ */

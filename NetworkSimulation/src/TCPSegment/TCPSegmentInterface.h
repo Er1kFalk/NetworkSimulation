@@ -21,7 +21,7 @@ public:
     /*Setters*/
     virtual void set_source_port(uint16_t port) = 0;
     virtual void set_destination_port(uint16_t port) = 0;
-    virtual void set_seq_nr(uint32_t seq) = 0;
+    virtual void set_sequence_nr(uint32_t seq) = 0;
     virtual void set_ack_nr(uint32_t seq) = 0;
     virtual void set_data_offset() = 0;
 

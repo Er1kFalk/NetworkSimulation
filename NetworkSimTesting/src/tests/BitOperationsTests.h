@@ -1,0 +1,5 @@
+#ifndef BITOPERATIONSTESTS_H_
+#define BITOPERATIONSTESTS_H_
+
+
+#endif

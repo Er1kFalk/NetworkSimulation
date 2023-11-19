@@ -3,15 +3,25 @@
 #include <sstream>
 
 unsigned char BitOperations::reset_n_upper_bits(unsigned char byte_to_change, unsigned char upper_bit_amount) {
+    if (upper_bit_amount > __CHAR_BIT__) {
+        throw std::invalid_argument("upper_bit_amount too large (>8)");
+    }
+    
     return byte_to_change & ~((1<<upper_bit_amount)-1 << (__CHAR_BIT__-upper_bit_amount));
 }
 
 unsigned char BitOperations::set_n_upper_bits(unsigned char byte_to_change, unsigned char value_to_set, unsigned char upper_bit_amount) {
+    if (value_to_set > ((1 << upper_bit_amount)-1)) {
+        throw std::invalid_argument("Value too large for selected amount of bits");
+    }
     byte_to_change = reset_n_upper_bits(byte_to_change, upper_bit_amount);
     return byte_to_change | (value_to_set << (__CHAR_BIT__ -upper_bit_amount));
 }
 
 unsigned char BitOperations::read_n_upper_bits (unsigned char byte, unsigned char upper_bit_amount) {
+    if (upper_bit_amount > __CHAR_BIT__) {
+        throw std::invalid_argument("at most 8 bits can be read from a char");
+    }
     return byte >> (__CHAR_BIT__-upper_bit_amount);
 }
 

@@ -20,7 +20,7 @@ void TCPSegment::set_destination_port(uint16_t port) {
     this->tcp_header = BitOperations::int16_to_char_vector(port, this->tcp_header, 2);
 }
 
-void TCPSegment::set_seq_nr(uint32_t seq) {
+void TCPSegment::set_sequence_nr(uint32_t seq) {
     // sets elements 4-7 to seq value
     this->tcp_header = BitOperations::int32_to_char_vector(seq, this->tcp_header, 4);
 }

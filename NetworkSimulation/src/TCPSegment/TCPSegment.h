@@ -39,7 +39,7 @@ public:
     /*Setters*/
     void set_source_port(uint16_t port) override;
     void set_destination_port(uint16_t port) override;
-    void set_seq_nr(uint32_t seq) override;
+    void set_sequence_nr(uint32_t seq) override;
     void set_ack_nr(uint32_t ack) override;
     void set_data_offset() override;
 

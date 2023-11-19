@@ -64,12 +64,12 @@ public:
 
         // this->current_client_state->set_source_port(client_source_port);
         // this->current_client_state->set_destination_port(client_destination_port);
-	    // this->current_client_state->set_seq_nr(231321); // random
+	    // this->current_client_state->set_sequence_nr(231321); // random
         // this->current_client_state->set_window_size(65465);
 
         // this->current_server_state->set_source_port(client_destination_port);
 	    // this->current_server_state->set_destination_port(client_source_port);
-	    // this->current_server_state->set_seq_nr(231321); // random
+	    // this->current_server_state->set_sequence_nr(231321); // random
         // this->current_server_state->set_window_size(65465);
     }
 

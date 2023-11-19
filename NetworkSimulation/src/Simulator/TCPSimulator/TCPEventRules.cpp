@@ -21,7 +21,7 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     syn_segment->set_ack_flag(false);
 	syn_segment->set_ack_nr(0);
     uint32_t seqnr = generator->generate_uniform_number() * (double) ((1ul<<32)-1);
-    syn_segment->set_seq_nr(seqnr);
+    syn_segment->set_sequence_nr(seqnr);
     syn_segment->set_ipv4_pseudo_header({0x1, 0x2, 0x3,0x4}, {0x4, 0x3, 0x2, 0x1}); // determined by generator file
     syn_segment->recalculate_fields();
 
@@ -86,7 +86,7 @@ void SendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
 
     current_client_state->set_ack_nr(current_server_state->get_sequence_nr() + 1);
-    current_client_state->set_seq_nr(current_client_state->get_sequence_nr() + 1);
+    current_client_state->set_sequence_nr(current_client_state->get_sequence_nr() + 1);
 	current_client_state->set_syn_flag(false);
 	current_client_state->set_ack_flag(true);
 
