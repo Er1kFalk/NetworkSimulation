@@ -16,13 +16,13 @@ class TCPSegmentInterface : public CommunicationProtocol {
 private:
 
 public:
-    virtual void set_ipv4_pseudo_header(std::array<unsigned char, 4> source_address, std::array<unsigned char, 4> destination_address) = 0;
+    virtual void set_ipv4_pseudo_header(std::vector<unsigned char> source_address, std::vector<unsigned char> destination_address) = 0;
 
     /*Setters*/
     virtual void set_source_port(uint16_t port) = 0;
     virtual void set_destination_port(uint16_t port) = 0;
     virtual void set_sequence_nr(uint32_t seq) = 0;
-    virtual void set_ack_nr(uint32_t seq) = 0;
+    virtual void set_acknowledgement_nr(uint32_t seq) = 0;
     virtual void set_data_offset() = 0;
 
     virtual void set_cwr_flag(bool b) = 0;
@@ -38,11 +38,13 @@ public:
     virtual void set_checksum() = 0;
     virtual void set_urgent_pointer(uint16_t urgent_pointer) = 0;
 
+    virtual void set_options(std::vector <unsigned char> options) = 0;
+
     /*Getters*/
     virtual uint16_t get_source_port() = 0;
     virtual uint16_t get_destination_port() = 0;
     virtual uint32_t get_sequence_nr() = 0;
-    virtual uint32_t get_ack_nr() = 0;
+    virtual uint32_t get_acknowledgement_nr() = 0;
     virtual unsigned char get_data_offset() = 0;
 
     virtual bool get_cwr_flag() = 0;

@@ -3,9 +3,22 @@
 #include <iostream>
 #include "../ProtocolUtils/ProtocolUtils.h"
 
-void TCPSegment::set_ipv4_pseudo_header(std::array<unsigned char, 4> source_ip_address, std::array<unsigned char, 4> destination_ip_address) {
-    this->source_ip_address = source_ip_address;
-    this->destination_ip_address = destination_ip_address;
+void TCPSegment::set_ipv4_pseudo_header(std::vector<unsigned char> source_ip_address, std::vector<unsigned char> destination_ip_address) {
+    if (source_ip_address.size() != 4) {
+        throw std::invalid_argument("source_ip_address must be of size 4");
+    } else if (destination_ip_address.size() != 4) {
+        throw std::invalid_argument("destination_ip_address must be of size 4");
+    }
+    assert(source_ip_address.size() == 4 && destination_ip_address.size() == 4);
+
+    this->ipv4_pseudo_header = {};
+    for (unsigned char c : source_ip_address) {ipv4_pseudo_header.push_back(c);}
+    for (unsigned char c : destination_ip_address) {ipv4_pseudo_header.push_back(c);}
+    ipv4_pseudo_header.push_back(0);
+    ipv4_pseudo_header.push_back(0x06);
+    
+    std::vector<unsigned char> tcplength = BitOperations::int16_into_char_vector(header_payload_to_array().size(), {0,0}, 0);
+    for (unsigned char c : tcplength) {ipv4_pseudo_header.push_back(c);}
 }
 
 /*Setters*/
@@ -25,7 +38,7 @@ void TCPSegment::set_sequence_nr(uint32_t seq) {
     this->tcp_header = BitOperations::int32_into_char_vector(seq, this->tcp_header, 4);
 }
 
-void TCPSegment::set_ack_nr(uint32_t ack) {
+void TCPSegment::set_acknowledgement_nr(uint32_t ack) {
     // sets elements 8-11 to ack value
     this->tcp_header = BitOperations::int32_into_char_vector(ack, this->tcp_header, 8);
 }
@@ -87,27 +100,32 @@ void TCPSegment::set_window_size(uint16_t wsize) {
 }
 
 void TCPSegment::set_checksum() {
-    std::vector<unsigned char> pseudo_header;
-    for (unsigned char c : source_ip_address) {pseudo_header.push_back(c);}
-    for (unsigned char c : destination_ip_address) {pseudo_header.push_back(c);}
-    pseudo_header.push_back(0);
-    pseudo_header.push_back(0x06);
-    std::vector<unsigned char> tcplength = BitOperations::int16_into_char_vector(header_payload_to_array().size(), {0,0}, 0);
-    for (unsigned char c : tcplength) {pseudo_header.push_back(c);}
-
-
-    std::vector<unsigned char> payload_arr = {};   
-    if (payload != nullptr) {
-        payload_arr = this->payload->header_payload_to_array();
+    if (this->ipv4_pseudo_header.size() != 12) {
+        throw std::invalid_argument("cannot calculate checksum when ipv4 pseudo header not set");
     }
 
-    this->tcp_header = BitOperations::int16_into_char_vector(ProtocolUtils::calculate_internet_checksum(pseudo_header) + ProtocolUtils::calculate_internet_checksum(tcp_header) + ProtocolUtils::calculate_internet_checksum(payload_arr), this->tcp_header, 16);
+    std::vector<unsigned char> data_to_calculate_checksum_over = ipv4_pseudo_header;
+
+    // add tcp to it
+    std::vector<unsigned char> tcp_segment = header_payload_to_array();
+    if (tcp_segment.size() % 2 != 0) { // pad it with 0 if uneven
+        tcp_segment.push_back(0);
+    }
+    assert(tcp_segment.size() % 2 == 0);
+
+    for (unsigned char c : tcp_segment) {data_to_calculate_checksum_over.push_back(c);}
+
+    this->tcp_header = BitOperations::int16_into_char_vector(ProtocolUtils::calculate_internet_checksum(data_to_calculate_checksum_over), this->tcp_header, 16);
 }
 
 void TCPSegment::set_urgent_pointer(uint16_t urgent_pointer) {
     // set index 18-19 to urgent pointer
     this->tcp_header = BitOperations::int16_into_char_vector(urgent_pointer, this->tcp_header, 18);
 
+}
+
+void TCPSegment::set_options(std::vector <unsigned char> options) {
+    this->options = options;
 }
 
 
@@ -128,7 +146,7 @@ uint32_t TCPSegment::get_sequence_nr() {
     return BitOperations::char_vector_to_int32(this->tcp_header, 4);
 }
 
-uint32_t TCPSegment::get_ack_nr() {
+uint32_t TCPSegment::get_acknowledgement_nr() {
     // convert octet 8-11 to int
     return BitOperations::char_vector_to_int32(this->tcp_header, 8);
 }

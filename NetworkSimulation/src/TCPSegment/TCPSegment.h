@@ -14,12 +14,12 @@
 #include <cassert>
 class TCPSegment : public TCPSegmentInterface {
     std::vector<unsigned char> tcp_header;
+    std::vector<unsigned char> options;
     std::shared_ptr<CommunicationProtocol> payload;
 
 
     /*For IPv4 pseudo header*/
-    std::array<unsigned char, 4> source_ip_address;
-    std::array<unsigned char, 4> destination_ip_address;
+    std::vector<unsigned char> ipv4_pseudo_header;
 
 public:
     TCPSegment() {
@@ -33,14 +33,14 @@ public:
         }
     }
 
-    void set_ipv4_pseudo_header(std::array<unsigned char, 4> source_ip_address, std::array<unsigned char, 4> destination_ip_address) override;
+    void set_ipv4_pseudo_header(std::vector<unsigned char> source_ip_address, std::vector<unsigned char> destination_ip_address) override;
 
 
     /*Setters*/
     void set_source_port(uint16_t port) override;
     void set_destination_port(uint16_t port) override;
     void set_sequence_nr(uint32_t seq) override;
-    void set_ack_nr(uint32_t ack) override;
+    void set_acknowledgement_nr(uint32_t ack) override;
     void set_data_offset() override;
 
     void set_cwr_flag(bool b) override;
@@ -56,11 +56,13 @@ public:
     void set_checksum() override;
     void set_urgent_pointer(uint16_t urgent_pointer) override;
 
+    void set_options(std::vector <unsigned char> options) override;
+
     /*getters*/
     uint16_t get_source_port() override;
     uint16_t get_destination_port() override;
     uint32_t get_sequence_nr() override;
-    uint32_t get_ack_nr() override;
+    uint32_t get_acknowledgement_nr() override;
     unsigned char get_data_offset() override;
 
     bool get_cwr_flag() override;

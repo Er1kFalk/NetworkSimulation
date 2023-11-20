@@ -40,17 +40,17 @@ void TCPConnection::add_segment_to_server_trace(std::shared_ptr<TCPSegmentInterf
 void TCPConnection::set_init_syn_packet() {
 	client_state->set_syn_flag(true);
 	client_state->set_ack_flag(false);
-	client_state->set_ack_nr(0);
+	client_state->set_acknowledgement_nr(0);
 }
 
 void TCPConnection::set_syn_ack_packet() {
-	server_state->set_ack_nr(client_state->get_sequence_nr() + 1);
+	server_state->set_acknowledgement_nr(client_state->get_sequence_nr() + 1);
 	server_state->set_syn_flag(true);
 	server_state->set_ack_flag(true);
 }
 
 void TCPConnection::set_ack_packet() {
-	client_state->set_ack_nr(server_state->get_sequence_nr() + 1);
+	client_state->set_acknowledgement_nr(server_state->get_sequence_nr() + 1);
     client_state->set_sequence_nr(client_state->get_sequence_nr() + 1);
 	client_state->set_syn_flag(false);
 	client_state->set_ack_flag(true);
@@ -85,25 +85,25 @@ void TCPConnection::three_way_handshake() {
 void TCPConnection::send_data(int packetnr_client, int packetnr_server) {
 	double packet_failure_prob = 0.01;
 	for (int i = 0; i < packetnr_client; i++) {
-        client_state->set_sequence_nr(server_state->get_ack_nr());
+        client_state->set_sequence_nr(server_state->get_acknowledgement_nr());
         set_data_packet(client_state);
 		add_segment_to_client_trace(client_state);
 
         server_state->set_ack_flag(true);
         server_state->set_syn_flag(false);
-		server_state->set_ack_nr(server_state->get_ack_nr() + client_state->get_payload()->header_payload_to_array().size());
+		server_state->set_acknowledgement_nr(server_state->get_acknowledgement_nr() + client_state->get_payload()->header_payload_to_array().size());
 		add_segment_to_server_trace(server_state);
 	}
 
 	for (int i = 0; i < packetnr_server; i++) {
-        server_state->set_sequence_nr(client_state->get_ack_nr());
+        server_state->set_sequence_nr(client_state->get_acknowledgement_nr());
 		set_data_packet(server_state);
 		add_segment_to_server_trace(server_state);
 
         client_state->set_payload(nullptr);
         client_state->set_ack_flag(true);
         client_state->set_syn_flag(false);
-		client_state->set_ack_nr(client_state->get_ack_nr() + server_state->get_payload()->header_payload_to_array().size());
+		client_state->set_acknowledgement_nr(client_state->get_acknowledgement_nr() + server_state->get_payload()->header_payload_to_array().size());
 		add_segment_to_client_trace(client_state);
 	}
 }

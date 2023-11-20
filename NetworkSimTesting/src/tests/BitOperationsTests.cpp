@@ -325,12 +325,12 @@ TEST(BitOperations, userRetrievesIndex2And3In3ElementVector) {
 /*
 char_vector_to_int32
 */
-TEST(BitOperations, userRetrievesIndex2And3In6ElementVector) {
+TEST(BitOperations, userRetrievesIndex2To5In6ElementVector) {
     uint32_t x = BitOperations::char_vector_to_int32({0x01, 0x02, 0x03, 0x04, 0x05, 0x06}, 2);
     EXPECT_EQ(x, 0x03040506ul);
 }
 
-TEST(BitOperations, userRetrievesIndex2And3In5ElementVector) {
+TEST(BitOperations, userRetrievesIndex2To5In5ElementVector) {
     try {
         BitOperations::char_vector_to_int32({0x01, 0x02, 0x03, 0x04, 0x05}, 2);
         FAIL();
