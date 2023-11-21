@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "wayneEnums.hpp"
+#include "../WayneUtils/wayneEnums.hpp"
 
 
 class PCAPWriter {

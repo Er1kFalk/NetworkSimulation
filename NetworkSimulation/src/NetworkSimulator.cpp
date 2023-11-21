@@ -12,8 +12,6 @@
 #include "PCAPWriter/PCAPWriter.h"
 
 #include <bits/stdc++.h>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <iostream>
 
@@ -200,10 +198,11 @@ int main(int argc, char *argv[]) {
 	std::vector<unsigned char> source = {0x01, 0x02, 0x03, 0x04};
 	std::vector<unsigned char> destination = {0x01, 0x02, 0x03, 0x04};
 
+	auto n1configs = std::shared_ptr<ConfigReader>(new ConfigReader({"../SimulatorConfig/"}));
 
 	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter("./test.pcap", wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
 	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({1,2}, NetworkLayer::IPv4));
-	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer));
+	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer, n1configs));
 	m->initialize();
 
 	std::shared_ptr<TCPState> client = std::shared_ptr<TCPState>(new TCPState(std::shared_ptr<TCPSegment>(new TCPSegment)));

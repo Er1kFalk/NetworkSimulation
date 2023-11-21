@@ -15,31 +15,9 @@
 #include <pcap/pcap.h>
 #include <iostream>
 
-// std::shared_ptr<BaseScheduler> NetworkNodeSimulator::get_next_scheduler() {
-//     std::shared_ptr<BaseScheduler> next_scheduler = nullptr;
-//     uint64_t next_time = std::numeric_limits<uint64_t>::max();
-//     for (auto scheduler : schedulers) {
-//         if (scheduler->contains_events()) {
-//             if (scheduler->get_scheduler_time() < next_time) {
-//                 next_time = scheduler->get_scheduler_time();
-//                 next_scheduler = scheduler;
-//             }
-//         }
-//     }
-//     return next_scheduler;
-// }
-
 void NetworkNodeSimulator::initialize() {
     scheduler = std::shared_ptr<BaseScheduler>(new BaseScheduler());
     scheduler->set_parent(shared_from_this());
-
-    // scheduler_ipv4 = std::shared_ptr<BaseScheduler>(new BaseScheduler());
-    // scheduler_ipv4->set_parent(shared_from_this());
-
-    // scheduler_tcp = std::shared_ptr<BaseScheduler>(new BaseScheduler());
-    // scheduler_tcp->set_parent(shared_from_this());
-
-    // schedulers = {scheduler_tcp, scheduler_ipv4, scheduler};
 }
 
 void NetworkNodeSimulator::run() {
@@ -48,11 +26,12 @@ void NetworkNodeSimulator::run() {
     }
 }
 
-NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter) {
+NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader) {
     this->np = np;
     this->time_sec = 0;
     this->time_us = 0;
     this->pcapwriter = pcapwriter;
+    this->confreader = confreader;
 }
 
 
@@ -62,23 +41,6 @@ receiver redirecting to pcap
 */
 
 void NetworkNodeSimulator::receive_message(std::vector<unsigned char> data, uint32_t time_s, uint32_t time_us) {
-    // pcap_t *handle = pcap_open_dead(DLT_EN10MB, 1 << 16);
-    // pcap_dumper_t *dumper = pcap_dump_open(handle, "./test.pcap");
-
-    
-    // struct pcap_pkthdr pcap_hdr;
-    // struct timeval timestamp;
-    // timestamp.tv_sec = time_s;
-    // timestamp.tv_usec = time;
-
-    // pcap_hdr.caplen = data.size();
-    // pcap_hdr.len = pcap_hdr.caplen;
-    // pcap_hdr.ts = timestamp;
-
-    // pcap_dump((u_char *)dumper, &pcap_hdr, data.data());
-
-    // pcap_dump_close(dumper);
-
     this->pcapwriter->write_packet(data, time_s, time_us);
 }
 

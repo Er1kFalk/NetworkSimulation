@@ -4,38 +4,22 @@
 #include <tuple>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include "GeneratorFileStruct.h"
 
-struct IPInfo {
-    std::vector<unsigned char> ip_address;
-    std::vector<unsigned char> ttl_values;
-};
-
-struct TCPInfo {
-    uint16_t source_port;
-    uint16_t destination_port;
-    uint16_t mss;
-    uint16_t packets_sent;
-};
-
-struct Transmitter {
-    bool init_connection;
-    bool end_connection;
-    std::array<unsigned char, 6> mac_address;
-    IPInfo ip_info;
-	TCPInfo tcp_info;
-};
-
-struct GeneratorFileStruct {
-    Transmitter client;
-    Transmitter server;
-};
 
 class ConfigReader {
 private:
     static uint32_t id;
-    GeneratorFileStruct generatorfile;
+    std::vector<GFStructs::GeneratorFile> generatorfiles;
+    std::vector<std::string> folders;
 
+    /*The operator BOOST use to go into (nested) json objects*/
     static const std::string NEST_OPERATOR;
+
+    /* JSON KEYS*/
+    static const std::string CONNECTION_OFFSET_SEC_KEY; /*seconds*/
+    static const std::string CONNECTION_OFFSET_USEC_KEY; /*microseconds*/
+    static const std::string REPEATS_AFTER_KEY; /*in sec_KEYonds*/
     static const std::string CLIENT_KEY;
     static const std::string SERVER_KEY;
     static const std::string INIT_CONNECTION_KEY;
@@ -48,8 +32,11 @@ private:
     static const std::string MSS_KEY;
     static const std::string PACKETS_SENT_KEY;
 
+    /*Given a list of json keys, it makes a path that can be used 
+    to read the corresponding value in a nested json structure*/
     std::string jsonpath(std::vector<std::string> v);
 
+    /*function to convert json list to a c++ vector*/
     template<typename T>
     std::vector<T> read_json_list(std::string key, boost::property_tree::ptree json) {
         std::vector<T> v;
@@ -61,11 +48,11 @@ private:
         return v;
     }
 
-    Transmitter read_transmitter_from_generator_file(std::string filename, std::string transmitter_key);
+    GFStructs::Transmitter read_transmitter_from_generator_file(std::string transmitter_key, boost::property_tree::ptree json);
     void read_generator_file(std::string filename);
-public:
     void read_generator_files(std::string folder);
-
+public:
+    ConfigReader(std::vector<std::string> folders);
 };
 
 #endif

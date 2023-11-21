@@ -11,8 +11,8 @@
 #include <algorithm>
 #include <limits>
 
-class TCPScheduler;
-class IPv4Scheduler;
+#include "../../ConfigReader/ConfigReader.h"
+
 class NetworkProperties;
 class BaseScheduler;
 class CommunicationProtocol;
@@ -22,9 +22,6 @@ class IPv4PacketInterface;
 class Event;
 class PCAPWriter;
 
-
-typedef std::variant<std::shared_ptr<TCPScheduler>, std::shared_ptr<IPv4Scheduler>> Scheduler;
-
 class NetworkNodeSimulator : public std::enable_shared_from_this<NetworkNodeSimulator> {
 private:
     std::shared_ptr<NetworkProperties> np;
@@ -32,11 +29,10 @@ private:
     uint32_t time_sec; // seconds
     uint32_t time_us; // microseconds
     std::shared_ptr<PCAPWriter> pcapwriter;
-
-    std::shared_ptr<BaseScheduler> get_next_scheduler();
+    std::shared_ptr<ConfigReader> confreader;
 
 public:
-    NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter);
+    NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader);
 
     void initialize();
 
