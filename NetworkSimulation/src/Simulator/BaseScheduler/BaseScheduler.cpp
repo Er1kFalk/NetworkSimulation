@@ -18,7 +18,8 @@ void BaseScheduler::schedule(std::shared_ptr<Event> e, uint32_t time_s, uint32_t
         time_s++;
         time_us-=1000000;
     }
-    EventQueueElement x = EventQueueElement(e, 0,0);
+    
+    EventQueueElement x = EventQueueElement(e, this->scheduler_time_sec+time_s, this->scheduler_time_us + time_us);
     this->events.push(x);
 }
 

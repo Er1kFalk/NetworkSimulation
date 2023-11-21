@@ -19,6 +19,7 @@ public:
     void set_event_rules(std::vector<EthernetEventRulePtr> event_rules)  {this->event_rules = event_rules;}
     std::vector<EthernetEventRulePtr> get_event_rules() {return this->event_rules;}
     void apply_rules(std::shared_ptr<BaseScheduler> scheduler) override;
+    std::shared_ptr<EthernetEvent> copy();
 };
 
 #endif

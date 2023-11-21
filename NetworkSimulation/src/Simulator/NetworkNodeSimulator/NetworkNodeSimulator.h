@@ -28,11 +28,12 @@ private:
     std::shared_ptr<BaseScheduler> scheduler;
     uint32_t time_sec; // seconds
     uint32_t time_us; // microseconds
+    uint32_t max_gen_time; // seconds
     std::shared_ptr<PCAPWriter> pcapwriter;
     std::shared_ptr<ConfigReader> confreader;
 
 public:
-    NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader);
+    NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time);
 
     void initialize();
 

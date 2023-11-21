@@ -20,9 +20,8 @@ protected:
     LinkLayer llayer;
     static std::map<LinkLayer, IPv4EventRulePtr> pass_to_layer;
 public:
-    void set_ipv4_packet(std::shared_ptr<IPv4PacketInterface> ipv4_packet, LinkLayer llayer) {
+    void set_ipv4_packet(std::shared_ptr<IPv4PacketInterface> ipv4_packet) {
         this->ipv4_packet = ipv4_packet;
-        this->llayer = llayer;
     }
     std::shared_ptr<IPv4PacketInterface> get_ipv4_packet() {return ipv4_packet;}
     void set_event_rules(std::vector<IPv4EventRulePtr> event_rules)  {this->event_rules = event_rules;}
@@ -30,6 +29,7 @@ public:
     void set_llayer(LinkLayer llayer) {this->llayer = llayer;}
     LinkLayer get_llayer() {return this->llayer;}
     void apply_rules(std::shared_ptr<BaseScheduler> scheduler) override;
+    std::shared_ptr<IPv4Event> copy();
 };
 
 #endif

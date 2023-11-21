@@ -9,7 +9,7 @@
 
 class ConfigReader {
 private:
-    static uint32_t id;
+    static uint32_t id; // MAYBE not needed
     std::vector<GFStructs::GeneratorFile> generatorfiles;
     std::vector<std::string> folders;
 
@@ -53,6 +53,7 @@ private:
     void read_generator_files(std::string folder);
 public:
     ConfigReader(std::vector<std::string> folders);
+    std::vector<GFStructs::GeneratorFile> get_generatorfiles() {return generatorfiles;}
 };
 
 #endif

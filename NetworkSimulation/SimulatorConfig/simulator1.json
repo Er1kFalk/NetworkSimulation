@@ -1,7 +1,8 @@
 {
-    "CONNECTION_OFFSET_SEC" : 123,
+    "CONNECTION_OFFSET_SEC" : 10,
     "CONNECTION_OFFSET_USEC" : 213,
     "REPEATS_AFTER" : 21332,
+    
     "CLIENT" : {
         "INIT_CONNECTION" : true,
         "END_CONNECTION" : true,
@@ -13,6 +14,13 @@
             "SOURCE_PORT" : "application set",
             "MSS" : 1460,
             "PACKETS_SENT" : 8
+        },
+        "APPLICATION_DATA" : {
+            "RANDOM" : true,
+            "PACKET_SIZES" : [10, 20, 30, 40],
+            "APPLICATION_DATA" : {
+            
+            }
         }
     },
     "SERVER" : {

@@ -24,7 +24,7 @@ public:
     }
 
     double get_rtt() {
-        return generator->generate_normal_number(rtt.mean, rtt.stddev);
+        return std::abs(generator->generate_normal_number(rtt.mean, rtt.stddev));
     }
     void set_packet_drop_prop(double p) {this->packet_drop_prop = p;}
     double get_packet_drop_prop() {return this->packet_drop_prop;}

@@ -90,9 +90,9 @@ public:
 
     std::shared_ptr<TCPEvent> copy() { // copy the state. but reset everything else
         std::shared_ptr<TCPEvent> e = std::make_shared<TCPEvent>(*this);
-        this->current_client_state = this->current_client_state->copy();
-        this->current_server_state = this->current_server_state->copy();
-        event_rules = {};
+        e->current_client_state = this->current_client_state->copy();
+        e->current_server_state = this->current_server_state->copy();
+        e->event_rules = {};
         return e;
     }
 

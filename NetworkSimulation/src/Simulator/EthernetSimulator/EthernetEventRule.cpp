@@ -3,5 +3,5 @@
 #include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 
 void SendEthernetData::handle(EthernetEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    scheduler->get_parent()->receive_message(e->get_ethernet_frame()->header_payload_to_array(), 0, 0);
+    scheduler->get_parent()->receive_message(e->get_ethernet_frame()->header_payload_to_array(), scheduler->get_scheduler_time_sec(), scheduler->get_scheduler_time_us());
 }
