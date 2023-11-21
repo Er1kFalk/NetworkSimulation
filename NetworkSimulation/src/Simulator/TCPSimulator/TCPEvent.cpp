@@ -13,5 +13,5 @@ void TCPEvent::apply_rules(std::shared_ptr<BaseScheduler> scheduler) {
     for (auto rule : event_rules) {
         rule->handle(shared_from_this(), scheduler);
     }
-    pass_to_layer[{nlayer, tx}]->handle(shared_from_this(), scheduler);
+    pass_to_layer[{nlayer, get_transmitter()}]->handle(shared_from_this(), scheduler);
 }

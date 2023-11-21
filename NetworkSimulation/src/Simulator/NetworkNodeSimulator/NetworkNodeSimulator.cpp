@@ -24,14 +24,6 @@ void NetworkNodeSimulator::initialize() {
         auto client = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
         auto server = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
 
-        client->set_source_port(generatorfile.client.tcp_info.source_port);
-        client->set_destination_port(generatorfile.server.tcp_info.source_port);
-        client->set_ipv4_pseudo_header(generatorfile.client.ip_info.ip_address, generatorfile.server.ip_info.ip_address);
-
-        server->set_source_port(generatorfile.server.tcp_info.source_port);
-        server->set_destination_port(generatorfile.client.tcp_info.source_port);
-        server->set_ipv4_pseudo_header(generatorfile.server.ip_info.ip_address, generatorfile.client.ip_info.ip_address);
-
         auto client_state = std::shared_ptr<TCPState>(new TCPState(client->copy()));
         auto server_state = std::shared_ptr<TCPState>(new TCPState(server->copy()));
 
@@ -76,7 +68,7 @@ void NetworkNodeSimulator::receive_message(std::vector<unsigned char> data, uint
 /*
 receiver redirecting to ethernet
 */
-void NetworkNodeSimulator::receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
+void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
     std::shared_ptr<EthernetEvent> e = std::shared_ptr<EthernetEvent>(new EthernetEvent);
     std::shared_ptr<EthernetFrameInterface> etherframe = initial_protocol_state;
     etherframe->set_payload(payload);
@@ -87,19 +79,16 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<CommunicationProtocol
     scheduler->schedule(e, time_s, time_us);
 }
 
-void NetworkNodeSimulator::receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<IPv4PacketInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
+void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<IPv4PacketInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
     std::shared_ptr<IPv4Event> e = std::shared_ptr<IPv4Event>(new IPv4Event);
-    std::shared_ptr<IPv4PacketInterface> packet = initial_protocol_state;
-    packet->set_payload(payload);
+    initial_protocol_state->set_payload(payload);
 
-    // packet->set_payload(c);
-    packet->set_source({0x1, 0x2, 0x3,0x4}); // determined by generator file
-    packet->set_destination({0x4, 0x3, 0x2, 0x1});
-    // packet->set_time_to_live(64); // determined by host (generator file)
 
-    e->set_ipv4_packet(packet);
+    e->set_ipv4_packet(initial_protocol_state);
+    e->set_genfile(calling_event->get_genfile());
+    e->set_transmitter(calling_event->get_transmitter());
     e->set_llayer(LinkLayer::Ethernet);
-    e->set_event_rules({std::shared_ptr<IPv4EventRule>(new SendIPv4Data)});
+    e->set_event_rules({std::shared_ptr<IPv4EventRule>(new SendIPv4DataClient)});
     scheduler->schedule(e, time_s, time_us);
 }
 

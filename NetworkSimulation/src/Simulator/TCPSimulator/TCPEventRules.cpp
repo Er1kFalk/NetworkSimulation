@@ -6,6 +6,9 @@
 #include "../BaseScheduler/BaseScheduler.h"
 #include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 #include "../../RandomUtils/RandomUtils.h"
+#include "../BaseScheduler/EventTypeDefs.h"
+#include "../IPv4Simulator/IPv4Event.h"
+#include "../IPv4Simulator/IPv4EventRule.h"
 
 // void R_INIT_CONNECTION::handle(TCPEventPtr e) {
 
@@ -15,16 +18,26 @@
 
 void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<RandomUtils> generator = std::shared_ptr<RandomUtils>(new RandomUtils());
-    std::shared_ptr<TCPSegmentInterface> syn_segment = e->get_current_client_state()->get_current_segment();
+    std::shared_ptr<TCPSegmentInterface> client = e->get_current_client_state()->get_current_segment();
+    std::shared_ptr<TCPSegmentInterface> server = e->get_current_server_state()->get_current_segment();
 
-    syn_segment->set_syn_flag(true);
-    syn_segment->set_ack_flag(false);
-	syn_segment->set_acknowledgement_nr(0);
+    client->set_source_port(e->get_genfile()->client.tcp_info.source_port);
+    client->set_destination_port(e->get_genfile()->server.tcp_info.source_port);
+    client->set_ipv4_pseudo_header(e->get_genfile()->client.ip_info.ip_address, e->get_genfile()->server.ip_info.ip_address);
+
+    server->set_source_port(e->get_genfile()->server.tcp_info.source_port);
+    server->set_destination_port(e->get_genfile()->client.tcp_info.source_port);
+    server->set_ipv4_pseudo_header(e->get_genfile()->server.ip_info.ip_address, e->get_genfile()->client.ip_info.ip_address);
+
+
+    client->set_syn_flag(true);
+    client->set_ack_flag(false);
+	client->set_acknowledgement_nr(0);
     uint32_t seqnr = generator->generate_uniform_number() * (double) ((1ul<<32)-1);
-    syn_segment->set_sequence_nr(seqnr);
-    syn_segment->recalculate_fields();
+    client->set_sequence_nr(seqnr);
+    client->recalculate_fields();
 
-    e->set_tx(Transmitter::Client);
+    e->set_transmitter(Transmitter::Client);
     //e->set_current_client_state(syn_segment);
 
     // delay stuff
@@ -71,7 +84,7 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
 	syn_ack_segment->set_ack_flag(true);
     syn_ack_segment->recalculate_fields();
 
-    e->set_tx(Transmitter::Server);
+    e->set_transmitter(Transmitter::Server);
 
     // scheduler->schedule(e->copy(), {TCPEventRulePtr(new SendAck)}, 0);
 
@@ -94,7 +107,7 @@ void SendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 	current_client_state->set_syn_flag(false);
 	current_client_state->set_ack_flag(true);
 
-    e->set_tx(Transmitter::Client);
+    e->set_transmitter(Transmitter::Client);
 
     // send to ipv4
 }
@@ -102,28 +115,21 @@ void SendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 
 void PassClientStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<IPv4PacketInterface> packet = std::shared_ptr<IPv4PacketInterface>(new IPv4Packet);
-    packet->set_version();
     packet->set_dscp(0);
     packet->set_ecn(0);
-        
-    
     packet->set_df_flag(true);
-    
     packet->set_protocol(0x06); // determined by upper layer protocol
     
 
-    scheduler->get_parent()->receive_message(e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
+    scheduler->get_parent()->receive_message(e, e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
 }
 
 void PassServerStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    std::shared_ptr<IPv4PacketInterface> packet = std::shared_ptr<IPv4PacketInterface>(new IPv4Packet);
-    packet->set_version();
+    std::shared_ptr<IPv4PacketInterface> packet = std::shared_ptr<IPv4PacketInterface>(new IPv4Packet);   
     packet->set_dscp(0);
     packet->set_ecn(0);
-    
     packet->set_df_flag(true);
-    
     packet->set_protocol(0x06); // determined by upper layer protocol
 
-    scheduler->get_parent()->receive_message(e->get_current_server_state()->get_current_segment()->copy(), packet, 0, 0);
+    scheduler->get_parent()->receive_message(e, e->get_current_server_state()->get_current_segment()->copy(), packet, 0, 0);
 }

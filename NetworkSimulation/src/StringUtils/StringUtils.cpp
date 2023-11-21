@@ -66,6 +66,7 @@ std::vector<unsigned char> StringUtils::string_to_ipv4_address(std::string ipv4)
 			throw std::invalid_argument("Not a valid ip: may only conbtain . and numbers");
 		}
 	}
+	vec_ip[i] = std::stoi(ipv4nr);
 	assert(i == 3);
 	return vec_ip;
 }

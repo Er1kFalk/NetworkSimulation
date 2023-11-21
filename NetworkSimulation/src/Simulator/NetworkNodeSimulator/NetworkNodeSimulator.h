@@ -31,6 +31,7 @@ private:
     uint32_t max_gen_time; // seconds
     std::shared_ptr<PCAPWriter> pcapwriter;
     std::shared_ptr<ConfigReader> confreader;
+    
 
 public:
     NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time);
@@ -48,12 +49,12 @@ public:
     /*
     receiver redirecting to ethernet
     */
-    void receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
+    void receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
 
     /*
     receiver redirecting to ipv4
     */
-    void receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<IPv4PacketInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
+    void receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<IPv4PacketInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
 
     /*
     receiver redirecting to tcp

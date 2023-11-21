@@ -11,6 +11,7 @@
 
 #include "TCPSimulatorTypeDefs.h"
 #include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
+#include "../BaseScheduler/EventTypeDefs.h"
 
 class TCPState {
 private:
@@ -53,14 +54,13 @@ protected:
     std::shared_ptr<TCPState> current_client_state;
     std::shared_ptr<TCPState> current_server_state;
     NetworkLayer nlayer; // network protocol to pass TCP data to
-    Transmitter tx; // indicates whether client or server is transmitting
     static std::map<std::tuple<NetworkLayer, Transmitter>, TCPEventRulePtr> pass_to_layer;
 public:
     TCPEvent(std::shared_ptr<TCPState> current_client_state, std::shared_ptr<TCPState> current_server_state, NetworkLayer nlayer) {
         this->current_client_state = current_client_state;
         this->current_server_state = current_server_state;
         this->nlayer = nlayer;
-        this->tx = Transmitter::Client;
+        this->set_transmitter(Transmitter::Client);
 
         // this->current_client_state->set_source_port(client_source_port);
         // this->current_client_state->set_destination_port(client_destination_port);
@@ -85,9 +85,6 @@ public:
     void set_nlayer(NetworkLayer nlayer) {this->nlayer = nlayer;}
     NetworkLayer get_nlayer() {return nlayer;}
     
-    Transmitter get_tx() {return tx;}
-    void set_tx(Transmitter tx) {this->tx = tx;}
-
     std::shared_ptr<TCPEvent> copy() { // copy the state. but reset everything else
         std::shared_ptr<TCPEvent> e = std::make_shared<TCPEvent>(*this);
         e->current_client_state = this->current_client_state->copy();

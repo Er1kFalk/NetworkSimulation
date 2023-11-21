@@ -12,7 +12,7 @@ public:
     virtual void handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) = 0;
 };
 
-class SendIPv4Data : public IPv4EventRule {
+class SendIPv4DataClient : public IPv4EventRule {
 public:
     void handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
 };
