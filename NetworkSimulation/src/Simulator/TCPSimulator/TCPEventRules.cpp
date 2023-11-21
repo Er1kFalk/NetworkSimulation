@@ -22,15 +22,18 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 	syn_segment->set_acknowledgement_nr(0);
     uint32_t seqnr = generator->generate_uniform_number() * (double) ((1ul<<32)-1);
     syn_segment->set_sequence_nr(seqnr);
-    syn_segment->set_ipv4_pseudo_header({0x1, 0x2, 0x3,0x4}, {0x4, 0x3, 0x2, 0x1}); // determined by generator file
     syn_segment->recalculate_fields();
 
     e->set_tx(Transmitter::Client);
     //e->set_current_client_state(syn_segment);
 
     // delay stuff
-    double rtt = scheduler->get_parent()->get_np()->get_rtt();
-    // scheduler->schedule(e->copy(), {TCPEventRulePtr(new ReceiveSynAck)}, rtt);
+    uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0; // in microseconds
+
+    TCPEventPtr tcpevent = e->copy();
+    tcpevent->set_event_rules({TCPEventRulePtr(new ReceiveSynAck)});
+
+    scheduler->schedule(tcpevent, 0, rtt);
     // send to ipv4
 
     // send to ipv4
@@ -66,6 +69,7 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     syn_ack_segment->set_acknowledgement_nr(current_client_state->get_sequence_nr() + 1);
 	syn_ack_segment->set_syn_flag(true);
 	syn_ack_segment->set_ack_flag(true);
+    syn_ack_segment->recalculate_fields();
 
     e->set_tx(Transmitter::Server);
 
@@ -106,6 +110,7 @@ void PassClientStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler>
     packet->set_df_flag(true);
     
     packet->set_protocol(0x06); // determined by upper layer protocol
+    
 
     scheduler->get_parent()->receive_message(e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
 }

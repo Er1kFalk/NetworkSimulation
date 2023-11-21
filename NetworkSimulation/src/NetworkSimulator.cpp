@@ -197,6 +197,10 @@ int main(int argc, char *argv[]) {
 	// std::cout << "Hello World" << std::endl;
 	// std::cout << "Hello No" << std::endl;
 
+	std::vector<unsigned char> source = {0x01, 0x02, 0x03, 0x04};
+	std::vector<unsigned char> destination = {0x01, 0x02, 0x03, 0x04};
+
+
 	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter("./test.pcap", wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
 	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({1,2}, NetworkLayer::IPv4));
 	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer));
@@ -205,13 +209,14 @@ int main(int argc, char *argv[]) {
 	std::shared_ptr<TCPState> client = std::shared_ptr<TCPState>(new TCPState(std::shared_ptr<TCPSegment>(new TCPSegment)));
 	client->get_current_segment()->set_destination_port(20);
 	client->get_current_segment()->set_source_port(5);
+	client->get_current_segment()->set_ipv4_pseudo_header(source, destination);
 
 	std::shared_ptr<TCPState> server = std::shared_ptr<TCPState>(new TCPState(std::shared_ptr<TCPSegment>(new TCPSegment)));
 	server->get_current_segment()->set_destination_port(5);
 	server->get_current_segment()->set_source_port(20);
+	server->get_current_segment()->set_ipv4_pseudo_header(destination, source);
 
 
-	m->receive_message(client, server, 0, 0);
 	m->receive_message(client, server, 0, 0);
 
 	m->run();
