@@ -10,7 +10,7 @@
 #include "../BaseScheduler/Event.h"
 
 #include "TCPSimulatorTypeDefs.h"
-#include "../MainSimulator/SimulatorTypeDefs.h"
+#include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
 
 class TCPState {
 private:

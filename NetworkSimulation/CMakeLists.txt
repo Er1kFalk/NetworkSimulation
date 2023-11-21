@@ -1,21 +1,26 @@
+
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 project(NetworkSimulation VERSION 0.0.1 LANGUAGES CXX)
 
 set(SRCDIR src)
+set(PCAPDIR ${CMAKE_CURRENT_SOURCE_DIR}/src/CppToolkit-PCAP)
 file(GLOB LIBRARIES ${SRCDIR}/*.cpp ${SRCDIR}/*/*.cpp ${SRCDIR}/*/*/*.cpp)
-#file(GLOB SOURCES ${SRCDIR}/*.h ${SRCDIR}/*/*.h ${SRCDIR}/*/*/*.h ${SRCDIR}/NetworkSimulator.cpp)
 
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
-#list(FILTER SOURCES EXCLUDE REGEX ".*Archived/.*")
 list(FILTER LIBRARIES EXCLUDE REGEX ".*Archived/.*")
+#list(FILTER LIBRARIES EXCLUDE REGEX ".*CppToolkit-PCAP/.*")
 
-ADD_LIBRARY(LibsModule 
-    ${LIBRARIES}
+
+
+include(CMakePrintHelpers)
+cmake_print_variables(LIBRARIES)
+
+ADD_LIBRARY(SIMLIBS
+    ${LIBRARIES} 
 )
 
-
 add_executable(NetworkSimulation
-    ${SRCDIR}/NetworkSimulator.cpp
+    ${LIBRARIES}
 )
 set_target_properties(
     NetworkSimulation 
@@ -24,6 +29,16 @@ set_target_properties(
         SUFFIX ".out"
 )
 
-target_include_directories(NetworkSimulation PRIVATE ${SRCDIR})
-target_link_libraries(LibsModule -lpcap)
-target_link_libraries(NetworkSimulation LibsModule)
+target_include_directories(NetworkSimulation PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    ${PCAPDIR}
+)
+
+target_link_libraries(NetworkSimulation -lpcap)
+#target_link_libraries(NetworkSimulation ${PCAPDIR}/)
+
+#target_link_libraries(NetworkSimulation SIMLIBS)
+
+#target_link_libraries(PCAPNG2 PRIVATE PCAPNG1)
+#target_link_libraries(NetworkSimulation PCAPNGWRITERLIB)
+

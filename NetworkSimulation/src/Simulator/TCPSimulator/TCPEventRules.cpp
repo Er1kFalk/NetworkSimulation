@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "../../IPv4Packet/IPv4Packet.h"
 #include "../BaseScheduler/BaseScheduler.h"
-#include "../MainSimulator/MainSimulator.h"
+#include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 #include "../../RandomUtils/RandomUtils.h"
 
 // void R_INIT_CONNECTION::handle(TCPEventPtr e) {
@@ -29,7 +29,7 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     //e->set_current_client_state(syn_segment);
 
     // delay stuff
-    int rtt = scheduler->get_parent()->get_np()->get_rtt();
+    double rtt = scheduler->get_parent()->get_np()->get_rtt();
     // scheduler->schedule(e->copy(), {TCPEventRulePtr(new ReceiveSynAck)}, rtt);
     // send to ipv4
 
@@ -107,7 +107,7 @@ void PassClientStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler>
     
     packet->set_protocol(0x06); // determined by upper layer protocol
 
-    scheduler->get_parent()->receive_message(e->get_current_client_state()->get_current_segment()->copy(), packet, 0);
+    scheduler->get_parent()->receive_message(e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
 }
 
 void PassServerStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
@@ -120,5 +120,5 @@ void PassServerStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler>
     
     packet->set_protocol(0x06); // determined by upper layer protocol
 
-    scheduler->get_parent()->receive_message(e->get_current_server_state()->get_current_segment()->copy(), packet, 0);
+    scheduler->get_parent()->receive_message(e->get_current_server_state()->get_current_segment()->copy(), packet, 0, 0);
 }

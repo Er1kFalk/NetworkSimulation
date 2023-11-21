@@ -3,7 +3,7 @@
 #include "../../IPv4Packet/IPv4PacketInterface.h"
 #include "../../EthernetFrame/EthernetFrame.h"
 #include "../BaseScheduler/BaseScheduler.h"
-#include "../MainSimulator/MainSimulator.h"
+#include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 
 void ReceiveIPv4Data::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<IPv4PacketInterface> packet = e->get_ipv4_packet();
@@ -26,5 +26,5 @@ void PassIPv4DataToEthernet::handle(IPv4EventPtr e, std::shared_ptr<BaseSchedule
     std::shared_ptr<EthernetFrameInterface> etherframe = std::shared_ptr<EthernetFrameInterface>(new EthernetFrame());
     etherframe->set_ethertype({0x08, 0x00});
 
-    scheduler->get_parent()->receive_message(e->get_ipv4_packet()->copy(), etherframe, 0);
+    scheduler->get_parent()->receive_message(e->get_ipv4_packet()->copy(), etherframe, 0, 0);
 }

@@ -8,8 +8,8 @@
 // #include "../BaseScheduler/BaseScheduler.h"
 // #include "TCPSimulatorTypeDefs.h"
 // #include "../CustomOperators/TupleGreaterThan.h"
-// #include "../MainSimulator/MainSimulator.h"
-// #include "../MainSimulator/SimulatorTypeDefs.h"
+// #include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
+// #include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
 
 // #ifndef TCPSCHEDULER_H_
 // #define TCPSCHEDULER_H_
@@ -30,7 +30,7 @@
     
 //     static std::map<std::tuple<NetworkLayer, Transmitter>, TCPEventRulePtr> pass_to_layer;
 // public:
-//     TCPScheduler(std::shared_ptr<NetworkProperties> np, std::shared_ptr<MainSimulator> parent) {
+//     TCPScheduler(std::shared_ptr<NetworkProperties> np, std::shared_ptr<NetworkNodeSimulator> parent) {
 //         this->np = np;
 //         this->set_parent(parent);
 //     }

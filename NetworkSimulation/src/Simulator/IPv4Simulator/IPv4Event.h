@@ -7,7 +7,7 @@
 #include "../../IPv4Packet/IPv4PacketInterface.h"
 #include "../../CommunicationProtocol.h"
 #include "IPv4SimulatorTypeDefs.h"
-#include "../MainSimulator/SimulatorTypeDefs.h"
+#include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
 #include "../BaseScheduler/Event.h"
 
 

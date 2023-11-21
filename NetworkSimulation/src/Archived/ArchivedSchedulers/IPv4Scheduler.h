@@ -19,7 +19,7 @@
 //     std::priority_queue<EventQueueElement, std::vector<EventQueueElement>, TupleGreaterThan<IPv4EventPtr>> events;
 
 // public:
-//     IPv4Scheduler(std::shared_ptr<MainSimulator> parent) {
+//     IPv4Scheduler(std::shared_ptr<NetworkNodeSimulator> parent) {
 //         this->set_parent(parent);
 //         set_scheduler_time(std::numeric_limits<uint64_t>::max());
 //     }

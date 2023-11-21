@@ -6,9 +6,10 @@
 #include "TCPSegment/TCPSegment.h"
 #include "ArrayUtils/ArrayUtils.h"
 #include "ProtocolUtils/ProtocolUtils.h"
-#include "Simulator/MainSimulator/MainSimulator.h"
+#include "Simulator/NetworkNodeSimulator/NetworkNodeSimulator.h"
 #include "Simulator/NetworkProperties.h"
 #include "TCPSegment/TCPSegment.h"
+#include "PCAPWriter/PCAPWriter.h"
 
 #include <bits/stdc++.h>
 #include <boost/property_tree/ptree.hpp>
@@ -192,12 +193,13 @@ struct NetworkNode {
 int main(int argc, char *argv[]) {
 	
 	// std::tuple<NetworkNode, int, NetworkNode, int> generator_1 = read_definition("../SimulatorConfig/simulator1.json");
-	int x = 0;
-	std::cout << "Hello World" << std::endl;
-	std::cout << "Hello No" << std::endl;
+	// int x = 0;
+	// std::cout << "Hello World" << std::endl;
+	// std::cout << "Hello No" << std::endl;
 
+	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter("./test.pcap", wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
 	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({1,2}, NetworkLayer::IPv4));
-	std::shared_ptr<MainSimulator> m = std::shared_ptr<MainSimulator>(new MainSimulator (np));
+	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer));
 	m->initialize();
 
 	std::shared_ptr<TCPState> client = std::shared_ptr<TCPState>(new TCPState(std::shared_ptr<TCPSegment>(new TCPSegment)));
@@ -209,9 +211,11 @@ int main(int argc, char *argv[]) {
 	server->get_current_segment()->set_source_port(20);
 
 
-	m->receive_message(client, server, 0);
+	m->receive_message(client, server, 0, 0);
+	m->receive_message(client, server, 0, 0);
 
 	m->run();
+
 
 	// NetworkNode a = std::get<0>(generator_1);
 	// a.mac_address = {0xAC, 0xD9, 0x10, 0x43};

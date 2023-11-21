@@ -1,6 +1,6 @@
 #include "../RandomUtils/RandomUtils.h"
 #include <memory>
-#include "MainSimulator/SimulatorTypeDefs.h"
+#include "NetworkNodeSimulator/SimulatorTypeDefs.h"
 
 #ifndef NETWORKPROPERTIES_H_
 #define NETWORKPROPERTIES_H_

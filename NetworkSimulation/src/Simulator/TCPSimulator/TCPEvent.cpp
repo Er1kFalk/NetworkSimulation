@@ -1,7 +1,7 @@
 #include "TCPEvent.h"
 #include "TCPEventRules.h"
 #include "../BaseScheduler/BaseScheduler.h"
-#include "../MainSimulator/MainSimulator.h"
+#include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 #include <iostream>
 
 std::map<std::tuple<NetworkLayer, Transmitter>, TCPEventRulePtr> TCPEvent::pass_to_layer = {
