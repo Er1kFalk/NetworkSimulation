@@ -21,13 +21,15 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<TCPSegmentInterface> client = e->get_current_client_state()->get_current_segment();
     std::shared_ptr<TCPSegmentInterface> server = e->get_current_server_state()->get_current_segment();
 
-    client->set_source_port(e->get_genfile()->client.tcp_info.source_port);
-    client->set_destination_port(e->get_genfile()->server.tcp_info.source_port);
-    client->set_ipv4_pseudo_header(e->get_genfile()->client.ip_info.ip_address, e->get_genfile()->server.ip_info.ip_address);
+    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
 
-    server->set_source_port(e->get_genfile()->server.tcp_info.source_port);
-    server->set_destination_port(e->get_genfile()->client.tcp_info.source_port);
-    server->set_ipv4_pseudo_header(e->get_genfile()->server.ip_info.ip_address, e->get_genfile()->client.ip_info.ip_address);
+    client->set_source_port(genfile.client.tcp_info.source_port);
+    client->set_destination_port(genfile.server.tcp_info.source_port);
+    client->set_ipv4_pseudo_header(genfile.client.ip_info.ip_address, genfile.server.ip_info.ip_address);
+
+    server->set_source_port(genfile.server.tcp_info.source_port);
+    server->set_destination_port(genfile.client.tcp_info.source_port);
+    server->set_ipv4_pseudo_header(genfile.server.ip_info.ip_address, genfile.client.ip_info.ip_address);
 
 
     client->set_syn_flag(true);

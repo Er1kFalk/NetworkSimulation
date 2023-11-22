@@ -4,8 +4,15 @@
 #include <vector>
 #include <array>
 #include <stdint.h>
+#include <map>
+#include <string>
+#include <tuple>
 
 namespace GFStructs {
+    enum class ProtocolModel {TCP, IPv4, Ethernet};
+    enum LayerModel {Application, Transport, Network, Link};
+    extern std::map<std::string, std::tuple<LayerModel, ProtocolModel>> pm_map;
+
     struct IPInfo {
         std::vector<unsigned char> ip_address;
         std::vector<unsigned char> ttl_values;
@@ -27,6 +34,7 @@ namespace GFStructs {
     };
 
     struct GeneratorFile {
+        std::map<LayerModel, ProtocolModel> protocol_stack;
         uint32_t connection_offset_sec;
         uint32_t connection_offset_us;
         uint32_t repeats_after;

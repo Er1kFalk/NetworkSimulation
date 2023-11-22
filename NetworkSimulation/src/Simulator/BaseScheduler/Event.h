@@ -10,14 +10,14 @@ class BaseScheduler;
 
 class Event {
 private:
-    std::shared_ptr<GFStructs::GeneratorFile> genfile;
+    uint32_t id;
     Transmitter tx;
 public:
     virtual void apply_rules(std::shared_ptr<BaseScheduler> scheduler) = 0;
-    void set_genfile(std::shared_ptr<GFStructs::GeneratorFile> genfile) {this->genfile = genfile;}
-    std::shared_ptr<GFStructs::GeneratorFile> get_genfile() {return this->genfile;}
     void set_transmitter(Transmitter tx) {this->tx = tx;}
     Transmitter get_transmitter() {return this->tx;}
+    void set_id(uint32_t id) {this->id = id;}
+    uint32_t get_id() {return this->id;}
 };
 
 #endif

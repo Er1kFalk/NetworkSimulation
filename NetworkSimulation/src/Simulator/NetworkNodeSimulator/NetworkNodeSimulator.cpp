@@ -15,28 +15,55 @@
 #include <pcap/pcap.h>
 #include <iostream>
 
-void NetworkNodeSimulator::initialize() {
-    scheduler = std::shared_ptr<BaseScheduler>(new BaseScheduler());
-    scheduler->set_parent(shared_from_this());
-
-    for (auto generatorfile : confreader->get_generatorfiles()) {
-
-        auto client = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::GeneratorFile gf) {
+    auto client = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
         auto server = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
 
         auto client_state = std::shared_ptr<TCPState>(new TCPState(client->copy()));
         auto server_state = std::shared_ptr<TCPState>(new TCPState(server->copy()));
 
         auto event = std::shared_ptr<TCPEvent>(new TCPEvent(client_state, server_state, NetworkLayer::IPv4));
-        event->set_genfile(std::make_shared<GFStructs::GeneratorFile>(generatorfile));
+        event->set_id(id);
 
-        uint32_t i = generatorfile.connection_offset_sec;
-        while (i < this->max_gen_time) {
+        uint32_t j = gf.connection_offset_sec;
+        while (j < this->max_gen_time) {
             auto to_schedule = event->copy();
             to_schedule->set_event_rules({TCPEventRulePtr(new SendSyn)});
-            this->scheduler->schedule(to_schedule, i, time_us);
-            i += generatorfile.connection_offset_sec;
+            this->scheduler->schedule(to_schedule, j, time_us);
+            j += gf.connection_offset_sec;
         }
+}
+
+void NetworkNodeSimulator::initialize() {
+    scheduler = std::shared_ptr<BaseScheduler>(new BaseScheduler());
+    scheduler->set_parent(shared_from_this());
+
+    auto genfiles = confreader->get_generatorfiles();
+
+    for (uint32_t i = 0; i < genfiles.size(); i++) {
+
+        generatorfiles[i] = genfiles[i];
+
+        for (uint32_t j = GFStructs::LayerModel::Application; j != GFStructs::LayerModel::Link; j++) {
+            auto key = genfiles[i].protocol_stack.find(static_cast<GFStructs::LayerModel>(j));
+            if (key != genfiles[i].protocol_stack.end()) {
+                
+                if (key->second == GFStructs::ProtocolModel::TCP) {
+                    initialize_tcp_event(i, genfiles[i]);
+                    
+                } else if (key->second == GFStructs::ProtocolModel::IPv4) {
+                    
+                   
+                } else if (key->second == GFStructs::ProtocolModel::Ethernet) {
+
+                    
+                } else {
+                    continue;
+                }
+                break;
+            } 
+        }
+        
     }
 }
 
@@ -85,7 +112,7 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event,
 
 
     e->set_ipv4_packet(initial_protocol_state);
-    e->set_genfile(calling_event->get_genfile());
+    e->set_id(calling_event->get_id());
     e->set_transmitter(calling_event->get_transmitter());
     e->set_llayer(LinkLayer::Ethernet);
     e->set_event_rules({std::shared_ptr<IPv4EventRule>(new SendIPv4DataClient)});
@@ -106,4 +133,13 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<TCPState> client, std
 
     e->set_event_rules({std::shared_ptr<TCPEventRule>(new SendSyn)});
     scheduler->schedule(e, time_s, time_us);
+}
+
+GFStructs::GeneratorFile NetworkNodeSimulator::get_generatorfile_by_id(uint32_t id) {
+    auto key = generatorfiles.find(id);
+    if (key == generatorfiles.end()) {
+        throw std::invalid_argument("No generator file by this id");
+    } else {
+        return key->second;
+    }
 }

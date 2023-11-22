@@ -17,12 +17,14 @@ void SendIPv4DataClient::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> s
     packet->set_mf_flag(false); // ip - if df = 0
     packet->set_fragment_offset(0);
     
+    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+
     if (e->get_transmitter() == Transmitter::Client) {
-        packet->set_source(e->get_genfile()->client.ip_info.ip_address);
-        packet->set_destination(e->get_genfile()->server.ip_info.ip_address);
+        packet->set_source(genfile.client.ip_info.ip_address);
+        packet->set_destination(genfile.server.ip_info.ip_address);
     } else {
-        packet->set_source(e->get_genfile()->server.ip_info.ip_address);
-        packet->set_destination(e->get_genfile()->client.ip_info.ip_address);
+        packet->set_source(genfile.server.ip_info.ip_address);
+        packet->set_destination(genfile.client.ip_info.ip_address);
     }
 
 

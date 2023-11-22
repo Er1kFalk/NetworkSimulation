@@ -1,8 +1,8 @@
 {
+    "PROTOCOL_STACK" : ["TCP", "IPv4", "Ethernet"],
     "CONNECTION_OFFSET_SEC" : 10,
     "CONNECTION_OFFSET_USEC" : 213,
     "REPEATS_AFTER" : 21332,
-    
     "CLIENT" : {
         "INIT_CONNECTION" : true,
         "END_CONNECTION" : true,

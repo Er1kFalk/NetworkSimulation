@@ -17,6 +17,7 @@ private:
     static const std::string NEST_OPERATOR;
 
     /* JSON KEYS*/
+    static const std::string PROTOCOL_STACK_KEY;
     static const std::string CONNECTION_OFFSET_SEC_KEY; /*seconds*/
     static const std::string CONNECTION_OFFSET_USEC_KEY; /*microseconds*/
     static const std::string REPEATS_AFTER_KEY; /*in sec_KEYonds*/
@@ -36,13 +37,23 @@ private:
     to read the corresponding value in a nested json structure*/
     std::string jsonpath(std::vector<std::string> v);
 
-    /*function to convert json list to a c++ vector*/
+    /*function to convert json number list to a c++ vector*/
     template<typename T>
     std::vector<T> read_json_list(std::string key, boost::property_tree::ptree json) {
         std::vector<T> v;
         
         for (boost::property_tree::ptree::value_type &val : json.get_child(key)) {
             v.push_back(std::stoi(val.second.data()));
+        }
+
+        return v;
+    }
+
+    std::vector<std::string> read_json_list(std::string key, boost::property_tree::ptree json) {
+        std::vector<std::string> v;
+
+        for (boost::property_tree::ptree::value_type &val : json.get_child(key)) {
+            v.push_back(val.second.data());
         }
 
         return v;

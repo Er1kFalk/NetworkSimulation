@@ -31,10 +31,12 @@ private:
     uint32_t max_gen_time; // seconds
     std::shared_ptr<PCAPWriter> pcapwriter;
     std::shared_ptr<ConfigReader> confreader;
-    
+    std::map<uint32_t, GFStructs::GeneratorFile> generatorfiles;
 
 public:
     NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time);
+
+    void initialize_tcp_event(uint32_t id, GFStructs::GeneratorFile gf);
 
     void initialize();
 
@@ -61,6 +63,7 @@ public:
     */
     void receive_message(std::shared_ptr<TCPState> client, std::shared_ptr<TCPState> server, uint32_t time_s, uint32_t time_us);
 
-    std::shared_ptr<NetworkProperties> get_np() {return np;}    
+    std::shared_ptr<NetworkProperties> get_np() {return np;}
+    GFStructs::GeneratorFile get_generatorfile_by_id(uint32_t id);
 };
 #endif

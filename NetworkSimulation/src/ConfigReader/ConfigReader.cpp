@@ -4,6 +4,7 @@
 
 const std::string ConfigReader::NEST_OPERATOR = ".";
 
+const std::string ConfigReader::PROTOCOL_STACK_KEY = "PROTOCOL_STACK";
 const std::string ConfigReader::CONNECTION_OFFSET_SEC_KEY = "CONNECTION_OFFSET_SEC"; 
 const std::string ConfigReader::CONNECTION_OFFSET_USEC_KEY = "CONNECTION_OFFSET_USEC";
 const std::string ConfigReader::REPEATS_AFTER_KEY = "REPEATS_AFTER";
@@ -80,6 +81,12 @@ void ConfigReader::read_generator_file(std::string filename) {
     boost::property_tree::read_json(filename, rtree);
 
     GFStructs::GeneratorFile gen;
+
+    std::vector<std::string> protocol_stack_string = read_json_list(PROTOCOL_STACK_KEY, rtree);
+    for (std::string p : protocol_stack_string) {
+        auto x = GFStructs::pm_map[p];
+        gen.protocol_stack[std::get<GFStructs::LayerModel>(x)] = std::get<GFStructs::ProtocolModel>(x);
+    }
 
     gen.client = read_transmitter_from_generator_file(CLIENT_KEY, rtree);
     gen.server = read_transmitter_from_generator_file(SERVER_KEY, rtree);
