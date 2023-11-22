@@ -39,6 +39,9 @@ public:
     virtual void set_urgent_pointer(uint16_t urgent_pointer) = 0;
 
     virtual void set_options(std::vector <unsigned char> options) = 0;
+    virtual void add_mss_option(uint16_t mss) = 0;
+    virtual void add_end_of_optionlist_option() = 0;
+    virtual void add_no_operation_option() = 0;
 
     /*Getters*/
     virtual uint16_t get_source_port() = 0;

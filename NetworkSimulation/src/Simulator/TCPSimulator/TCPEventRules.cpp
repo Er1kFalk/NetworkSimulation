@@ -37,6 +37,7 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 	client->set_acknowledgement_nr(0);
     uint32_t seqnr = generator->generate_uniform_number() * (double) ((1ul<<32)-1);
     client->set_sequence_nr(seqnr);
+    client->add_mss_option(genfile.client.tcp_info.mss);
     client->recalculate_fields();
 
     e->set_transmitter(Transmitter::Client);
@@ -88,6 +89,13 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
 
     e->set_transmitter(Transmitter::Server);
 
+    TCPEventPtr tcpevent = e->copy();
+    assert(e.get() != tcpevent.get());
+    tcpevent->set_event_rules({TCPEventRulePtr(new SendAck)});
+
+    scheduler->schedule(tcpevent, 0, 100);
+
+
     // scheduler->schedule(e->copy(), {TCPEventRulePtr(new SendAck)}, 0);
 
     // send to ipv4
@@ -99,7 +107,6 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     // }
 }
 
-
 void SendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
@@ -108,6 +115,8 @@ void SendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     current_client_state->set_sequence_nr(current_client_state->get_sequence_nr() + 1);
 	current_client_state->set_syn_flag(false);
 	current_client_state->set_ack_flag(true);
+    current_client_state->set_options({}); // clear the option
+    current_client_state->recalculate_fields();
 
     e->set_transmitter(Transmitter::Client);
 

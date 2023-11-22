@@ -37,6 +37,9 @@ public:
     NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time);
 
     void initialize_tcp_event(uint32_t id, GFStructs::GeneratorFile gf);
+    void initialize_ipv4_event(uint32_t id, GFStructs::GeneratorFile gf);
+    void initialize_ethernet_event(uint32_t id, GFStructs::GeneratorFile gf);
+
 
     void initialize();
 

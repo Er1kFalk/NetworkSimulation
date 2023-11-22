@@ -44,7 +44,9 @@ void TCPSegment::set_acknowledgement_nr(uint32_t ack) {
 }
 
 void TCPSegment::set_data_offset() {
-    const unsigned char header_length = 5;
+    assert(options.size() % 4 == 0);
+    const unsigned char header_length = 5 + options.size()/4;
+
     // set 4 upper bits to header length and lower 4 bits are left at 0
     const unsigned char data_offset_reserved = BitOperations::set_n_upper_bits(0, header_length, 4);
     
@@ -100,6 +102,7 @@ void TCPSegment::set_window_size(uint16_t wsize) {
 }
 
 void TCPSegment::set_checksum() {
+    this->tcp_header = BitOperations::int16_into_char_vector(0, this->tcp_header, 16); // reset checksum - otherwise old checksums will be included in calculation!
     if (this->ipv4_pseudo_header.size() != 12) {
         throw std::invalid_argument("cannot calculate checksum when ipv4 pseudo header not set");
     }
@@ -128,6 +131,21 @@ void TCPSegment::set_options(std::vector <unsigned char> options) {
     this->options = options;
 }
 
+void TCPSegment::add_mss_option(uint16_t mss) {
+    options.push_back(2); // mss option type
+    options.push_back(4); // mss length
+    std::array<unsigned char, 2> mss_arr = BitOperations::int16_to_char_arr(mss);
+    options.push_back(mss_arr[0]);
+    options.push_back(mss_arr[1]);
+}
+
+void TCPSegment::add_end_of_optionlist_option() {
+    options.push_back(0);
+}
+
+void TCPSegment::add_no_operation_option() {
+    options.push_back(1);
+}
 
 /*Getters*/
 
@@ -201,6 +219,17 @@ uint16_t TCPSegment::get_urgent_pointer() {
     return BitOperations::char_vector_to_int16(this->tcp_header, 18);
 }
 
+std::vector<unsigned char> TCPSegment::header_to_array() {
+    std::vector<unsigned char> fullheader = this->tcp_header;
+
+    for (unsigned char c : options) {
+        fullheader.push_back(c);
+    }
+
+    return fullheader;
+}
+
+
 std::vector<unsigned char> TCPSegment::header_payload_to_array() {
     std::vector<unsigned char> header_payload = this->header_to_array();
     
@@ -219,7 +248,19 @@ std::shared_ptr<TCPSegmentInterface> TCPSegment::copy() {
     return std::make_shared<TCPSegment>(*this);
 }
 
+void TCPSegment::add_options_padding() {
+    while (options.size() % 4 != 0) {
+        add_no_operation_option();
+    }
+}
+
 void TCPSegment::recalculate_fields() {
+    add_options_padding();
     set_data_offset();
+    uint32_t pseudo_header_length = header_payload_to_array().size();
+    assert(pseudo_header_length <= UINT16_MAX); // if not we have overflow
+    this->ipv4_pseudo_header = BitOperations::int16_into_char_vector(pseudo_header_length, this->ipv4_pseudo_header, 10);
+
     set_checksum();
+
 }

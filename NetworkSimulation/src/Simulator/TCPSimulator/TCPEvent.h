@@ -43,7 +43,11 @@ public:
     void set_is_retransmission(bool is_retransmission) {this->is_retransmission = is_retransmission;}
     void set_first_rtt_measurement_made(bool first_rtt_measurement_made) {this->first_rtt_measurement_made = first_rtt_measurement_made;}
 
-    std::shared_ptr<TCPState> copy() {return std::make_shared<TCPState>(*this);}
+    std::shared_ptr<TCPState> copy() {
+        auto newstate = std::make_shared<TCPState>(*this);
+        newstate->current_segment = this->current_segment->copy();
+        return newstate;
+    }
 };
 
 class TCPEvent : public Event, public std::enable_shared_from_this<TCPEvent> {
@@ -54,7 +58,7 @@ protected:
     std::shared_ptr<TCPState> current_client_state;
     std::shared_ptr<TCPState> current_server_state;
     NetworkLayer nlayer; // network protocol to pass TCP data to
-    static std::map<std::tuple<NetworkLayer, Transmitter>, TCPEventRulePtr> pass_to_layer;
+    static std::map<std::tuple<GFStructs::ProtocolModel, Transmitter>, TCPEventRulePtr> pass_to_layer;
 public:
     TCPEvent(std::shared_ptr<TCPState> current_client_state, std::shared_ptr<TCPState> current_server_state, NetworkLayer nlayer) {
         this->current_client_state = current_client_state;

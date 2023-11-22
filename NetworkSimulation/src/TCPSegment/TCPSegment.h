@@ -21,6 +21,8 @@ class TCPSegment : public TCPSegmentInterface {
     /*For IPv4 pseudo header*/
     std::vector<unsigned char> ipv4_pseudo_header;
 
+    void add_options_padding();
+
 public:
     TCPSegment() {
         this->tcp_header.resize(20); // default header size
@@ -58,6 +60,10 @@ public:
 
     void set_options(std::vector <unsigned char> options) override;
 
+    virtual void add_mss_option(uint16_t mss) override;
+    virtual void add_end_of_optionlist_option() override;
+    virtual void add_no_operation_option() override;
+
     /*getters*/
     uint16_t get_source_port() override;
     uint16_t get_destination_port() override;
@@ -78,7 +84,7 @@ public:
     uint16_t get_checksum() override;
     uint16_t get_urgent_pointer() override;
 
-    std::vector<unsigned char> header_to_array() override {return this->tcp_header;}
+    std::vector<unsigned char> header_to_array() override;
     std::vector<unsigned char> header_payload_to_array() override;
 
     void set_payload(std::shared_ptr<CommunicationProtocol> payload) override {this->payload = payload;}
