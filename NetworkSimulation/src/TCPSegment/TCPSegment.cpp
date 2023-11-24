@@ -1,7 +1,7 @@
 #include "TCPSegment.h"
 #include "../BitOperations/BitOperations.h"
-#include <iostream>
 #include "../ProtocolUtils/ProtocolUtils.h"
+#include <stdexcept>
 
 void TCPSegment::set_ipv4_pseudo_header(std::vector<unsigned char> source_ip_address, std::vector<unsigned char> destination_ip_address) {
     if (source_ip_address.size() != 4) {
@@ -262,5 +262,4 @@ void TCPSegment::recalculate_fields() {
     this->ipv4_pseudo_header = BitOperations::int16_into_char_vector(pseudo_header_length, this->ipv4_pseudo_header, 10);
 
     set_checksum();
-
 }

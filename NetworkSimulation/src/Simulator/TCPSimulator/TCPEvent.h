@@ -14,7 +14,6 @@
 #include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
 #include "../BaseScheduler/EventTypeDefs.h"
 
-#include <iostream>
 
 class TCPState {
 private:
@@ -96,14 +95,7 @@ public:
     NetworkLayer get_nlayer() {return nlayer;}
 
     void add_to_send_order(GFStructs::TransmittingNow sender) {this->send_order->push(sender);}
-    void remove_from_send_order() {
-        if (this->send_order->front() == GFStructs::TransmittingNow::Client) {
-            std::cout << "removed client from send order" << std::endl;
-        } else {
-            std::cout << "removed server from send order" << std::endl;
-        }
-        this->send_order->pop();
-    }
+    void remove_from_send_order() {this->send_order->pop();}
     GFStructs::TransmittingNow send_order_see_first() {return this->send_order->front();}
     bool send_queue_empty() {return this->send_order->empty();}
 

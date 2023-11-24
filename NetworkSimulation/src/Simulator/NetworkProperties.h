@@ -15,12 +15,10 @@ private:
     std::shared_ptr<RandomUtils> generator;
     double packet_drop_prop;
     RTT rtt;
-    NetworkLayer nlayer;
 public:
-    NetworkProperties(RTT rtt, NetworkLayer nlayer) {
+    NetworkProperties(RTT rtt) {
         this->generator = std::shared_ptr<RandomUtils>(new RandomUtils());
         this->rtt = rtt;
-        this->nlayer = nlayer;
     }
 
     double get_rtt() {
@@ -29,7 +27,6 @@ public:
     void set_packet_drop_prop(double p) {this->packet_drop_prop = p;}
     double get_packet_drop_prop() {return this->packet_drop_prop;}
     bool is_packet_dropped() {return generator->generate_uniform_number() <= this->packet_drop_prop;}
-    NetworkLayer get_nlayer() {return this->nlayer;}
 };
 
 #endif

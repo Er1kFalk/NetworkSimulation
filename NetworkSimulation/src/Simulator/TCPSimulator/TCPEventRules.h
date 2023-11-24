@@ -52,6 +52,11 @@ class ClientSendAck : public TCPEventRule {
     void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
 };
 
+class TCPReset : public TCPEventRule {
+    void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+};
+
+
 class PassServerStateToIPv4 : public TCPEventRule {
     void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
 };

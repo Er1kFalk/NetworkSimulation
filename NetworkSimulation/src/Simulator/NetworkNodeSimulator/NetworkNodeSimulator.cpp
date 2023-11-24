@@ -13,7 +13,6 @@
 #include "../../RandomUtils/RandomUtils.h"
 #include "../../PCAPWriter/PCAPWriter.h"
 #include <pcap/pcap.h>
-#include <iostream>
 
 void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::GeneratorFile gf) {
     auto client = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
@@ -47,9 +46,14 @@ void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::Generato
 
     uint32_t j = gf.connection_offset_sec;
     while (j < this->max_gen_time) {
-        auto to_schedule = event->copy();
-        to_schedule->set_event_rules({TCPEventRulePtr(new SendSyn)});
-        this->scheduler->schedule(to_schedule, j, time_us);
+        auto schedule_tcp_syn = event->copy();
+        schedule_tcp_syn->set_event_rules({TCPEventRulePtr(new SendSyn)});
+        this->scheduler->schedule(schedule_tcp_syn, j, time_us);
+
+        auto schedule_tcp_end = event->copy();
+        schedule_tcp_end->set_event_rules({TCPEventRulePtr(new TCPReset)});
+        this->scheduler->schedule(schedule_tcp_end, j+gf.connection_close, time_us);
+
         j += gf.repeats_after;
     }
 }
@@ -135,22 +139,6 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event,
     e->set_transmitter(calling_event->get_transmitter());
     e->set_llayer(LinkLayer::Ethernet);
     e->set_event_rules({std::shared_ptr<IPv4EventRule>(new SendIPv4DataClient)});
-    scheduler->schedule(e, time_s, time_us);
-}
-
-/*
-receiver redirecting to tcp
-*/
-void NetworkNodeSimulator::receive_message(std::shared_ptr<TCPState> client, std::shared_ptr<TCPState> server, uint32_t time_s, uint32_t time_us) {
-    std::shared_ptr<TCPEvent> e = std::shared_ptr<TCPEvent>(new TCPEvent(client, server, np->get_nlayer()));
-
-
-    // packet->set_payload(c);
-    // packet->set_source({0x1, 0x2, 0x3,0x4}); // determined by generator file
-    // packet->set_destination({0x4, 0x3, 0x2, 0x1});
-    // packet->set_time_to_live(64); // determined by host (generator file)
-
-    e->set_event_rules({std::shared_ptr<TCPEventRule>(new SendSyn)});
     scheduler->schedule(e, time_s, time_us);
 }
 

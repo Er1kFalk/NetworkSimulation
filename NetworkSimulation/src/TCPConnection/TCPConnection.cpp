@@ -3,7 +3,6 @@
 #include <random>
 #include "../TCPSegment/TCPSegment.h"
 #include "../ArrayUtils/ArrayUtils.h"
-#include <iostream>
 
 TCPConnection::TCPConnection(uint16_t client_source_port, uint16_t client_destination_port, uint64_t timestamp) {
 	srand(time(NULL));

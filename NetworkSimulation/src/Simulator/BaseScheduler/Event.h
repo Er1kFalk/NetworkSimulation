@@ -5,7 +5,6 @@
 #include <memory>
 #include "../../ConfigReader/GeneratorFileStruct.h"
 #include "EventTypeDefs.h"
-#include <iostream>
 
 class BaseScheduler;
 

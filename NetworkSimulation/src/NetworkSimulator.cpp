@@ -24,185 +24,33 @@
 #include "TCPConnection/TCPConnection.h"
 #include "Simulator/TCPSimulator/TCPEvent.h"
 
-struct NetworkNode {
-	std::array<unsigned char, 6> mac_address;
-	std::array<unsigned char, 4> ip_address;
-	uint16_t source_port;
-};
-
-// class NetworkGenerator {
-// 	NetworkNode client, server;
-
-// 	uint64_t timestamp;
-// 	std::shared_ptr<TCPConnection> tcp_connection;
-
-// 	std::vector<std::tuple<uint64_t, std::shared_ptr<CommunicationProtocol>>> trace;
-// public:
-// 	NetworkGenerator(NetworkNode client, NetworkNode server, uint64_t timestamp) {
-// 		this->client = client;
-// 		this->server = server;
-// 		this->timestamp = timestamp;
-
-// 	}
-
-// 	std::shared_ptr<EthernetFrameInterface> ethernet_base_frame_client() {
-// 		return std::shared_ptr<EthernetFrameInterface>(new EthernetFrame(
-// 			client.mac_address,
-// 			server.mac_address,
-// 			EthertypeConstants::IPv4
-// 		));
-// 	}
-
-// 	std::shared_ptr<EthernetFrameInterface> ethernet_base_frame_server() {
-// 		return std::shared_ptr<EthernetFrameInterface>(new EthernetFrame(
-// 			server.mac_address,
-// 			client.mac_address,
-// 			EthertypeConstants::IPv4
-// 		));
-// 	}
-
-// 	std::shared_ptr<IPv4PacketInterface> ip_base_packet_client(unsigned char protocol) {
-// 		return std::shared_ptr<IPv4PacketInterface>(new IPv4Packet(
-// 				0, // dscp
-// 				0, // ecn
-// 				0, // identification ID
-// 				false, // df
-// 				false, // mf
-// 				0, // offset
-// 				64, // ttl
-// 				protocol, // protocol
-// 				client.ip_address,
-// 				server.ip_address,
-// 				{},
-// 				nullptr
-// 			)
-// 		);
-// 	}
-
-// 	std::shared_ptr<IPv4PacketInterface> ip_base_packet_server(unsigned char protocol) {
-// 		return std::shared_ptr<IPv4PacketInterface>(new IPv4Packet(
-// 				0, // dscp
-// 				0, // ecn
-// 				0, // identification ID
-// 				false, // df
-// 				false, // mf
-// 				0, // offset
-// 				64, // ttl
-// 				protocol, // protocol
-// 				server.ip_address,
-// 				client.ip_address,
-// 				{},
-// 				nullptr
-// 			)
-// 		);
-// 	}
-
-// 	void setup_tcp_connection() {
-// 		tcp_connection = std::shared_ptr<TCPConnection>(new TCPConnection(client.source_port, server.source_port, timestamp));
-// 	}
-
-// 	void simulate_tcp_connection(int dataout, int datain) {
-// 		tcp_connection->three_way_handshake();
-// 		tcp_connection->send_data(dataout, datain);
-// 		std::vector<std::tuple<uint64_t, std::shared_ptr<TCPSegmentInterface>>> tcp_trace_client = tcp_connection->get_segment_trace_client();
-// 		std::vector<std::tuple<uint64_t, std::shared_ptr<TCPSegmentInterface>>> tcp_trace_server = tcp_connection->get_segment_trace_server();
-
-// 		std::cout << std::hex << (int) std::get<1>(tcp_trace_client[0])->header_to_array()[13] << std::endl;
-
-// 		for (auto t : tcp_trace_client) {
-// 			std::shared_ptr<EthernetFrameInterface> ethernetframe (new EthernetFrame(server.mac_address, client.mac_address, EthertypeConstants::IPv4));
-
-// 			std::shared_ptr<CommunicationProtocol> protocol_stack = ProtocolUtils::build_protocol_stack_from_vector({ethernet_base_frame_client(), ip_base_packet_client(0x06), std::get<1>(t)});
-// 			this->trace.push_back({std::get<0>(t), protocol_stack});
-// 		}
-
-// 		for (auto t : tcp_trace_server) {
-
-// 			std::shared_ptr<CommunicationProtocol> protocol_stack = ProtocolUtils::build_protocol_stack_from_vector({ethernet_base_frame_server(), ip_base_packet_server(0x06), std::get<1>(t)});
-// 			this->trace.push_back({std::get<0>(t), protocol_stack});
-// 		}
-// 	}
-
-// 	std::vector<std::tuple<uint64_t, std::shared_ptr<CommunicationProtocol>>> get_trace() {return trace;}
-// };
-
-// std::array<unsigned char, 4> ip_address_string_to_vec(std::string ip) {
-// 	std::string ip_block = "";
-// 	std::array<unsigned char, 4> vec_ip = {};
-// 	int i = 0;
-// 	for (unsigned char c : ip) {
-// 		if (c>=48 && c <=57) { // c is a nr
-// 			ip_block += c;
-// 		} else if (c == '.') {
-// 			vec_ip[i] = std::stoi(ip_block);
-// 			i++;
-// 			ip_block = "";
-// 			continue;
-// 		} else {
-// 			throw std::invalid_argument("Not a valid ip");
-// 		}
-// 	}
-// 	vec_ip[i] = std::stoi(ip_block);
-// 	return vec_ip;
-// }
-
-// std::tuple<NetworkNode, int, NetworkNode, int> read_definition(std::string filepath) {
-// 	boost::property_tree::ptree root;
-// 	boost::property_tree::read_json(filepath, root);
-
-// 	NetworkNode client, server;
-// 	int clientpackets_sent, serverpackets_sent;
-
-// 	if (root.get<bool>("NODE_1.INIT_CONNECTION")) {
-// 		client.ip_address = ip_address_string_to_vec(root.get<std::string>("NODE_1.IP_ADDRESS"));
-// 		if (root.get<std::string>("NODE_1.TCP_INFO.SOURCE_PORT").compare("random") == 0) {
-// 			client.source_port = rand() % 65535;
-// 		} else {
-// 			client.source_port = root.get<int>("NODE_1.TCP_INFO.SOURCE_PORT");
-// 		}
-// 		clientpackets_sent = root.get<int>("NODE_1.TCP_INFO.PACKETS_SENT");
-
-// 		server.ip_address = ip_address_string_to_vec(root.get<std::string>("NODE_2.IP_ADDRESS"));
-// 		if (root.get<std::string>("NODE_2.TCP_INFO.SOURCE_PORT").compare("random") == 0) {
-// 			server.source_port = rand() % 65535;
-// 		} else {
-// 			server.source_port = root.get<int>("NODE_2.TCP_INFO.SOURCE_PORT");
-// 		}
-// 		serverpackets_sent = root.get<int>("NODE_2.TCP_INFO.PACKETS_SENT");
-// 	} else {
-// 		server.ip_address = ip_address_string_to_vec(root.get<std::string>("NODE_1.IP_ADDRESS"));
-// 		if (root.get<std::string>("NODE_1.TCP_INFO.SOURCE_PORT").compare("random") == 0) {
-// 			server.source_port = rand() % 65535;
-// 		} else {
-// 			server.source_port = root.get<int>("NODE_1.TCP_INFO.SOURCE_PORT");
-// 		}
-
-// 		client.ip_address = ip_address_string_to_vec(root.get<std::string>("NODE_2.IP_ADDRESS"));
-// 		if (root.get<std::string>("NODE_2.TCP_INFO.SOURCE_PORT").compare("random") == 0) {
-// 			client.source_port = rand() % 65535;
-// 		} else {
-// 			client.source_port = root.get<int>("NODE_2.TCP_INFO.SOURCE_PORT");
-// 		}
-// 		clientpackets_sent = root.get<int>("NODE_2.TCP_INFO.PACKETS_SENT");
-// 	}
-// 	return {client, clientpackets_sent, server, serverpackets_sent};
-// }
 
 int main(int argc, char *argv[]) {
-	
-	// std::tuple<NetworkNode, int, NetworkNode, int> generator_1 = read_definition("../SimulatorConfig/simulator1.json");
-	// int x = 0;
-	// std::cout << "Hello World" << std::endl;
-	// std::cout << "Hello No" << std::endl;
+	std::vector<std::string> args;
+	std::string filename;
+	int simulation_time;
+	double rtt_mean;
+	double rtt_stddev;
 
-	std::vector<unsigned char> source = {0x01, 0x02, 0x03, 0x04};
-	std::vector<unsigned char> destination = {0x01, 0x02, 0x03, 0x04};
+	for (int i = 0; i < argc; i++) {
+		args.push_back(std::string(argv[i]));
+	}
 
-	auto n1configs = std::shared_ptr<ConfigReader>(new ConfigReader({"../SimulatorConfig/"}));
+	std::cout << "Enter output filename (include .pcap extension) : ";
+	std::cin >> filename;
+	std::cout << std::endl << "Enter simulation time: ";
+	std::cin >> simulation_time;
+	std::cout << std::endl << "Enter round trip time mean (ms) for the network: ";
+	std::cin >> rtt_mean;
+	std::cout << std::endl << "Enter round trip time standard deviation (ms) for the network: ";
+	std::cin >> rtt_stddev;
 
-	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter("./test.pcap", wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
-	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({1,2}, NetworkLayer::IPv4));
-	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer, n1configs, 500));
+
+	auto n1configs = std::shared_ptr<ConfigReader>(new ConfigReader(args));
+
+	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter(filename, wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
+	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({rtt_mean,rtt_stddev}));
+	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer, n1configs, simulation_time));
 	m->initialize();
 
 	// std::shared_ptr<TCPState> client = std::shared_ptr<TCPState>(new TCPState(std::shared_ptr<TCPSegment>(new TCPSegment)));

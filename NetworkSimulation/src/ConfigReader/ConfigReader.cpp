@@ -24,6 +24,8 @@ const std::string ConfigReader::PACKETS_KEY = "PACKETS";
 const std::string ConfigReader::INTERPACKET_DELAYS_KEY = "INTERPACKET_DELAYS";
 const std::string ConfigReader::SEND_ORDER_KEY = "SEND_ORDER";
 const std::string ConfigReader::APPLICATION_DATA_KEY = "APPLICATION_DATA";
+const std::string ConfigReader::CONNECTION_END_KEY = "CONNECTION_END";
+
 
 ConfigReader::ConfigReader(std::vector<std::string> folders) {
     for (std::string s : folders) {
@@ -118,12 +120,13 @@ void ConfigReader::read_generator_file(std::string filename) {
         auto x = GFStructs::pm_map[p];
         gen.protocol_stack[std::get<GFStructs::LayerModel>(x)] = std::get<GFStructs::ProtocolModel>(x);
     }
-
     gen.client = read_transmitter_from_generator_file(CLIENT_KEY, rtree);
     gen.server = read_transmitter_from_generator_file(SERVER_KEY, rtree);
 
     gen.connection_offset_sec = rtree.get<uint32_t>(CONNECTION_OFFSET_SEC_KEY);
     gen.connection_offset_us = rtree.get<uint32_t>(CONNECTION_OFFSET_USEC_KEY);
+    gen.connection_close = rtree.get<uint32_t>(CONNECTION_END_KEY);
+
     gen.repeats_after = rtree.get<uint32_t>(REPEATS_AFTER_KEY);
 
     gen.application_info = read_application_data_config(rtree.get<std::string>(APPLICATION_DATA_KEY));

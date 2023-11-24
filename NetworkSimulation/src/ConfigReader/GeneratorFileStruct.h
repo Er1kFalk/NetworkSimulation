@@ -52,6 +52,7 @@ namespace GFStructs {
         std::map<LayerModel, ProtocolModel> protocol_stack;
         uint32_t connection_offset_sec;
         uint32_t connection_offset_us;
+        uint32_t connection_close;
         uint32_t repeats_after;
         ApplicationInfo application_info;
         Transmitter client;

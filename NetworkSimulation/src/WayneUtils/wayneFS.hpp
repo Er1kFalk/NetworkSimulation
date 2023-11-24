@@ -8,7 +8,6 @@
 #ifndef LIB_WAYNEFS_HPP_
 #define LIB_WAYNEFS_HPP_
 
-#include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <string>

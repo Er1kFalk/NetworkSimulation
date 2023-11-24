@@ -1,6 +1,5 @@
 #include "BaseScheduler.h"
 #include "Event.h"
-#include <iostream>
 
 void BaseScheduler::dispatch_next_event() {
     auto eq = events.top();

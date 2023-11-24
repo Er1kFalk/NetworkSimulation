@@ -61,11 +61,6 @@ public:
     */
     void receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<IPv4PacketInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
 
-    /*
-    receiver redirecting to tcp
-    */
-    void receive_message(std::shared_ptr<TCPState> client, std::shared_ptr<TCPState> server, uint32_t time_s, uint32_t time_us);
-
     std::shared_ptr<NetworkProperties> get_np() {return np;}
     GFStructs::GeneratorFile get_generatorfile_by_id(uint32_t id);
 };

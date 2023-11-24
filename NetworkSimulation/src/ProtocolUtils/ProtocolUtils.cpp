@@ -1,5 +1,4 @@
 #include "ProtocolUtils.h"
-#include <iostream>
 
 /*
     COURTESY OF RFC1071 P.6
@@ -53,7 +52,6 @@ bool ProtocolUtils::verify_internet_checksum(std::vector<unsigned char> data, un
     while (sum>>16)
         sum = (sum & 0xffff) + (sum >> 16);
 
-    std::cout << sum << std::endl;
     return sum == 0xffff; // true if verified, false if not
 }
 

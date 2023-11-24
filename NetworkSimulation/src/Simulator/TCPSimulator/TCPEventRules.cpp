@@ -92,6 +92,7 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     e->get_current_server_state()->set_initial_seqnr(seqnr);
     syn_ack_segment->set_sequence_nr(seqnr);
     e->get_current_client_state()->add_bytes_received(1);
+    e->get_current_server_state()->add_bytes_sent(1);
 
     syn_ack_segment->set_acknowledgement_nr(e->get_current_server_state()->get_bytes_received() + e->get_current_client_state()->get_initial_seq_nr());
 	syn_ack_segment->set_syn_flag(true);
@@ -149,8 +150,6 @@ void SendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 }
 
 void ClientSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    std::cout << 1 << std::endl;
-
     std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
     
     std::shared_ptr data = std::shared_ptr<Data>(new Data(e->get_current_client_state()->data_send_queue_see_first()));
@@ -175,7 +174,6 @@ void ClientSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
 }
 
 void ServerSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    std::cout << 2 << std::endl;
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
 
 
@@ -191,6 +189,7 @@ void ServerSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
 
     // set fields    
     current_server_state->set_syn_flag(false);
+    current_server_state->set_psh_flag(true);
     current_server_state->recalculate_fields();
 
     e->set_transmitter(GFStructs::TransmittingNow::Server);
@@ -233,7 +232,16 @@ void ClientSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     e->set_transmitter(GFStructs::TransmittingNow::Client);
 }
 
+void TCPReset::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+    e->get_current_client_state()->get_current_segment()->set_rst_flag(true);
+    e->get_current_client_state()->get_current_segment()->set_fin_flag(true);
 
+    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+    e->get_current_client_state()->get_current_segment()->set_ipv4_pseudo_header(genfile.client.ip_info.ip_address, genfile.server.ip_info.ip_address);
+    e->get_current_client_state()->get_current_segment()->recalculate_fields();
+
+    e->set_transmitter(GFStructs::TransmittingNow::Client);
+}
 
 void PassClientStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<IPv4PacketInterface> packet = std::shared_ptr<IPv4PacketInterface>(new IPv4Packet);

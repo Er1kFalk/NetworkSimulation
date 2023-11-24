@@ -3,7 +3,6 @@
 #include <cassert>
 #include <algorithm>
 #include "../BitOperations/BitOperations.h"
-#include <iostream>
 #include "../ProtocolUtils/ProtocolUtils.h"
 #include "../ProtocolConstants/ProtocolConstants.h"
 

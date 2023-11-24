@@ -5,7 +5,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include "GeneratorFileStruct.h"
-#include <iostream>
 
 class ConfigReader {
 private:
@@ -36,6 +35,7 @@ private:
     static const std::string INTERPACKET_DELAYS_KEY;
     static const std::string SEND_ORDER_KEY;
     static const std::string APPLICATION_DATA_KEY;
+    static const std::string CONNECTION_END_KEY;
 
     /*Given a list of json keys, it makes a path that can be used 
     to read the corresponding value in a nested json structure*/
@@ -73,7 +73,6 @@ private:
             for (boost::property_tree::ptree::value_type &val2 : val1.second) {
                 temp.push_back(stoi(val2.second.data()));
             }
-            std::cout << std::endl;
             v.push_back(temp);
         }
 

@@ -5,7 +5,6 @@
 #include <cassert>
 #include "../CommunicationProtocol.h"
 #include <memory>
-#include <iostream>
 
 namespace ProtocolUtils {
     
