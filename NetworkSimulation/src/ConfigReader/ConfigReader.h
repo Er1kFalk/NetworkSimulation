@@ -71,8 +71,9 @@ private:
         for (boost::property_tree::ptree::value_type &val1 : json.get_child(key)) {
             std::vector<T> temp = {};
             for (boost::property_tree::ptree::value_type &val2 : val1.second) {
-                temp.push_back(std::stoi(val2.second.data()));
+                temp.push_back(stoi(val2.second.data()));
             }
+            std::cout << std::endl;
             v.push_back(temp);
         }
 

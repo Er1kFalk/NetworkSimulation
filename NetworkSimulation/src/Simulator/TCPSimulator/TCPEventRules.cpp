@@ -19,9 +19,9 @@
 std::shared_ptr<RandomUtils> TCPEventRule::generator = std::shared_ptr<RandomUtils>(new RandomUtils());
 
 void TCPEventRule::send_data(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    if (!e->nothing_left_to_send()) {
-        GFStructs::TransmittingNow t = e->send_order_see_first();
+    if (!e->send_queue_empty()) {
         TCPEventPtr tcpevent = e;
+        GFStructs::TransmittingNow t = tcpevent->send_order_see_first();
         if (t == GFStructs::TransmittingNow::Client) {
             tcpevent->set_event_rules({TCPEventRulePtr(new ClientSendData)});
             uint32_t interpacket_delay = tcpevent->get_current_client_state()->interpacket_delays_see_first();
@@ -29,7 +29,6 @@ void TCPEventRule::send_data(TCPEventPtr e, std::shared_ptr<BaseScheduler> sched
             tcpevent->get_current_client_state()->remove_from_interpacket_delays();
             tcpevent->remove_from_send_order();
         } else if (t == GFStructs::TransmittingNow::Server) {
-            std::cout << 1 << std::endl;
             tcpevent->set_event_rules({TCPEventRulePtr(new ServerSendData)});
             uint32_t interpacket_delay = tcpevent->get_current_server_state()->interpacket_delays_see_first();
             scheduler->schedule(tcpevent, 0, interpacket_delay);
@@ -59,16 +58,19 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     client->set_syn_flag(true);
     client->set_ack_flag(false);
 	client->set_acknowledgement_nr(0);
+    
     uint32_t seqnr = generator->generate_uniform_number() * (double) ((1ul<<32)-1);
-    e->get_current_client_state()->add_bytes_sent(seqnr+1);
+    e->get_current_client_state()->set_initial_seqnr(seqnr);
+    e->get_current_client_state()->add_bytes_sent(1);
+    e->get_current_server_state()->add_bytes_received(1);
     client->set_sequence_nr(seqnr);
+
     client->add_mss_option(genfile.client.tcp_info.mss);
     uint32_t choose_index = generator->generate_uniform_number() * (double) (genfile.client.tcp_info.window_sizes.size()-1);
     client->set_window_size(genfile.client.tcp_info.window_sizes[choose_index]);
     client->recalculate_fields();
 
     e->set_transmitter(GFStructs::TransmittingNow::Client);
-    e->remove_from_send_order();
     //e->set_current_client_state(syn_segment);
 
     // delay stuff
@@ -87,10 +89,11 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     std::shared_ptr syn_ack_segment = e->get_current_server_state()->get_current_segment();
     
     uint32_t seqnr = generator->generate_uniform_number() * (double) ((1ul<<32)-1);
+    e->get_current_server_state()->set_initial_seqnr(seqnr);
     syn_ack_segment->set_sequence_nr(seqnr);
-    e->get_current_server_state()->add_bytes_sent(seqnr+1);
-    syn_ack_segment->set_acknowledgement_nr(current_client_state->get_sequence_nr() + 1);
+    e->get_current_client_state()->add_bytes_received(1);
 
+    syn_ack_segment->set_acknowledgement_nr(e->get_current_server_state()->get_bytes_received() + e->get_current_client_state()->get_initial_seq_nr());
 	syn_ack_segment->set_syn_flag(true);
 	syn_ack_segment->set_ack_flag(true);
     
@@ -101,7 +104,6 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     syn_ack_segment->recalculate_fields();
 
     e->set_transmitter(GFStructs::TransmittingNow::Server);
-    e->remove_from_send_order();
 
     TCPEventPtr tcpevent = e->copy();
     assert(e.get() != tcpevent.get());
@@ -125,9 +127,8 @@ void SendInitialAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
     std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
 
-    current_client_state->set_acknowledgement_nr(current_server_state->get_sequence_nr() + 1);
-    // current_client_state->set_sequence_nr(e->get_current_client_state()->get_seq_nr());
-    // e->get_current_client_state()->add_bytes_sent(1);
+    current_client_state->set_acknowledgement_nr(e->get_current_client_state()->get_bytes_received() + e->get_current_server_state()->get_initial_seq_nr());
+
     current_client_state->set_syn_flag(false);
 	current_client_state->set_ack_flag(true);
     current_client_state->set_options({}); // clear the option
@@ -139,7 +140,6 @@ void SendInitialAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
     current_client_state->recalculate_fields();
 
     e->set_transmitter(GFStructs::TransmittingNow::Client);
-    e->remove_from_send_order();
 
     TCPEventRule::send_data(e, scheduler);
 }
@@ -149,47 +149,67 @@ void SendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 }
 
 void ClientSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    if (!e->nothing_left_to_send()) {
-        std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
-        std::shared_ptr data = std::shared_ptr<Data>(new Data(e->get_current_client_state()->data_send_queue_see_first()));
-        e->get_current_client_state()->remove_from_data_send_queue();
-        current_client_state->set_payload(data);
-        e->set_transmitter(GFStructs::TransmittingNow::Client);
-        e->remove_from_send_order();
-        current_client_state->set_sequence_nr(e->get_current_client_state()->get_seq_nr());
-        e->get_current_client_state()->add_bytes_sent(data->header_payload_to_array().size());
-        current_client_state->set_psh_flag(true);
-        current_client_state->recalculate_fields();
+    std::cout << 1 << std::endl;
 
-        TCPEventRule::send_data(e, scheduler);
+    std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
+    
+    std::shared_ptr data = std::shared_ptr<Data>(new Data(e->get_current_client_state()->data_send_queue_see_first()));
+    e->get_current_client_state()->remove_from_data_send_queue();
+    current_client_state->set_payload(data);
+    
+    e->set_transmitter(GFStructs::TransmittingNow::Client);
+    
+    current_client_state->set_sequence_nr(e->get_current_client_state()->get_bytes_sent() + e->get_current_client_state()->get_initial_seq_nr());
+    e->get_current_client_state()->add_bytes_sent(data->header_payload_to_array().size());
+    e->get_current_server_state()->add_bytes_received(data->header_payload_to_array().size());
+    
+    current_client_state->set_psh_flag(true);
+    current_client_state->recalculate_fields();
 
-        TCPEventPtr tcpevent = e->copy();
-        e->set_event_rules({TCPEventRulePtr(new ServerSendAck)});
-        uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0;
-        scheduler->schedule(tcpevent, 0, rtt);
-    }
+    TCPEventRule::send_data(e->copy(), scheduler);
+
+    TCPEventPtr tcpevent = e->copy();
+    tcpevent->set_event_rules({TCPEventRulePtr(new ServerSendAck)});
+    uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0;
+    scheduler->schedule(tcpevent, 0, rtt);
 }
 
 void ServerSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
-    if (!e->nothing_left_to_send()) {
-        std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
-        std::shared_ptr data = std::shared_ptr<Data>(new Data(e->get_current_server_state()->data_send_queue_see_first()));
-        e->get_current_server_state()->remove_from_data_send_queue();
-        current_server_state->set_payload(data);
-        current_server_state->set_syn_flag(false);
-        e->set_transmitter(GFStructs::TransmittingNow::Server);
-        e->remove_from_send_order();
-        current_server_state->recalculate_fields();
+    std::cout << 2 << std::endl;
+    std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
 
-        TCPEventRule::send_data(e, scheduler);
-    }
+
+    // set the payload
+    std::shared_ptr data = std::shared_ptr<Data>(new Data(e->get_current_server_state()->data_send_queue_see_first()));
+    e->get_current_server_state()->remove_from_data_send_queue(); 
+    current_server_state->set_payload(data);
+
+    current_server_state->set_sequence_nr(e->get_current_server_state()->get_bytes_sent() + e->get_current_server_state()->get_initial_seq_nr());
+    e->get_current_server_state()->add_bytes_sent(data->header_payload_to_array().size());
+    e->get_current_client_state()->add_bytes_received(data->header_payload_to_array().size());
+
+
+    // set fields    
+    current_server_state->set_syn_flag(false);
+    current_server_state->recalculate_fields();
+
+    e->set_transmitter(GFStructs::TransmittingNow::Server);
+
+    // schedule any data sending events, if needed
+    TCPEventRule::send_data(e->copy(), scheduler);
+
+    // schedule an ack event (by client)
+    TCPEventPtr tcpevent = e->copy();
+    tcpevent->set_event_rules({TCPEventRulePtr(new ClientSendAck)});
+    uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0;
+    scheduler->schedule(tcpevent, 0, rtt);
 }
 
 void ServerSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
     std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
     // current_server_state->set_sequence_nr(current_client_state->get_acknowledgement_nr());
-    current_server_state->set_acknowledgement_nr(current_client_state->get_sequence_nr() + current_client_state->header_payload_to_array().size()-current_client_state->header_to_array().size());
+    current_server_state->set_acknowledgement_nr(e->get_current_server_state()->get_bytes_received() + e->get_current_client_state()->get_initial_seq_nr());
     current_server_state->set_syn_flag(false);
     current_server_state->set_payload(nullptr);
     current_server_state->recalculate_fields();
@@ -198,13 +218,29 @@ void ServerSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     e->set_transmitter(GFStructs::TransmittingNow::Server);
 }
 
+void ClientSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+    std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
+    std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
+    // current_server_state->set_sequence_nr(current_client_state->get_acknowledgement_nr());
+    current_client_state->set_acknowledgement_nr(e->get_current_client_state()->get_bytes_received() + e->get_current_server_state()->get_initial_seq_nr());
+    current_client_state->set_syn_flag(false);
+    current_client_state->set_psh_flag(false);
+    current_client_state->set_payload(nullptr);
+    current_client_state->recalculate_fields();
+    current_server_state->set_sequence_nr(e->get_current_server_state()->get_bytes_sent() + e->get_current_server_state()->get_initial_seq_nr());
+    
+
+    e->set_transmitter(GFStructs::TransmittingNow::Client);
+}
+
+
+
 void PassClientStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<IPv4PacketInterface> packet = std::shared_ptr<IPv4PacketInterface>(new IPv4Packet);
     packet->set_dscp(0);
     packet->set_ecn(0);
     packet->set_df_flag(true);
     packet->set_protocol(0x06); // determined by upper layer protocol
-    
 
     scheduler->get_parent()->receive_message(e, e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
 }

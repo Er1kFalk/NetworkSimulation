@@ -59,7 +59,6 @@ void NetworkNodeSimulator::initialize() {
     scheduler->set_parent(shared_from_this());
 
     auto genfiles = confreader->get_generatorfiles();
-
     for (uint32_t i = 0; i < genfiles.size(); i++) {
 
         generatorfiles[i] = genfiles[i];

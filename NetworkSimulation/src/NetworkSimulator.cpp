@@ -218,8 +218,6 @@ int main(int argc, char *argv[]) {
 
 	// m->receive_message(client, server, 0, 0);
 
-	m->initialize();
-
 	m->run();
 
 
