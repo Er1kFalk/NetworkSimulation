@@ -4,6 +4,7 @@
 #include <tuple>
 #include <memory>
 #include <map>
+#include <queue>
 
 #include "../../TCPSegment/TCPSegmentInterface.h"
 #include "../../TCPSegment/TCPSegment.h"
@@ -16,32 +17,28 @@
 class TCPState {
 private:
     std::shared_ptr<TCPSegmentInterface> current_segment;
-    bool is_retransmission; // true if this segment is a retransmission of a previous one
-    bool first_rtt_measurement_made; // true if we have measured the first RTT in this session, otherwise false 
-    int SRTT, RTTVAR, RTO;
+    std::queue<std::vector<unsigned char>> data_send_queue;
+    std::queue<uint32_t> interpacket_delays;
+    uint32_t seq_nr;
 public:
     TCPState(std::shared_ptr<TCPSegmentInterface> current_segment) {
         this->current_segment = current_segment;
-        this->SRTT = 0;
-        this->RTTVAR = 0;
-        this->RTO = 3000; // initially set to 3 seconds (3000ms)
-        this->is_retransmission = false;
-        this->first_rtt_measurement_made = false;
+        this->seq_nr = 0;
     }
 
-    int get_srtt() {return this->SRTT;}
-    int get_rttvar() {return this->RTTVAR;}
-    int get_rto() {return this->RTO;}
     std::shared_ptr<TCPSegmentInterface> get_current_segment() {return this->current_segment;}
-    bool get_is_retransmission() {return this->is_retransmission;}
-    bool get_first_rtt_measurement_made() {return this->first_rtt_measurement_made;}
 
-    void set_srtt(int SRTT) {this->SRTT = SRTT;}
-    void set_rttvar(int RTTVAR) {this->RTTVAR = RTTVAR;}
-    void set_rto(int RTO) {this->RTO = RTO;}
     void set_current_segment(std::shared_ptr<TCPSegmentInterface> current_segment) {this->current_segment = current_segment;}
-    void set_is_retransmission(bool is_retransmission) {this->is_retransmission = is_retransmission;}
-    void set_first_rtt_measurement_made(bool first_rtt_measurement_made) {this->first_rtt_measurement_made = first_rtt_measurement_made;}
+    void add_to_data_send_queue(std::vector<unsigned char> packet) {data_send_queue.push(packet);}
+    void remove_from_data_send_queue() {data_send_queue.pop();}
+    std::vector<unsigned char> data_send_queue_see_first() {return data_send_queue.front();}
+
+    void add_bytes_sent(uint32_t bytes_sent) {this->seq_nr+=bytes_sent;}
+    uint32_t get_seq_nr() {return this->seq_nr;}
+
+    void add_to_interpacket_delays(uint32_t delay) {this->interpacket_delays.push(delay);}
+    void remove_from_interpacket_delays() {this->interpacket_delays.pop();}
+    uint32_t interpacket_delays_see_first() {return this->interpacket_delays.front();}
 
     std::shared_ptr<TCPState> copy() {
         auto newstate = std::make_shared<TCPState>(*this);
@@ -57,24 +54,19 @@ protected:
     std::vector<TCPEventRulePtr> event_rules;
     std::shared_ptr<TCPState> current_client_state;
     std::shared_ptr<TCPState> current_server_state;
+    std::queue<GFStructs::TransmittingNow> send_order;
     NetworkLayer nlayer; // network protocol to pass TCP data to
-    static std::map<std::tuple<GFStructs::ProtocolModel, Transmitter>, TCPEventRulePtr> pass_to_layer;
+    static std::map<std::tuple<GFStructs::ProtocolModel, GFStructs::TransmittingNow>, TCPEventRulePtr> pass_to_layer;
 public:
     TCPEvent(std::shared_ptr<TCPState> current_client_state, std::shared_ptr<TCPState> current_server_state, NetworkLayer nlayer) {
         this->current_client_state = current_client_state;
         this->current_server_state = current_server_state;
         this->nlayer = nlayer;
-        this->set_transmitter(Transmitter::Client);
-
-        // this->current_client_state->set_source_port(client_source_port);
-        // this->current_client_state->set_destination_port(client_destination_port);
-	    // this->current_client_state->set_sequence_nr(231321); // random
-        // this->current_client_state->set_window_size(65465);
-
-        // this->current_server_state->set_source_port(client_destination_port);
-	    // this->current_server_state->set_destination_port(client_source_port);
-	    // this->current_server_state->set_sequence_nr(231321); // random
-        // this->current_server_state->set_window_size(65465);
+        this->set_transmitter(GFStructs::TransmittingNow::Client);
+        
+        this->send_order.push(GFStructs::TransmittingNow::Client);
+        this->send_order.push(GFStructs::TransmittingNow::Server);
+        this->send_order.push(GFStructs::TransmittingNow::Client);
     }
 
     void set_current_client_state(std::shared_ptr<TCPState> current_client_state) {this->current_client_state = current_client_state;}
@@ -88,7 +80,12 @@ public:
     
     void set_nlayer(NetworkLayer nlayer) {this->nlayer = nlayer;}
     NetworkLayer get_nlayer() {return nlayer;}
-    
+
+    void add_to_send_order(GFStructs::TransmittingNow sender) {this->send_order.push(sender);}
+    void remove_from_send_order() {this->send_order.pop();}
+    GFStructs::TransmittingNow send_order_see_first() {return this->send_order.front();}
+    bool nothing_left_to_send() {return this->send_order.empty();}
+
     std::shared_ptr<TCPEvent> copy() { // copy the state. but reset everything else
         std::shared_ptr<TCPEvent> e = std::make_shared<TCPEvent>(*this);
         e->current_client_state = this->current_client_state->copy();

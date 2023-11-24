@@ -2,25 +2,20 @@
     "PROTOCOL_STACK" : ["TCP", "IPv4", "Ethernet"],
     "CONNECTION_OFFSET_SEC" : 10,
     "CONNECTION_OFFSET_USEC" : 213,
-    "REPEATS_AFTER" : 21332,
+    "REPEATS_AFTER" : 10000,
+    "APPLICATION_DATA" : "../ApplicationDataConfigs/applicationdata.json",
     "CLIENT" : {
         "INIT_CONNECTION" : true,
         "END_CONNECTION" : true,
         "IP_INFO" : {
             "IP_ADDRESS" : "application set",
-            "TTL" : [128]
+            "TTL" : 128
         },
         "TCP_INFO" : {
             "SOURCE_PORT" : "application set",
             "MSS" : 1460,
-            "PACKETS_SENT" : 8
-        },
-        "APPLICATION_DATA" : {
-            "RANDOM" : true,
-            "PACKET_SIZES" : [10, 20, 30, 40],
-            "APPLICATION_DATA" : {
-            
-            }
+            "PACKETS_SENT" : 8,
+            "WINDOW_SIZES" : [4535, 5435, 5435]
         }
     },
     "SERVER" : {
@@ -28,12 +23,13 @@
         "END_CONNECTION" : false,
         "IP_INFO" : {
             "IP_ADDRESS" : "40.113.10.67",
-            "TTL" : [64]
+            "TTL" : 64
         },
         "TCP_INFO" : {
             "SOURCE_PORT" : 443,
             "MSS" : 1440,
-            "PACKETS_SENT" : 10
+            "PACKETS_SENT" : 10,
+            "WINDOW_SIZES" : [4535, 5435, 5435]
         }
     }
 }

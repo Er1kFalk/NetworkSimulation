@@ -1,0 +1,17 @@
+{
+    "CLIENT" : {
+        "PACKETS" : [
+            [1, 2, 3, 4, 5, 6],
+            [5, 43, 3, 4, 5]
+        ],
+        "INTERPACKET_DELAYS" : [10, 20]
+    },
+    "SERVER" : {
+        "PACKETS" : [
+            [1000, 2000, 300],
+            [2000, 2000, 1000]
+        ],
+        "INTERPACKET_DELAYS" : [5, 7]
+    },
+    "SEND_ORDER" : ["CLIENT", "SERVER", "CLIENT", "SERVER"]
+}

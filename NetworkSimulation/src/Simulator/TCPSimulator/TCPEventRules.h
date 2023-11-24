@@ -10,11 +10,14 @@
 class BaseScheduler;
 
 class TCPEventRule {
-
+protected:
+    static std::shared_ptr<RandomUtils> generator;
 public:
     virtual void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) = 0;
     // static void init_connection(TCPEventPtr e);
     // static void send_syn(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler);
+
+    static void send_data(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler);
 };
 
 class SendSyn : public TCPEventRule {
@@ -25,7 +28,23 @@ class ReceiveSynAck : public TCPEventRule {
     void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
 };
 
-class SendAck : public TCPEventRule {
+class SendInitialAck : public TCPEventRule {
+    void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+};
+
+class SendData : public TCPEventRule {
+    void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+};
+
+class ServerSendData : public TCPEventRule {
+    void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+};
+
+class ClientSendData : public TCPEventRule {
+    void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+};
+
+class ServerSendAck : public TCPEventRule {
     void handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
 };
 

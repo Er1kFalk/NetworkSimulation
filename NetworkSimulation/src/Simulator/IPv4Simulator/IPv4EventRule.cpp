@@ -19,12 +19,14 @@ void SendIPv4DataClient::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> s
     
     auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
 
-    if (e->get_transmitter() == Transmitter::Client) {
+    if (e->get_transmitter() == GFStructs::TransmittingNow::Client) {
         packet->set_source(genfile.client.ip_info.ip_address);
         packet->set_destination(genfile.server.ip_info.ip_address);
+        packet->set_time_to_live(genfile.client.ip_info.ttl_values);
     } else {
         packet->set_source(genfile.server.ip_info.ip_address);
         packet->set_destination(genfile.client.ip_info.ip_address);
+        packet->set_time_to_live(genfile.server.ip_info.ttl_values);
     }
 
 

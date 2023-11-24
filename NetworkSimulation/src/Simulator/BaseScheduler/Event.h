@@ -11,11 +11,11 @@ class BaseScheduler;
 class Event {
 private:
     uint32_t id;
-    Transmitter tx;
+    GFStructs::TransmittingNow tx;
 public:
     virtual void apply_rules(std::shared_ptr<BaseScheduler> scheduler) = 0;
-    void set_transmitter(Transmitter tx) {this->tx = tx;}
-    Transmitter get_transmitter() {return this->tx;}
+    void set_transmitter(GFStructs::TransmittingNow tx) {this->tx = tx;}
+    GFStructs::TransmittingNow get_transmitter() {return this->tx;}
     void set_id(uint32_t id) {this->id = id;}
     uint32_t get_id() {return this->id;}
 };

@@ -4,8 +4,8 @@
 // #include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 
 // std::map<std::tuple<NetworkLayer, Transmitter>, TCPEventRulePtr> TCPScheduler::pass_to_layer = {
-//     {{NetworkLayer::IPv4, Transmitter::Client}, TCPEventRulePtr(new PassClientStateToIPv4)},
-//     {{NetworkLayer::IPv4, Transmitter::Server}, TCPEventRulePtr(new PassServerStateToIPv4)}
+//     {{NetworkLayer::IPv4, GFStructs::TransmittingNow::Client}, TCPEventRulePtr(new PassClientStateToIPv4)},
+//     {{NetworkLayer::IPv4, GFStructs::TransmittingNow::Server}, TCPEventRulePtr(new PassServerStateToIPv4)}
 // };
 
 // void TCPScheduler::schedule(TCPEventPtr e, std::vector<TCPEventRulePtr> r, uint64_t time) {

@@ -5,11 +5,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include "GeneratorFileStruct.h"
-
+#include <iostream>
 
 class ConfigReader {
 private:
-    static uint32_t id; // MAYBE not needed
     std::vector<GFStructs::GeneratorFile> generatorfiles;
     std::vector<std::string> folders;
 
@@ -32,6 +31,11 @@ private:
     static const std::string SOURCE_PORT_KEY;
     static const std::string MSS_KEY;
     static const std::string PACKETS_SENT_KEY;
+    static const std::string WINDOW_SIZES_KEY;
+    static const std::string PACKETS_KEY;
+    static const std::string INTERPACKET_DELAYS_KEY;
+    static const std::string SEND_ORDER_KEY;
+    static const std::string APPLICATION_DATA_KEY;
 
     /*Given a list of json keys, it makes a path that can be used 
     to read the corresponding value in a nested json structure*/
@@ -59,9 +63,26 @@ private:
         return v;
     }
 
+
+    template<typename T>
+    std::vector<std::vector<T>> read_json_list_of_lists(std::string key, boost::property_tree::ptree json) {
+        std::vector<std::vector<T>> v;
+
+        for (boost::property_tree::ptree::value_type &val1 : json.get_child(key)) {
+            std::vector<T> temp = {};
+            for (boost::property_tree::ptree::value_type &val2 : val1.second) {
+                temp.push_back(std::stoi(val2.second.data()));
+            }
+            v.push_back(temp);
+        }
+
+        return v;
+    }
+
     GFStructs::Transmitter read_transmitter_from_generator_file(std::string transmitter_key, boost::property_tree::ptree json);
     void read_generator_file(std::string filename);
     void read_generator_files(std::string folder);
+    GFStructs::ApplicationInfo read_application_data_config(std::string filename);
 public:
     ConfigReader(std::vector<std::string> folders);
     std::vector<GFStructs::GeneratorFile> get_generatorfiles() {return generatorfiles;}

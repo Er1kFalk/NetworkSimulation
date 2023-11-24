@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 
 	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter("./test.pcap", wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
 	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({1,2}, NetworkLayer::IPv4));
-	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer, n1configs, 50));
+	std::shared_ptr<NetworkNodeSimulator> m = std::shared_ptr<NetworkNodeSimulator>(new NetworkNodeSimulator (np, writer, n1configs, 500));
 	m->initialize();
 
 	// std::shared_ptr<TCPState> client = std::shared_ptr<TCPState>(new TCPState(std::shared_ptr<TCPSegment>(new TCPSegment)));

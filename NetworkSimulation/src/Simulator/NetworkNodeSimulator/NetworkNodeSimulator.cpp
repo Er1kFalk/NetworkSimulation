@@ -17,21 +17,41 @@
 
 void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::GeneratorFile gf) {
     auto client = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
-        auto server = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+    auto server = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
 
-        auto client_state = std::shared_ptr<TCPState>(new TCPState(client->copy()));
-        auto server_state = std::shared_ptr<TCPState>(new TCPState(server->copy()));
+    auto client_state = std::shared_ptr<TCPState>(new TCPState(client->copy()));
+    auto server_state = std::shared_ptr<TCPState>(new TCPState(server->copy()));
 
-        auto event = std::shared_ptr<TCPEvent>(new TCPEvent(client_state, server_state, NetworkLayer::IPv4));
-        event->set_id(id);
+    for (std::vector<unsigned char> packet : gf.application_info.client.packets) {
+        client_state->add_to_data_send_queue(packet);
+    }
 
-        uint32_t j = gf.connection_offset_sec;
-        while (j < this->max_gen_time) {
-            auto to_schedule = event->copy();
-            to_schedule->set_event_rules({TCPEventRulePtr(new SendSyn)});
-            this->scheduler->schedule(to_schedule, j, time_us);
-            j += gf.connection_offset_sec;
-        }
+    for (uint32_t delay : gf.application_info.client.interpacket_delay) {
+        client_state->add_to_interpacket_delays(delay);
+    }
+
+    for (std::vector<unsigned char> packet : gf.application_info.server.packets) {
+        server_state->add_to_data_send_queue(packet);
+    }
+
+    for (uint32_t delay : gf.application_info.server.interpacket_delay) {
+        server_state->add_to_interpacket_delays(delay);
+    }
+
+    auto event = std::shared_ptr<TCPEvent>(new TCPEvent(client_state, server_state, NetworkLayer::IPv4));
+    event->set_id(id);
+
+    for (GFStructs::TransmittingNow t : gf.application_info.send_order) {
+        event->add_to_send_order(t);
+    }
+
+    uint32_t j = gf.connection_offset_sec;
+    while (j < this->max_gen_time) {
+        auto to_schedule = event->copy();
+        to_schedule->set_event_rules({TCPEventRulePtr(new SendSyn)});
+        this->scheduler->schedule(to_schedule, j, time_us);
+        j += gf.repeats_after;
+    }
 }
 
 void NetworkNodeSimulator::initialize() {
