@@ -112,9 +112,9 @@ Generator configs are specified in .json. Such a file looks like this:
 }
 ```
 
-The _PROTOCOL_STACK_ defines which protocols are used, from the transport layer and all the way down to the link layer. Currently only TCP, IPv4 and Ethernet are supported, but it is planned to add more protocols in the future.
-_CONNECTION_OFFSET_ defines when the first packet is transmitted. (_CONNECTION_OFFSET_SEC_ is in seconds and _USEC_ is in micro seconds).
-_CONNECTION_END_ defines when the connection is terminated. In TCP, this means a RST or when the 4-way close will occur. If _CONNECTION_END_ < _CONNECTION_OFFSET_, it will result in weird behavior (i.e. you will first get a close dialog, then a 3-way handshake opening the connection, and then the data exchange).
-_REPEATS_AFTER_ means that this session will be repeated after the time specified, in minutes. 
+* The _PROTOCOL_STACK_ defines which protocols are used, from the transport layer and all the way down to the link layer. Currently only TCP, IPv4 and Ethernet are supported, but it is planned to add more protocols in the future.
+* _CONNECTION_OFFSET_ defines when the first packet is transmitted. (_CONNECTION_OFFSET_SEC_ is in seconds and _USEC_ is in micro seconds).
+* _CONNECTION_END_ defines when the connection is terminated. In TCP, this means a RST or when the 4-way close will occur. If _CONNECTION_END_ < _CONNECTION_OFFSET_, it will result in weird behavior (i.e. you will first get a close dialog, then a 3-way handshake opening the connection, and then the data exchange).
+* _REPEATS_AFTER_ means that this session will be repeated after the time specified, in minutes. 
 
 
