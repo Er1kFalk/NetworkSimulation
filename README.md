@@ -30,11 +30,11 @@ Ubuntu install: sudo apt install lcov
 # Building
 ## Building the network simulator
 1. Go to the _NetworkSimulation_ folder
-2. mkdir build && cd build
+2. `mkdir build && cd build`
 
 Then build by:
-3. cmake ..
-4. make
+3. `cmake ..`
+4. `make`
 
 **Note**: Currently the compilation process is (very) slow. This is due to the CMAKE file using glob. A better compilation process will have to be developed in the future.
 
