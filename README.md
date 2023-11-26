@@ -52,7 +52,7 @@ If you want to also generate code coverage, run ./gen_coverage.sh.
 It will not work for all systems, since it is platform dependent.
 
 # Running the network simulator
-In order to run the network simulator, you have to specify the folders where your generator files are located as run argument. All generator files in that folder will then be used to generate traffic.
+In order to run the network simulator, you have to specify the folders where your generator configs are located as run argument. All generator files in that folder will then be used to generate traffic.
 You can specify multiple generator files. For example:
 
 ```
@@ -70,11 +70,51 @@ Currently, only a single node can be simulated.
 
 After running `./NetworkSimulation.out` you will be prompted for a output filename, the average RTT and the standard deviation of the RTT in the network you want to simulate. In addition, you will be told to specify the simulation time, in seconds. After that it runs, and an output PCAP file with the simulated traces is generated.
 
+# Specifying generator configs
+Generator configs are specified in .json. Such a file looks like this:
 
+```json
+{
+    "PROTOCOL_STACK" : ["TCP", "IPv4", "Ethernet"],
+    "CONNECTION_OFFSET_SEC" : 10,
+    "CONNECTION_OFFSET_USEC" : 213,
+    "CONNECTION_END" : 110,
+    "REPEATS_AFTER" : 150,
+    "APPLICATION_DATA" : "../ApplicationDataConfigs/applicationdata.json",
+    "CLIENT" : {
+        "INIT_CONNECTION" : true,
+        "END_CONNECTION" : true,
+        "IP_INFO" : {
+            "IP_ADDRESS" : "192.168.0.1",
+            "TTL" : 128
+        },
+        "TCP_INFO" : {
+            "SOURCE_PORT" : "application set",
+            "MSS" : 1460,
+            "PACKETS_SENT" : 8,
+            "WINDOW_SIZES" : [4535, 5435, 5435]
+        }
+    },
+    "SERVER" : {
+        "INIT_CONNECTION" : false,
+        "END_CONNECTION" : false,
+        "IP_INFO" : {
+            "IP_ADDRESS" : "40.113.10.67",
+            "TTL" : 64
+        },
+        "TCP_INFO" : {
+            "SOURCE_PORT" : 443,
+            "MSS" : 1440,
+            "PACKETS_SENT" : 10,
+            "WINDOW_SIZES" : [4535, 5435, 5435]
+        }
+    }
+}
+```
 
-
-
-
-
+The _PROTOCOL_STACK_ defines which protocols are used, from the transport layer and all the way down to the link layer. Currently only TCP, IPv4 and Ethernet are supported, but it is planned to add more protocols in the future.
+_CONNECTION_OFFSET_ defines when the first packet is transmitted. (_CONNECTION_OFFSET_SEC_ is in seconds and _USEC_ is in micro seconds).
+_CONNECTION_END_ defines when the connection is terminated. In TCP, this means a RST or when the 4-way close will occur. If _CONNECTION_END_ < _CONNECTION_OFFSET_, it will result in weird behavior (i.e. you will first get a close dialog, then a 3-way handshake opening the connection, and then the data exchange).
+_REPEATS_AFTER_ means that this session will be repeated after the time specified, in minutes. 
 
 
