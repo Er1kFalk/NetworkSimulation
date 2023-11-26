@@ -22,9 +22,11 @@ git clone https://github.com/google/googletest.git
 mkdir build && cd build
 cmake ..
 make
-copy lib files to /usr/local/lib
-copy header files to /usr/local/include
 ```
+
+Then:
+copy lib files to `/usr/local/lib`
+copy header files to `/usr/local/include`
 
 - **LCOV**: Used for generating code coverage documentation. 
 Ubuntu install: sudo apt install lcov
