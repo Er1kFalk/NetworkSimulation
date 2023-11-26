@@ -3,9 +3,6 @@ Dependencies:
 libpcap:
 apt install libpcap-dev
 
-zlib:
-apt install zlib1g-dev
-
 GOOGLE TEST:
 cd /usr/src # folder where you want to download src files to
 git clone https://github.com/google/googletest.git
@@ -20,10 +17,3 @@ sudo apt install lcov
 
 BOOST:
 apt install libboost-all-dev
-
-PCAPPLUSPLUS:
-Go to https://github.com/seladb/PcapPlusPlus/releases/tag/v23.09.
-Download latest release for distro + extract
-Copy include files to /usr/local/include/pcapplusplus
-Copy lib files to /usr/local/lib/
-Copy bin files to /usr/local/bin/
