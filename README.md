@@ -115,6 +115,10 @@ Generator configs are specified in .json. Such a file looks like this:
 * The _PROTOCOL_STACK_ defines which protocols are used, from the transport layer and all the way down to the link layer. Currently only TCP, IPv4 and Ethernet are supported, but it is planned to add more protocols in the future.
 * _CONNECTION_OFFSET_ defines when the first packet is transmitted. (_CONNECTION_OFFSET_SEC_ is in seconds and _USEC_ is in micro seconds).
 * _CONNECTION_END_ defines when the connection is terminated. In TCP, this means a RST or when the 4-way close will occur. If _CONNECTION_END_ < _CONNECTION_OFFSET_, it will result in weird behavior (i.e. you will first get a close dialog, then a 3-way handshake opening the connection, and then the data exchange).
-* _REPEATS_AFTER_ means that this session will be repeated after the time specified, in minutes. 
+* _REPEATS_AFTER_ means that this session will be repeated after the time specified, in minutes.
+* _APPLICATION_DATA_ points to an application data configuration file that defines how data should be exchanged (by defining the data contained in the packets for both client and server, the delay between sending the packets, and the send pattern between client and server).
+* _CLIENT_ and _SERVER _defines the configuration of the client (the one initiating a connection) and the server. _INIT_CONNECTION_ and _END_CONNECTION_ is not used to do anything currently. However, the parser still needs them. _END_CONNECTION_ will be used in the future to determine _which_ of the client and server that initiates the closing of a connection. Note that currently connections are closed using RST (a very rude close), which is not very realistic.
+* _IP_INFO_ defines the configuration for the IPv4 protocol. Currently, this is only the IPv4 address and time to live. Since TTL values almost never change during a session, only one value can be chosen.
+* _TCP_INFO_ defines the configuration for the TCP protocol. Right now only _SOURCE_PORT_, _MSS_ and _WINDOW_SIZES_ have an effect (_PACKETS SENT_ is a left over that is not really used anymore). _WINDOW SIZES_ is a list of window sizes. When simulating, TCP will choose one of these window sizes, at random, for every segment.
 
 
