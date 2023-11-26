@@ -6,16 +6,17 @@ PCAPNG is currently not supported.
 - Unit tests are located in the NetworkSimTesting folder.
 - The code base is located in the NetworkSimulation folder.
 
-# Dependencies
+# Network Simulator Dependencies
 The project depends on the following libraries:
-- libpcap: In order to write .pcap files. See https://www.tcpdump.org/.
+- **libpcap**: In order to write .pcap files. See https://www.tcpdump.org/.
 Ubuntu install: `apt install libpcap-dev`
-- BOOST: For reading JSON configuration files.
+- **BOOST**: For reading JSON configuration files.
 Ubuntu install: apt install libboost-all-dev
 
 # Testing dependencies
-- Google Test: Used for unit testing. See https://github.com/google/googletest.git.
+- **Google Test**: Used for unit testing. See https://github.com/google/googletest.git.
 Ubuntu install:
+```bash
 cd /usr/src
 git clone https://github.com/google/googletest.git
 mkdir build && cd build
@@ -23,8 +24,9 @@ cmake ..
 make
 copy lib files to /usr/local/lib
 copy header files to /usr/local/include
+```
 
-- LCOV: Used for generating code coverage documentation. 
+- **LCOV**: Used for generating code coverage documentation. 
 Ubuntu install: sudo apt install lcov
 
 # Building
