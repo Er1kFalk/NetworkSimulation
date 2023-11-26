@@ -34,6 +34,7 @@ Ubuntu install: sudo apt install lcov
 
 Then build by:
 3. `cmake ..`
+
 4. `make`
 
 **Note**: Currently the compilation process is (very) slow. This is due to the CMAKE file using glob. A better compilation process will have to be developed in the future.
