@@ -33,6 +33,7 @@ Ubuntu install: sudo apt install lcov
 2. `mkdir build && cd build`
 
 Then build by:
+
 3. `cmake ..`
 
 4. `make`
