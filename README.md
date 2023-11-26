@@ -11,7 +11,7 @@ The project depends on the following libraries:
 - **libpcap**: In order to write .pcap files. See https://www.tcpdump.org/.
 Ubuntu install: `apt install libpcap-dev`
 - **BOOST**: For reading JSON configuration files.
-Ubuntu install: apt install libboost-all-dev
+Ubuntu install: `apt install libboost-all-dev`
 
 # Testing dependencies
 - **Google Test**: Used for unit testing. See https://github.com/google/googletest.git.
