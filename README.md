@@ -29,7 +29,7 @@ copy lib files to `/usr/local/lib`
 copy header files to `/usr/local/include`
 
 - **LCOV**: Used for generating code coverage documentation. 
-Ubuntu install: sudo apt install lcov
+Ubuntu install: `sudo apt install lcov`
 
 # Building
 ## Building the network simulator
@@ -46,11 +46,11 @@ Then build by:
 
 ## Building the tests
 1. Go to the _NetworkSimTesting_ folder
-2. mkdir build && cd build
+2. `mkdir build && cd build`
 
 Then build by:
-3. cmake ..
-4. make ..
+3. `cmake ..`
+4. `make ..`
 
 If you want to also generate code coverage, run ./gen_coverage.sh.
 It will not work for all systems, since it is platform dependent.
