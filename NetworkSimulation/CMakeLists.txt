@@ -4,7 +4,7 @@ project(NetworkSimulation VERSION 0.0.1 LANGUAGES CXX)
 
 set(SRCDIR src)
 set(PCAPDIR ${CMAKE_CURRENT_SOURCE_DIR}/src/CppToolkit-PCAP)
-file(GLOB LIBRARIES ${SRCDIR}/*.cpp ${SRCDIR}/*/*.cpp ${SRCDIR}/*/*/*.cpp)
+file(GLOB LIBRARIES ${SRCDIR}/*.cpp ${SRCDIR}/*/*.cpp ${SRCDIR}/*/*/*.cpp ${SRCDIR}/*/*/*/*.cpp)
 
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 list(FILTER LIBRARIES EXCLUDE REGEX ".*Archived/.*")

@@ -3,7 +3,7 @@
 
 #include <tuple>
 #include <memory>
-#include "../../TCPSegment/TCPSegmentInterface.h"
+#include "../../HeaderGenerators/TCPSegment/TCPSegmentInterface.h"
 #include "../NetworkProperties.h"
 #include "TCPSimulatorTypeDefs.h"
 

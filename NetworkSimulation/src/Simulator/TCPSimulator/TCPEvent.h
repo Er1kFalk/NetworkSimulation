@@ -6,8 +6,7 @@
 #include <map>
 #include <queue>
 
-#include "../../TCPSegment/TCPSegmentInterface.h"
-#include "../../TCPSegment/TCPSegment.h"
+#include "../../HeaderGenerators/TCPSegment/TCPSegment.h"
 #include "../BaseScheduler/Event.h"
 
 #include "TCPSimulatorTypeDefs.h"

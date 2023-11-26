@@ -1,14 +1,11 @@
-#include "EthernetFrame/EthernetFrameInterface.h"
-#include "EthernetFrame/EthernetFrame.h"
-#include "IPv4Packet/IPv4PacketInterface.h"
-#include "IPv4Packet/IPv4Packet.h"
-#include "ProtocolConstants/ProtocolConstants.h"
-#include "TCPSegment/TCPSegment.h"
-#include "ArrayUtils/ArrayUtils.h"
-#include "ProtocolUtils/ProtocolUtils.h"
+#include "HeaderGenerators/EthernetFrame/EthernetFrame.h"
+#include "HeaderGenerators/IPv4Packet/IPv4Packet.h"
+#include "HeaderGenerators/ProtocolConstants/ProtocolConstants.h"
+#include "HeaderGenerators/TCPSegment/TCPSegment.h"
+#include "UtilityLibraries/ArrayUtils/ArrayUtils.h"
+#include "UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 #include "Simulator/NetworkNodeSimulator/NetworkNodeSimulator.h"
 #include "Simulator/NetworkProperties.h"
-#include "TCPSegment/TCPSegment.h"
 #include "PCAPWriter/PCAPWriter.h"
 
 #include <bits/stdc++.h>
@@ -21,7 +18,6 @@
 #include <math.h>
 
 #include <pcap/pcap.h>
-#include "TCPConnection/TCPConnection.h"
 #include "Simulator/TCPSimulator/TCPEvent.h"
 
 

@@ -86,7 +86,8 @@
         "shared_mutex": "cpp",
         "syncstream": "cpp",
         "typeindex": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "cassert": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }

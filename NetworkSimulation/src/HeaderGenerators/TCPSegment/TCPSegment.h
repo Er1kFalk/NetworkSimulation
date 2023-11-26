@@ -12,6 +12,7 @@
 #include <array>
 #include <vector>
 #include <cassert>
+
 class TCPSegment : public TCPSegmentInterface {
     std::vector<unsigned char> tcp_header;
     std::vector<unsigned char> options;

@@ -5,7 +5,7 @@
  *      Author: erik
  */
 
-#include "../CommunicationProtocol.h"
+#include "../CommunicationProtocol/CommunicationProtocol.h"
 #include <memory>
 #include <stdint.h>
 

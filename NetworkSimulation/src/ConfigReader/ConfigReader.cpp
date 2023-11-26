@@ -1,6 +1,6 @@
 #include "ConfigReader.h"
-#include "../StringUtils/StringUtils.h"
-#include "../WayneUtils/wayneFS.hpp"
+#include "../UtilityLibraries/StringUtils/StringUtils.h"
+#include "../UtilityLibraries/WayneUtils/wayneFS.hpp"
 
 const std::string ConfigReader::NEST_OPERATOR = ".";
 

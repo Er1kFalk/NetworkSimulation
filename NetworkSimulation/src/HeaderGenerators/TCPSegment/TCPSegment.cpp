@@ -1,6 +1,6 @@
 #include "TCPSegment.h"
-#include "../BitOperations/BitOperations.h"
-#include "../ProtocolUtils/ProtocolUtils.h"
+#include "../../UtilityLibraries/BitOperations/BitOperations.h"
+#include "../../UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 #include <stdexcept>
 
 void TCPSegment::set_ipv4_pseudo_header(std::vector<unsigned char> source_ip_address, std::vector<unsigned char> destination_ip_address) {

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <cassert>
-#include "../CommunicationProtocol.h"
+#include "../../HeaderGenerators/CommunicationProtocol/CommunicationProtocol.h"
 #include <memory>
 
 namespace ProtocolUtils {

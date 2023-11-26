@@ -2,7 +2,7 @@
 #define ETHERNETEVENT_H_
 
 #include "EthernetSimulatorTypeDefs.h"
-#include "../../EthernetFrame/EthernetFrameInterface.h"
+#include "../../HeaderGenerators/EthernetFrame/EthernetFrameInterface.h"
 #include "../BaseScheduler/Event.h"
 #include "EthernetEventRule.h"
 

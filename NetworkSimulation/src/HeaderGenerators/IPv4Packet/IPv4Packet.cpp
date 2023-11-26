@@ -2,8 +2,8 @@
 #include <stdexcept>
 #include <cassert>
 #include <algorithm>
-#include "../BitOperations/BitOperations.h"
-#include "../ProtocolUtils/ProtocolUtils.h"
+#include "../../UtilityLibraries/BitOperations/BitOperations.h"
+#include "../../UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 #include "../ProtocolConstants/ProtocolConstants.h"
 
 const unsigned char IPv4Packet::default_header_size = 20; // IHL w/o options+padding (in octets, not in 32-bit blocks as IHL is measured in)

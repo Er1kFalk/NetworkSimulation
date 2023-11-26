@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <map>
 #include <string>
-#include "../CommunicationProtocol.h"
+#include "../CommunicationProtocol/CommunicationProtocol.h"
 #include "EthernetFrameInterface.h"
 #include <cassert>
 #include <memory>

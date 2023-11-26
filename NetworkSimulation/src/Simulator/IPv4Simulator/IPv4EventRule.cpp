@@ -1,7 +1,7 @@
 #include "IPv4EventRule.h"
 #include "IPv4Event.h"
-#include "../../IPv4Packet/IPv4PacketInterface.h"
-#include "../../EthernetFrame/EthernetFrame.h"
+#include "../../HeaderGenerators/IPv4Packet/IPv4PacketInterface.h"
+#include "../../HeaderGenerators/EthernetFrame/EthernetFrame.h"
 #include "../BaseScheduler/BaseScheduler.h"
 #include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
 

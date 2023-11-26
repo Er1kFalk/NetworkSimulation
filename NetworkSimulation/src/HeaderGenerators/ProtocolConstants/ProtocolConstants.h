@@ -5,7 +5,7 @@
  *      Author: erik
  */
 
-#include <vector>
+#include <array>
 #include <stdint.h>
 
 #ifndef PROTOCOLCONSTANTS_H_
