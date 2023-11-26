@@ -25,7 +25,9 @@ make
 ```
 
 Then:
+
 copy lib files to `/usr/local/lib`
+
 copy header files to `/usr/local/include`
 
 - **LCOV**: Used for generating code coverage documentation. 
