@@ -10,11 +10,6 @@
 #include "../IPv4Simulator/IPv4Event.h"
 #include "../IPv4Simulator/IPv4EventRule.h"
 
-// void R_INIT_CONNECTION::handle(TCPEventPtr e) {
-
-//     TCPEventPtr send_syn_event = TCPEventPtr(new TCP_SEND_SYN(e->get_current_client_state(), e->get_current_server_state()));
-//     TCPScheduler::schedule(send_syn_event, {std::make_shared<std::function<void(TCPEventPtr)>>(f)}, 0);
-// }
 
 std::shared_ptr<RandomUtils> TCPEventRule::generator = std::shared_ptr<RandomUtils>(new RandomUtils());
 
@@ -71,9 +66,7 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     client->recalculate_fields();
 
     e->set_transmitter(GFStructs::TransmittingNow::Client);
-    //e->set_current_client_state(syn_segment);
 
-    // delay stuff
     uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0; // in microseconds
 
     TCPEventPtr tcpevent = e->copy();
@@ -111,17 +104,6 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     tcpevent->set_event_rules({TCPEventRulePtr(new SendInitialAck)});
 
     scheduler->schedule(tcpevent, 0, 100);
-
-
-    // scheduler->schedule(e->copy(), {TCPEventRulePtr(new SendInitialAck)}, 0);
-
-    // send to ipv4
-
-    // if (np->is_packet_dropped()) {
-    //     scheduler->schedule(e, {TCPEventRulePtr(new SendSyn)}, 0);
-    // } else {
-
-    // }
 }
 
 void SendInitialAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
@@ -207,7 +189,7 @@ void ServerSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
 void ServerSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
     std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
-    // current_server_state->set_sequence_nr(current_client_state->get_acknowledgement_nr());
+
     current_server_state->set_acknowledgement_nr(e->get_current_server_state()->get_bytes_received() + e->get_current_client_state()->get_initial_seq_nr());
     current_server_state->set_syn_flag(false);
     current_server_state->set_payload(nullptr);
@@ -220,7 +202,7 @@ void ServerSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
 void ClientSendAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr current_server_state = e->get_current_server_state()->get_current_segment();
     std::shared_ptr current_client_state = e->get_current_client_state()->get_current_segment();
-    // current_server_state->set_sequence_nr(current_client_state->get_acknowledgement_nr());
+
     current_client_state->set_acknowledgement_nr(e->get_current_client_state()->get_bytes_received() + e->get_current_server_state()->get_initial_seq_nr());
     current_client_state->set_syn_flag(false);
     current_client_state->set_psh_flag(false);

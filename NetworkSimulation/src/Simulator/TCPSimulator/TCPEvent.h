@@ -35,6 +35,7 @@ public:
     std::shared_ptr<TCPSegmentInterface> get_current_segment() {return this->current_segment;}
 
     void set_current_segment(std::shared_ptr<TCPSegmentInterface> current_segment) {this->current_segment = current_segment;}
+    
     void add_to_data_send_queue(std::vector<unsigned char> packet) {data_send_queue->push(packet);}
     void remove_from_data_send_queue() {data_send_queue->pop();}
     std::vector<unsigned char> data_send_queue_see_first() {return data_send_queue->front();}
@@ -64,8 +65,6 @@ public:
 
 class TCPEvent : public Event, public std::enable_shared_from_this<TCPEvent> {
 protected: 
-    // <enum class SV {INIT_CONN, SYN_SENT, LOSS_DETECTION, AWAIT_SYN_ACK, SYN_ACK_RECEIVED, ACK_SENT, ESTABLISHED};
-    // SV current_state;>
     std::vector<TCPEventRulePtr> event_rules;
     std::shared_ptr<TCPState> current_client_state;
     std::shared_ptr<TCPState> current_server_state;
