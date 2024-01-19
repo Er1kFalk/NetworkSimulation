@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 
 	std::cout << "Enter output filename (include .pcap extension) : ";
 	std::cin >> filename;
-	std::cout << std::endl << "Enter simulation time: ";
+	std::cout << std::endl << "Enter simulation time (s): ";
 	std::cin >> simulation_time;
 	std::cout << std::endl << "Enter round trip time mean (ms) for the network: ";
 	std::cin >> rtt_mean;
