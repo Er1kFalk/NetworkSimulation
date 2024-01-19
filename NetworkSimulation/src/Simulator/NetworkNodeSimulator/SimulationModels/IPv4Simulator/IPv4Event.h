@@ -4,10 +4,10 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include "../../HeaderGenerators/IPv4Packet/IPv4PacketInterface.h"
-#include "../../HeaderGenerators/CommunicationProtocol/CommunicationProtocol.h"
+#include "../../../../HeaderGenerators/IPv4Packet/IPv4PacketInterface.h"
+#include "../../../../HeaderGenerators/CommunicationProtocol/CommunicationProtocol.h"
 #include "IPv4SimulatorTypeDefs.h"
-#include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
+#include "../../SimulatorTypeDefs.h"
 #include "../BaseScheduler/Event.h"
 
 

@@ -1,7 +1,7 @@
 #include "TCPEvent.h"
 #include "TCPEventRules.h"
 #include "../BaseScheduler/BaseScheduler.h"
-#include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
+#include "../../NetworkNodeSimulator.h"
 
 std::map<std::tuple<GFStructs::ProtocolModel, GFStructs::TransmittingNow>, TCPEventRulePtr> TCPEvent::pass_to_layer = {
     {{GFStructs::ProtocolModel::IPv4, GFStructs::TransmittingNow::Client}, TCPEventRulePtr(new PassClientStateToIPv4)},

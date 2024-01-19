@@ -1,0 +1,5 @@
+add_subdirectory(CommunicationProtocol)
+add_subdirectory(Data)
+add_subdirectory(EthernetFrame)
+add_subdirectory(IPv4Packet)
+add_subdirectory(TCPSegment)

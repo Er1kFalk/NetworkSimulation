@@ -6,11 +6,11 @@
 #include <map>
 #include <queue>
 
-#include "../../HeaderGenerators/TCPSegment/TCPSegment.h"
+#include "../../../../HeaderGenerators/TCPSegment/TCPSegment.h"
 #include "../BaseScheduler/Event.h"
 
 #include "TCPSimulatorTypeDefs.h"
-#include "../NetworkNodeSimulator/SimulatorTypeDefs.h"
+#include "../../SimulatorTypeDefs.h"
 #include "../BaseScheduler/EventTypeDefs.h"
 
 

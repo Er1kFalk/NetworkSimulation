@@ -1,0 +1,6 @@
+add_subdirectory(ArrayUtils)
+add_subdirectory(BitOperations)
+add_subdirectory(ProtocolUtils)
+add_subdirectory(RandomUtils)
+add_subdirectory(StringUtils)
+add_subdirectory(WayneUtils)

@@ -3,8 +3,8 @@
 
 #include <tuple>
 #include <memory>
-#include "../../HeaderGenerators/TCPSegment/TCPSegmentInterface.h"
-#include "../NetworkProperties.h"
+#include "../../../../HeaderGenerators/TCPSegment/TCPSegmentInterface.h"
+#include "../../../NetworkProperties.h"
 #include "TCPSimulatorTypeDefs.h"
 
 class BaseScheduler;

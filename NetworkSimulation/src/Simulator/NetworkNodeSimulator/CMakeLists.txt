@@ -1,0 +1,11 @@
+add_subdirectory(SimulationModels)
+
+set(NETWORK_NODE_SIMULATOR_SOURCES
+    NetworkNodeSimulator.cpp
+)
+
+add_library(network_node_simulator_lib STATIC ${NETWORK_NODE_SIMULATOR_SOURCES})
+target_link_libraries(network_node_simulator_lib base_scheduler_lib)
+target_link_libraries(network_node_simulator_lib tcp_simulator_lib)
+target_link_libraries(network_node_simulator_lib ipv4_packet_lib)
+target_link_libraries(network_node_simulator_lib ethernet_simulator_lib)

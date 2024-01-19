@@ -18,7 +18,6 @@
 #include <math.h>
 
 #include <pcap/pcap.h>
-#include "Simulator/TCPSimulator/TCPEvent.h"
 
 
 int main(int argc, char *argv[]) {

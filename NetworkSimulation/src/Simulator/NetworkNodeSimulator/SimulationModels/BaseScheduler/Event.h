@@ -3,7 +3,7 @@
 #define EVENT_H_
 
 #include <memory>
-#include "../../ConfigReader/GeneratorFileStruct.h"
+#include "../../../../ConfigReader/GeneratorFileStruct.h"
 #include "EventTypeDefs.h"
 
 class BaseScheduler;

@@ -1,9 +1,9 @@
 #include "IPv4EventRule.h"
 #include "IPv4Event.h"
-#include "../../HeaderGenerators/IPv4Packet/IPv4PacketInterface.h"
-#include "../../HeaderGenerators/EthernetFrame/EthernetFrame.h"
+#include "../../../../HeaderGenerators/IPv4Packet/IPv4PacketInterface.h"
+#include "../../../../HeaderGenerators/EthernetFrame/EthernetFrame.h"
 #include "../BaseScheduler/BaseScheduler.h"
-#include "../NetworkNodeSimulator/NetworkNodeSimulator.h"
+#include "../../NetworkNodeSimulator.h"
 
 void ReceiveIPv4Data::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<IPv4PacketInterface> packet = e->get_ipv4_packet();
