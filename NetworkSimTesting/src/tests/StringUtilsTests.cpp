@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "StringUtils/StringUtils.h"
+#include "../../../NetworkSimulation/src/UtilityLibraries/StringUtils/StringUtils.h"
 #include <string>
 #include <vector>
 #include "../TestUtils/TestUtils.h"

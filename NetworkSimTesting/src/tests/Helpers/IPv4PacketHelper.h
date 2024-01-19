@@ -5,7 +5,8 @@
  *      Author: erik
  */
 
-#include "IPv4Packet/IPv4Packet.h"
+#include "../../../../NetworkSimulation/src/HeaderGenerators/IPv4Packet/IPv4Packet.h"
+#include "../../../../NetworkSimulation/src/HeaderGenerators/Data/Data.h"
 #include <memory>
 
 #ifndef IPV4PACKETHELPER_H_

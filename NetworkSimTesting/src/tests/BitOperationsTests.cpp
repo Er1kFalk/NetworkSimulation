@@ -1,5 +1,5 @@
 #include "BitOperationsTests.h"
-#include "../../../NetworkSimulation/src/BitOperations/BitOperations.h"
+#include "../../../NetworkSimulation/src/UtilityLibraries/BitOperations/BitOperations.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 

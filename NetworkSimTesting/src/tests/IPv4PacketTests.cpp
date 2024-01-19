@@ -1,11 +1,13 @@
 #include "IPv4PacketTests.h"
-#include "IPv4Packet/IPv4Packet.h"
+#include "../../NetworkSimulation/src/HeaderGenerators/IPv4Packet/IPv4Packet.h"
+
+
 #include "Helpers/IPv4PacketHelper.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "ProtocolConstants/ProtocolConstants.h"
-#include "BitOperations/BitOperations.h"
-#include "../../../NetworkSimulation/src/ProtocolUtils/ProtocolUtils.h"
+#include "../../../NetworkSimulation/src/HeaderGenerators/ProtocolConstants/ProtocolConstants.h"
+#include "../../../NetworkSimulation/src/UtilityLibraries/BitOperations/BitOperations.h"
+#include "../../../NetworkSimulation/src/UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 
 IPv4PacketHelper packet_helper;
 

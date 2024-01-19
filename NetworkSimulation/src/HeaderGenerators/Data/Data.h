@@ -1,5 +1,8 @@
 #include "../CommunicationProtocol/CommunicationProtocol.h"
 
+#ifndef DATA_H_
+#define DATA_H_
+
 class Data : public CommunicationProtocol {
 private:
 	std::vector<unsigned char> data;
@@ -25,3 +28,5 @@ public:
 	std::shared_ptr<CommunicationProtocol> get_payload () override {return this->payload;}
 	void recalculate_fields() override {}
 };
+
+#endif

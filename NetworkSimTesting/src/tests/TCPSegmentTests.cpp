@@ -1,5 +1,5 @@
 #include "TCPSegmentTests.h"
-#include "../../../NetworkSimulation/src/TCPSegment/TCPSegment.h"
+#include "../../../NetworkSimulation/src/HeaderGenerators/TCPSegment/TCPSegment.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 

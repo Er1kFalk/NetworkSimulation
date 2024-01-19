@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 #include "../../HeaderGenerators/CommunicationProtocol/CommunicationProtocol.h"
+#include "../../HeaderGenerators/Data/Data.h"
 #include <memory>
 
 namespace ProtocolUtils {

@@ -2,8 +2,8 @@
 #include <gmock/gmock.h>
 
 #include "EthernetHeaderTests.h"
-#include "EthernetFrame/EthernetFrameInterface.h"
-#include "EthernetFrame/EthernetFrame.h"
+#include "../../NetworkSimulation/src/HeaderGenerators/EthernetFrame/EthernetFrameInterface.h"
+#include "../../NetworkSimulation/src/HeaderGenerators/EthernetFrame/EthernetFrame.h"
 #include <memory>
 
 TEST(EthernetFrameInterface, userSetsEthernetFrameInterfaceAndConvertsItToArray) {

@@ -1,5 +1,5 @@
 #include "ProtocolUtilsTests.h"
-#include "../../../NetworkSimulation/src/ProtocolUtils/ProtocolUtils.h"
+#include "../../../NetworkSimulation/src/UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <vector>
