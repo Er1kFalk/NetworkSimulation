@@ -1,4 +1,0 @@
-add_subdirectory(BaseScheduler)
-add_subdirectory(EthernetSimulator)
-add_subdirectory(IPv4Simulator)
-add_subdirectory(TCPSimulator)

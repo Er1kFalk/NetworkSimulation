@@ -1,5 +1,0 @@
-add_subdirectory(ConfigReader)
-add_subdirectory(HeaderGenerators)
-add_subdirectory(PCAPWriter)
-add_subdirectory(Simulator)
-add_subdirectory(UtilityLibraries)
