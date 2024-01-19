@@ -89,11 +89,14 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     e->get_current_client_state()->add_bytes_received(1);
     e->get_current_server_state()->add_bytes_sent(1);
 
+    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+
+
     syn_ack_segment->set_acknowledgement_nr(e->get_current_server_state()->get_bytes_received() + e->get_current_client_state()->get_initial_seq_nr());
+    syn_ack_segment->add_mss_option(genfile.server.tcp_info.mss);
 	syn_ack_segment->set_syn_flag(true);
 	syn_ack_segment->set_ack_flag(true);
     
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
     uint32_t choose_index = generator->generate_uniform_number() * (double) (genfile.server.tcp_info.window_sizes.size()-1);
     syn_ack_segment->set_window_size(genfile.server.tcp_info.window_sizes[choose_index]);
 
@@ -105,7 +108,7 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     assert(e.get() != tcpevent.get());
     tcpevent->set_event_rules({TCPEventRulePtr(new SendInitialAck)});
 
-    scheduler->schedule(tcpevent, 0, 100);
+    scheduler->schedule(tcpevent, 0, 1000);
 }
 
 void SendInitialAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
@@ -117,6 +120,7 @@ void SendInitialAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
     current_client_state->set_syn_flag(false);
 	current_client_state->set_ack_flag(true);
     current_client_state->set_options({}); // clear the option
+    current_server_state->set_options({});
 
     auto generator = std::shared_ptr<RandomUtils>(new RandomUtils());
     auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
