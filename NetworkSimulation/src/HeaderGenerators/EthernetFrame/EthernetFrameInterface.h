@@ -6,8 +6,6 @@
  */
 
 #include "../CommunicationProtocol/CommunicationProtocol.h"
-#include <memory>
-#include <stdint.h>
 
 #ifndef ETHERNETFRAMEINTERFACE_H_
 #define ETHERNETFRAMEINTERFACE_H_

@@ -14,7 +14,7 @@ IPv4PacketHelper packet_helper;
 /*VERSION USE CASES*/
 TEST(IPv4PacketInterface, UserInitializesInitializesIPv4PacketInterfaceAndVersionIs4) {
     defaultPacketArgs args;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
 
     EXPECT_EQ(stdpacket->get_version(), 4);
 }
@@ -26,7 +26,7 @@ TEST(IPv4PacketInterface, userSetsDscp) {
     defaultPacketArgs args;
     args.dscp = 0;
     ASSERT_EQ(args.dscp, IPv4Constants::BoundaryConstants::DSCP_MIN);
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
 
     EXPECT_EQ(stdpacket->get_dscp(), 0);
 }
@@ -35,7 +35,7 @@ TEST(IPv4PacketInterface, userSetsDscpToMaxValue) {
     defaultPacketArgs args;
     args.dscp = 63;
     ASSERT_EQ(args.dscp, IPv4Constants::BoundaryConstants::DSCP_MAX);
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
 
     EXPECT_EQ(stdpacket->get_dscp(), 63);
 }
@@ -44,7 +44,7 @@ TEST(IPv4PacketInterface, userSetsDscpToMoreThanMaxValue) {
     defaultPacketArgs args;
     args.dscp = 64;
     ASSERT_GT(args.dscp, IPv4Constants::BoundaryConstants::DSCP_MAX);
-    std::unique_ptr<IPv4PacketInterface> stdpacket;
+    std::shared_ptr<IPv4PacketInterface> stdpacket;
 
     try {
         stdpacket = packet_helper.get_stdpacket(args);
@@ -59,7 +59,7 @@ TEST(IPv4PacketInterface, userSetsEcnToMinValue) {
     defaultPacketArgs args;
     args.ecn = 0;
     ASSERT_EQ(args.ecn, IPv4Constants::BoundaryConstants::ECN_MIN);
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
     EXPECT_EQ(stdpacket->get_ecn(), 0);
 }
@@ -68,7 +68,7 @@ TEST(IPv4PacketInterface, userSetsEcnToMaxValue) {
     defaultPacketArgs args;
     args.ecn = 3;
     ASSERT_EQ(args.ecn, IPv4Constants::BoundaryConstants::ECN_MAX);
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
     EXPECT_EQ(stdpacket->get_ecn(), 3);
 }
@@ -77,7 +77,7 @@ TEST(IPv4PacketInterface, userSetsEcnToMoreThanMaxValue) {
     defaultPacketArgs args;
     args.ecn = 4;
     ASSERT_GT(args.ecn, IPv4Constants::BoundaryConstants::ECN_MAX);
-    std::unique_ptr<IPv4PacketInterface> stdpacket;
+    std::shared_ptr<IPv4PacketInterface> stdpacket;
     
 
     try{
@@ -96,7 +96,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithoutOptions) {
     args.payload = std::shared_ptr<CommunicationProtocol>(new Data(std::vector<unsigned char>(625, 1)));
     ASSERT_EQ(args.options.size(), 0);
     ASSERT_EQ(args.payload->header_to_array().size(), 625);
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
     stdpacket->recalculate_fields();
 
@@ -113,7 +113,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsAMul
     ASSERT_EQ(args.payload->header_to_array().size(), 625);
     ASSERT_EQ(args.options.size(), 4);
 
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
     stdpacket->recalculate_fields();
 
@@ -128,9 +128,9 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsNotA
     args.options = {0x01, 0x02, 0x03, 0x04, 0x05};
     args.payload = std::shared_ptr<CommunicationProtocol>(new Data(std::vector<unsigned char>(625, 1)));
     ASSERT_EQ(args.payload->header_to_array().size(), 625);
-    ASSERT_EQ(args.options.size(), 5); 
-    
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    ASSERT_EQ(args.options.size(), 5);
+
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     stdpacket->recalculate_fields();
 
     // std header without options => no padding, ihl is always 5
@@ -144,7 +144,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsNotA
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithIdentification625) {
     defaultPacketArgs args;
     args.identfication_id = 625;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
     
     EXPECT_THAT(stdpacket->get_identification(), 0x0271);
 }
@@ -153,9 +153,10 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithIdentification62
 /*MF AND DF FLAG USE CASES*/
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFTrueAndMFFalse) {
     defaultPacketArgs args;
+    int x = 0;
     args.df = true;
     args.mf = false;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
 
     unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
@@ -167,7 +168,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFFalseAndMFTrue
     defaultPacketArgs args;
     args.df = false;
     args.mf = true;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
     unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
@@ -179,7 +180,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFFalseAndMFFals
     defaultPacketArgs args;
     args.df = false;
     args.mf = false;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
     unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
@@ -191,7 +192,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFTrueAndMFTrue)
     defaultPacketArgs args;
     args.df = true;
     args.mf = true;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
     unsigned char flags = stdpacket->header_to_array()[6];
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
@@ -205,7 +206,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithMinFragmentOffse
     args.df = false;
     args.mf = false;
     args.offset = IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MIN;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
     EXPECT_EQ(stdpacket->get_fragment_offset(), 0);
 }
@@ -215,7 +216,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithMaxFragmentOffse
     args.df = false;
     args.mf = false;
     args.offset = IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX;
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
         
     EXPECT_EQ(stdpacket->get_fragment_offset(), 0x1FFF);
 }
@@ -226,7 +227,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithGreaterThanMaxFr
     args.mf = false;
     args.offset = 8192;
     ASSERT_GT(args.offset, IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX);
-    std::unique_ptr<IPv4PacketInterface> stdpacket;
+    std::shared_ptr<IPv4PacketInterface> stdpacket;
 
     try {
         stdpacket = packet_helper.get_stdpacket(args);
@@ -240,7 +241,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithGreaterThanMaxFr
 TEST(IPv4PacketInterface, userInitializesIPv4PacketAndChecksumIsCorrect) {
     defaultPacketArgs args;
 
-    std::unique_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
 
     stdpacket->recalculate_fields();
 

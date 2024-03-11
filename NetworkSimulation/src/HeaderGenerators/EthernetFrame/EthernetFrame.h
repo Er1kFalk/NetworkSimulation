@@ -9,12 +9,7 @@
 #define ETHERNETFRAME_H_
 
 #include <stdint.h>
-#include <map>
-#include <string>
-#include "../CommunicationProtocol/CommunicationProtocol.h"
 #include "EthernetFrameInterface.h"
-#include <cassert>
-#include <memory>
 
 class EthernetFrame : public EthernetFrameInterface {
 private:

@@ -6,14 +6,8 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <pcap.h>
-#include <zlib.h>
-#include <array>
-#include <vector>
 #include "EthernetFrame.h"
-#include <stdexcept>
 #include <algorithm>
-#include <list>
 
 std::vector<unsigned char> EthernetFrame::header_to_array() {
 	std::vector<unsigned char> header;

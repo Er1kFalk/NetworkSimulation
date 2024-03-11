@@ -29,10 +29,10 @@ struct defaultPacketArgs{
 
 class IPv4PacketHelper {
 public:
-	std::unique_ptr<IPv4PacketInterface> get_stdpacket(defaultPacketArgs args
+    std::shared_ptr<IPv4PacketInterface> get_stdpacket(defaultPacketArgs args
 	) {
 
-		std::unique_ptr<IPv4PacketInterface> p = std::unique_ptr<IPv4PacketInterface>(new IPv4Packet());
+        std::shared_ptr<IPv4PacketInterface> p = std::shared_ptr<IPv4PacketInterface>(new IPv4Packet());
 		p->set_version();
 		p->set_dscp(args.dscp);
 		p->set_ecn(args.ecn);

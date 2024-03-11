@@ -1,2 +1,6 @@
 /NetworkSimTesting/build/
 /NetworkSimulation/build/
+NetworkSimTesting/CMakeLists.txt.user
+NetworkSimulation/CMakeLists.txt.user
+build-NetworkSimTesting-Desktop_Qt_6_6_1_GCC_64bit-Debug/
+build-NetworkSimulation-Desktop_Qt_6_6_1_GCC_64bit-Debug/

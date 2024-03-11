@@ -1,7 +1,5 @@
 #include "IPv4Packet.h"
 #include <stdexcept>
-#include <cassert>
-#include <algorithm>
 #include "../../UtilityLibraries/BitOperations/BitOperations.h"
 #include "../../UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 #include "../ProtocolConstants/ProtocolConstants.h"
@@ -19,6 +17,8 @@ unsigned char IPv4Packet::get_version() {
 
 void IPv4Packet::set_ihl() {
     int octet_amount = this->ip_header.size() + this->options.size();
+    assert(this->ip_header.size() % 4 == 0);
+    assert(this->options.size() % 4 == 0);
     assert(octet_amount % 4 == 0); // header should ALWAYS be a multiple 32 bits / 4 octets - if not, something is wrong
     // set 4 lower bits to the amount of 4-octet / 32bit values
     this->ip_header[0] = BitOperations::set_n_lower_bits(this->ip_header[0], octet_amount/4, 4);
@@ -181,7 +181,7 @@ std::vector<unsigned char> IPv4Packet::get_destination() {
 
 void IPv4Packet::set_options(std::vector<unsigned char> options) {
     this->options = options;
-    if (options.size() % 4 != 0) { // if our options are not a multiple of 32-bits / 4 octets
+    while (this->options.size() % 4 != 0) { // if our options are not a multiple of 32-bits / 4 octets
         this->options.push_back(0); // add the end of options marker
     }
 }
@@ -191,6 +191,7 @@ void IPv4Packet::set_padding() {
     for (unsigned char i = 0; i < rest; i++) {
         this->options.push_back(0); // add padding until a multiple of 32 bits
     }
+    assert(this->options.size() % 4 == 0);
     assert(this->header_to_array().size() % 4 == 0); // the header should be a multiple of 32 bits after adding padding
 }
 

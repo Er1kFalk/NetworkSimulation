@@ -6,8 +6,6 @@
  */
 
 #include "../CommunicationProtocol/CommunicationProtocol.h"
-#include <array>
-#include <memory>
 
 #ifndef IPV4PACKETINTERFACE_H_
 #define IPV4PACKETINTERFACE_H_
@@ -16,18 +14,6 @@ class IPv4PacketInterface : public CommunicationProtocol {
 private:
 
 public:
-    // virtual void set_dscp(unsigned char dscp) = 0;
-    // virtual void set_ecn(unsigned char ecn) = 0;
-    // virtual void set_identification(int prev_id) = 0;
-    // virtual void set_df_flag(bool b) = 0;
-    // virtual void set_mf_flag(bool b) = 0;
-    // virtual void set_fragment_offset(unsigned int offset) = 0;
-    // virtual void set_time_to_live(unsigned char time_to_live) = 0;
-    // virtual void set_protocol(unsigned char protocol) = 0;
-    // virtual void set_source(std::array<unsigned char, 4> address) = 0;
-    // virtual void set_destination(std::array<unsigned char, 4> address) = 0;
-    // virtual void set_options(std::vector<unsigned char> options) = 0;
-
     virtual unsigned char get_version() = 0;
     virtual unsigned char get_ihl() = 0;
     virtual unsigned char get_dscp() = 0;

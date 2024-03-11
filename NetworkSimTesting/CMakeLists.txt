@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 project(NetworkSimTesting VERSION 0.0.1 LANGUAGES CXX)
+SET(CMAKE_BUILD_TYPE Debug)
 
 set(SRCDIR_TEST src)
 set(SRCDIR_NETWORKSIM ../NetworkSimulation/src)

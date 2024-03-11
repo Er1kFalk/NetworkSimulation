@@ -175,7 +175,7 @@ unsigned char BitOperations::read_nth_lsb (unsigned char byte, unsigned char n) 
     if (n >= __CHAR_BIT__) {
         throw std::invalid_argument("cannot read more than 7th lsbit in unsigned char");
     }
-    assert(n >= __CHAR_BIT__);
+    assert(n < __CHAR_BIT__);
     
     unsigned char result = (byte >> n) & 1;
 

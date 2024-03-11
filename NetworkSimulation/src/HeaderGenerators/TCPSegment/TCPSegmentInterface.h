@@ -6,7 +6,6 @@
  */
 
 #include "../CommunicationProtocol/CommunicationProtocol.h"
-#include <array>
 #include <stdint.h>
 
 #ifndef TCPSEGMENTINTERFACE_H_

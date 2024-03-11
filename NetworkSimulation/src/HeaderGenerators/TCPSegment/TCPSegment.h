@@ -9,8 +9,6 @@
 #define TCPSEGMENT_H_
 
 #include "TCPSegmentInterface.h"
-#include <array>
-#include <vector>
 #include <cassert>
 
 class TCPSegment : public TCPSegmentInterface {
