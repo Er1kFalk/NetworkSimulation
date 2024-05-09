@@ -6,16 +6,16 @@
 
 /* 
 reset_n_upper_bits()
- */ 
+ */
 
 TEST(BitOperations, reset4UpperBits) {
     char test = 0xFF;
-    EXPECT_EQ(BitOperations::reset_n_upper_bits(test, 4), 0xF);
+    EXPECT_EQ(BitOperations::reset_n_upper_bits(test, 4), 0x0F);
 }
 
 TEST(BitOperations, reset6UpperBits) {
     char test = 0xFF;
-    EXPECT_EQ(BitOperations::reset_n_upper_bits(test, 6), 3);
+    EXPECT_EQ(BitOperations::reset_n_upper_bits(test, 6), 0b11);
 }
 
 TEST(BitOperations, resetMoreThan8UpperBits) {
@@ -70,8 +70,8 @@ read_n_upper_bits
  */ 
 
 TEST(BitOperations, read3UpperBits) {
-    char test = 0xFF;
-    EXPECT_EQ(BitOperations::read_n_upper_bits(test, 2), 3);
+    unsigned char test = (unsigned char) 0b10100000;
+    EXPECT_EQ(BitOperations::read_n_upper_bits(test, 3), 5);
 }
 
 TEST(BitOperations, read5UpperBits) {
@@ -125,7 +125,7 @@ TEST(BitOperations, set4LowerBitsTo7) {
 }
 
 TEST(BitOperations, set6LowerBitsTo5) {
-    char test = 0x00;
+    char test = 0x0F;
     EXPECT_EQ(BitOperations::set_n_lower_bits(test, 5, 6), 0x05);
 }
 
@@ -156,7 +156,7 @@ read_n_lower_bits
  */ 
 
 TEST(BitOperations, read3LowerBits) {
-    char test = 0xFF;
+    char test = 0x0F;
     EXPECT_EQ(BitOperations::read_n_lower_bits(test, 2), 3);
 }
 
@@ -177,10 +177,10 @@ TEST(BitOperations, readMoreThan8LowerBits) {
 
 /* 
 read_nth_lsb
- */ 
+ */
 
 TEST(BitOperations, read3rdLsbit) {
-    unsigned char test = 0xFF;
+    unsigned char test = 0b1000;
     EXPECT_EQ(BitOperations::read_nth_lsb(test, 3), 1);
 
     test = 0xF0;
@@ -240,7 +240,7 @@ int16_to_char_arr
  */ 
 
 TEST(BitOperations, convertInt16ToCharArr) {
-    std::array<unsigned char,2> x = BitOperations::int16_to_char_arr(16705);
+    std::array<unsigned char,2> x = BitOperations::int16_to_char_arr(0x4141);
     EXPECT_THAT(x, testing::ElementsAreArray({0x41, 0x41}));
 }
 
@@ -275,7 +275,7 @@ TEST(BitOperations, convertCharArrToInt32) {
 int16_into_char_vector
 */
 TEST(BitOperations, userSetsIndex2and3In5ElementVector) {
-    std::vector<unsigned char> x = BitOperations::int16_into_char_vector(16705, {0x01, 0x02, 0x03, 0x04, 0x05}, 2);
+    std::vector<unsigned char> x = BitOperations::int16_into_char_vector(0x4141, {0x01, 0x02, 0x03, 0x04, 0x05}, 2);
     EXPECT_THAT(x, testing::ElementsAreArray({0x01, 0x02, 0x41, 0x41, 0x05}));
 }
 

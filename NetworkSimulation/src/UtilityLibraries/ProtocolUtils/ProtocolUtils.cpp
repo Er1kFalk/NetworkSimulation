@@ -54,16 +54,3 @@ bool ProtocolUtils::verify_internet_checksum(std::vector<unsigned char> data, un
 
     return sum == 0xffff; // true if verified, false if not
 }
-
-
-
-std::shared_ptr<CommunicationProtocol> ProtocolUtils::build_protocol_stack_from_vector(std::vector<std::shared_ptr<CommunicationProtocol>> v) {
-    if (v.size() == 0) {
-        return {};
-    }
-    for (int i = v.size()-2; i >= 0; i--) {
-        v[i]->set_payload(v[i+1]);
-    }
-
-    return v[0];
-}
