@@ -1,3 +1,4 @@
+./build.sh
 cd build/
 rm -rf out_coverage/*
 ./NetworkSimTesting
