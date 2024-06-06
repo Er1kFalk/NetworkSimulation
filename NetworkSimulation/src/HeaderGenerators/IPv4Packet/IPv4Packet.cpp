@@ -191,7 +191,6 @@ void IPv4Packet::set_padding() {
     for (unsigned char i = 0; i < rest; i++) {
         this->options.push_back(0); // add padding until a multiple of 32 bits
     }
-    assert(this->options.size() % 4 == 0);
     assert(this->header_to_array().size() % 4 == 0); // the header should be a multiple of 32 bits after adding padding
 }
 

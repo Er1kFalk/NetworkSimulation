@@ -70,6 +70,7 @@ public:
 
     void set_payload(std::shared_ptr<CommunicationProtocol> payload) override {
         this->payload = payload;
+        set_padding();
         set_ihl();
         set_total_length();
         set_header_checksum();
