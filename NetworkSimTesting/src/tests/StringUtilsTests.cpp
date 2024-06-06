@@ -71,9 +71,10 @@ TEST (StringUtils, char_repeats_in_string_1) {
 			"ssfds.34sdf.fffff.ff32d"
 	};
 
+
 	char_repeats_in_string_helper_tester("STRING WITH COLON EVERY 2 CHARS", colon_2_char_sep, ':', 2, '4');
 	char_repeats_in_string_helper_tester("STRING WITH COLON EVERY 5 CHARS", colon_5_char_sep, ':', 5, 'g');
 	char_repeats_in_string_helper_tester("STRING WITH DOT EVERY 5 CHARS", colon_5_char_sep, ':', 5, 'l');
-
+    EXPECT_FALSE(StringUtils::char_repeats_in_string(dot_5_char_sep[0], '.', 24));
 }
 
