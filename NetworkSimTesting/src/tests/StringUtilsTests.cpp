@@ -78,3 +78,34 @@ TEST (StringUtils, char_repeats_in_string_1) {
     EXPECT_FALSE(StringUtils::char_repeats_in_string(dot_5_char_sep[0], '.', 24));
 }
 
+TEST (StringUtils, is_valid_ipv4_WhereIPIsTooLong) {
+    std::string test = "192.168.111.1111";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
+}
+
+TEST (StringUtils, is_valid_ipv4_WhereAddressHasTooManyDots) {
+    std::string test = "192.168.1.1.1";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
+}
+
+TEST (StringUtils, is_valid_ipv4_WhereAddressHasLetters) {
+    std::string test = "192.16a.1.1";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
+}
+
+TEST (StringUtils, is_valid_ipv4_WhereAddressHasMoreThan3NumbersBetweenDots) {
+    std::string test = "127.0.1111.1";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
+}
+
+TEST (StringUtils, is_valid_ipv4_WhereAddressIsValid) {
+    std::string test1 = "192.168.1.1";
+    std::string test2 = "127.0.0.1";
+    std::string test3 = "1.111.0.111";
+    std::string test4 = "111.444.555.666";
+
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test1));
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test2));
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test3));
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test4));
+}
