@@ -20,7 +20,8 @@ std::string StringUtils::to_lower(std::string s) {
 
 // finite automata that returns true if IP is valid
 bool StringUtils::is_valid_ipv4(std::string ipv4) {
-    std::map<std::tuple<int, std::string>, int> trans_function = {
+    const std::map<std::tuple<int, std::string>, int> trans_function = {// LCOV_EXCL_START
+
         {{0, "nr"}, 1},
         {{1, "nr"}, 2},
         {{2, "nr"}, 3},
@@ -31,7 +32,7 @@ bool StringUtils::is_valid_ipv4(std::string ipv4) {
         {{6, "nr"}, 7},
         {{7, "nr"}, 8},
         {{6, "nr"}, 6},
-    };
+    }; // LCOV_EXCL_STOP
 
     int state = 0;
     int count = 0;

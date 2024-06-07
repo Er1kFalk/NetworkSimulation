@@ -53,3 +53,27 @@ TEST (StringUtils, is_valid_ipv4_WhereAddressIsValid) {
     EXPECT_TRUE(StringUtils::is_valid_ipv4(test3));
     EXPECT_TRUE(StringUtils::is_valid_ipv4(test4));
 }
+
+TEST (StringUtils, string_to_ipv4_addressWhereAddressIsValid) {
+    std::string test1 = "192.168.1.1";
+    std::string test2 = "127.0.0.1";
+    std::string test3 = "1.111.0.111";
+    std::string test4 = "111.444.555.666";
+
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test1), testing::ElementsAreArray({192, 168, 1, 1}));
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test2), testing::ElementsAreArray({127, 0, 0, 1}));
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test3), testing::ElementsAreArray({1, 111, 0, 111}));
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test4), testing::ElementsAreArray({111, 444, 555, 666}));
+}
+
+TEST (StringUtils, string_to_ipv4_addressWhereAddressIsInValid) {
+    std::string test1 = "192.1684.2.1";
+
+    try {
+        StringUtils::string_to_ipv4_address(test1);
+        FAIL();
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "You did not provide a valid IPv4 address");
+    }
+}
+
