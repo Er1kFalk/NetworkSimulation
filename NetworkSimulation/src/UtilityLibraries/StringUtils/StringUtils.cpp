@@ -67,6 +67,8 @@ std::vector<unsigned char> StringUtils::string_to_ipv4_address(std::string ipv4)
     if (!is_valid) {
         throw std::invalid_argument("You did not provide a valid IPv4 address");
     }
+    assert(is_valid);
+
     std::string ipv4nr = "";
     std::vector<unsigned char> vec_ip = {0, 0, 0, 0};
     assert(vec_ip.size() == 4);
@@ -76,13 +78,10 @@ std::vector<unsigned char> StringUtils::string_to_ipv4_address(std::string ipv4)
         if (c>=48 && c <=57) { // c is a nr
             ipv4nr += c;
             assert(ipv4nr.length() <= 3);
-        } else if (c == '.') {
+        } else { // c is a .
             vec_ip[i] = std::stoi(ipv4nr);
             i++;
             ipv4nr = "";
-            continue;
-        } else {
-            throw std::invalid_argument("Not a valid ip: may only conbtain . and numbers");
         }
     }
     vec_ip[i] = std::stoi(ipv4nr);
