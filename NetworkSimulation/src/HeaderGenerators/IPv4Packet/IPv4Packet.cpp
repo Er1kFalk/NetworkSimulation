@@ -113,10 +113,7 @@ void IPv4Packet::set_fragment_offset(uint16_t offset) {
 
 uint16_t IPv4Packet::get_fragment_offset() {
     uint16_t fragment_offset = BitOperations::char_arr_to_int16({BitOperations::read_n_lower_bits(this->ip_header[6], 5), this->ip_header[7]});
-    
-    if (fragment_offset > IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX) {
-        throw std::invalid_argument("Offset must be between 0 and 8191");
-    }
+    assert(fragment_offset <= IPv4Constants::BoundaryConstants::FRAGMENT_OFFSET_MAX);
 
     return fragment_offset;
 }
@@ -167,7 +164,7 @@ std::vector<unsigned char> IPv4Packet::get_source() {
 
 void IPv4Packet::set_destination(std::vector<unsigned char> destination) {
     if (destination.size() != 4) {
-        throw std::invalid_argument("Source address must be of length 4");
+        throw std::invalid_argument("Destination address must be of length 4");
     }
     this->ip_header[16] = destination[0];
     this->ip_header[17] = destination[1];
@@ -181,14 +178,12 @@ std::vector<unsigned char> IPv4Packet::get_destination() {
 
 void IPv4Packet::set_options(std::vector<unsigned char> options) {
     this->options = options;
-    while (this->options.size() % 4 != 0) { // if our options are not a multiple of 32-bits / 4 octets
-        this->options.push_back(0); // add the end of options marker
-    }
 }
 
 void IPv4Packet::set_padding() {
     unsigned char rest = this->options.size() % 4;
-    for (unsigned char i = 0; i < rest; i++) {
+    // runs if options is NOT a multiple of 4
+    for (unsigned char i = 0; rest != 0 && i < (4-rest); i++) {
         this->options.push_back(0); // add padding until a multiple of 32 bits
     }
     assert(this->header_to_array().size() % 4 == 0); // the header should be a multiple of 32 bits after adding padding

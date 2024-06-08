@@ -13,6 +13,7 @@ public:
 	virtual void set_payload(std::shared_ptr<CommunicationProtocol> payload) = 0;
 	virtual std::shared_ptr<CommunicationProtocol> get_payload () = 0;
 	virtual void recalculate_fields() = 0;
+    bool equal(std::shared_ptr<CommunicationProtocol> c);
 };
 
 #endif /* COMMUNICATIONPROTOCOL_H_ */

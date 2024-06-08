@@ -88,6 +88,22 @@ TEST(IPv4PacketInterface, userSetsEcnToMoreThanMaxValue) {
     }
 }
 
+/*TIME TO LIVE*/
+TEST(IPv4PacketInterface, userSetsTimeToLive) {
+    defaultPacketArgs args;
+    args.time_to_live = 0xFF;
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    EXPECT_EQ(0xFF, stdpacket->get_time_to_live());
+}
+
+/*PROTOCOL*/
+TEST(IPv4PacketInterface, userSetsProtocol) {
+    defaultPacketArgs args;
+    args.p = 0x0F;
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    EXPECT_EQ(0x0F, stdpacket->get_protocol());
+}
+
 /*OPTIONS USE CASES*/
 
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithoutOptions) {
@@ -131,6 +147,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithOptionThatIsNotA
     ASSERT_EQ(args.options.size(), 5);
 
     std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+
     stdpacket->recalculate_fields();
 
     // std header without options => no padding, ihl is always 5
@@ -162,6 +179,8 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFTrueAndMFFalse
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 7), 0); // reserved
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 6), 1); // df
     EXPECT_EQ(BitOperations::read_nth_lsb(flags, 5), 0); // mf
+    EXPECT_TRUE(stdpacket->get_df_flag());
+    EXPECT_FALSE(stdpacket->get_mf_flag());
 }
 
 TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithDFFalseAndMFTrue) {
@@ -238,6 +257,7 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketInterfaceWithGreaterThanMaxFr
         
 }
 
+/*CHECKSUM USE CASES*/
 TEST(IPv4PacketInterface, userInitializesIPv4PacketAndChecksumIsCorrect) {
     defaultPacketArgs args;
 
@@ -246,4 +266,100 @@ TEST(IPv4PacketInterface, userInitializesIPv4PacketAndChecksumIsCorrect) {
     stdpacket->recalculate_fields();
 
     EXPECT_TRUE(ProtocolUtils::verify_internet_checksum(stdpacket->header_to_array(), 0)); // putting 0 here, since the checksum is included in header_to_array
+}
+
+// checks that get_header_checksum() works at it should
+TEST(IPv4PacketInterface, userInitializesIPv4PacketAndChecksumIsReturnedCorrectly) {
+    defaultPacketArgs args;
+
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    stdpacket->recalculate_fields();
+
+    uint16_t calculated_checksum = stdpacket->get_header_checksum();
+
+    // calculate own checksum
+    std::vector<unsigned char> header_arr = stdpacket->header_to_array();
+    header_arr[10] = 0;
+    header_arr[11] = 0; // reset checksum, so it's not included in calculation
+    uint16_t test_calculated_checksum = ProtocolUtils::calculate_internet_checksum(header_arr);
+
+    EXPECT_EQ(calculated_checksum, test_calculated_checksum);
+}
+
+/*COPY USE CASES*/
+TEST(IPv4PacketInterface, userCopiesIPv4Packet) {
+    defaultPacketArgs args;
+
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    stdpacket->recalculate_fields();
+
+    std::shared_ptr<IPv4PacketInterface> newpacket = stdpacket->copy();
+    EXPECT_NE(newpacket.get(), stdpacket.get());
+    EXPECT_TRUE(newpacket->equal(stdpacket));
+}
+
+/*SET IPV4 SOURCE ADDRESS*/
+TEST(IPv4PacketInterface, userTriesToSetSourceAddressThatIsLessThan4Octets) {
+    defaultPacketArgs args;
+    args.source_address = {1,2,3};
+
+    try {
+        std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+        FAIL();
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "Source address must be of length 4");
+    }
+}
+
+TEST(IPv4PacketInterface, userTriesToSetSourceAddressThatIsMoreThan4Octets) {
+    defaultPacketArgs args;
+    args.source_address = {1,2,3,4,5};
+
+    try {
+        std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+        FAIL();
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "Source address must be of length 4");
+    }
+}
+
+TEST(IPv4PacketInterface, userTriesToSetSourceAddressThatIsExactly4Octets) {
+    defaultPacketArgs args;
+    args.source_address = {1,2,3,4};
+
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    EXPECT_THAT(stdpacket->get_source(), testing::ElementsAreArray(args.source_address));
+}
+
+/*SET IPV4 DESTINATION ADDRESS*/
+TEST(IPv4PacketInterface, userTriesToSetDestinationAddressThatIsLessThan4Octets) {
+    defaultPacketArgs args;
+    args.destination_address = {1,2,3};
+
+    try {
+        std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+        FAIL();
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "Destination address must be of length 4");
+    }
+}
+
+TEST(IPv4PacketInterface, userTriesToSetDestinationAddressThatIsMoreThan4Octets) {
+    defaultPacketArgs args;
+    args.destination_address = {1,2,3,4,5};
+
+    try {
+        std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+        FAIL();
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "Destination address must be of length 4");
+    }
+}
+
+TEST(IPv4PacketInterface, userTriesToSetDestinationAddressThatIsExactly4Octets) {
+    defaultPacketArgs args;
+    args.destination_address = {1,2,3,4};
+
+    std::shared_ptr<IPv4PacketInterface> stdpacket = packet_helper.get_stdpacket(args);
+    EXPECT_THAT(stdpacket->get_destination(), testing::ElementsAreArray(args.destination_address));
 }
