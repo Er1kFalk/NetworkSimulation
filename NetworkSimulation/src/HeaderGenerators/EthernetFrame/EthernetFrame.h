@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include "EthernetFrameInterface.h"
+#include <array>
 
 class EthernetFrame : public EthernetFrameInterface {
 private:

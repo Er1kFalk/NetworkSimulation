@@ -62,6 +62,8 @@ public:
     virtual uint16_t get_checksum() = 0;
     virtual uint16_t get_urgent_pointer() = 0;
 
+    virtual std::vector<unsigned char> get_ipv4_pseudo_header() = 0;
+
     virtual std::shared_ptr<TCPSegmentInterface> copy() = 0;
 };
 

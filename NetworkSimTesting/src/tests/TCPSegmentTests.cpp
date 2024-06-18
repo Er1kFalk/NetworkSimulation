@@ -214,3 +214,74 @@ TEST(TCPSegment, settingUrgentPointer) {
 
     EXPECT_EQ(t->get_urgent_pointer(), test);
 }
+
+/*
+set_ipv4_pseudo_header
+*/
+
+TEST(TCPSegment, settingIpv4PseudoHeader) {
+    std::shared_ptr<TCPSegmentInterface> t = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+
+    std::vector<unsigned char> test_src = {0, 1, 2, 3};
+    std::vector<unsigned char> test_dest = {4, 5, 6, 7};
+
+    std::vector<unsigned char> test = {0, 1, 2, 3, 4, 5, 6, 7, 0, 0x06, 0, 20};
+
+    ASSERT_THAT(t->get_ipv4_pseudo_header(), testing::Not(testing::ElementsAreArray(test)));
+    t->set_ipv4_pseudo_header(test_src, test_dest);
+
+    EXPECT_THAT(t->get_ipv4_pseudo_header(), testing::ElementsAreArray(test));
+}
+
+TEST(TCPSegment, settingIpv4PseudoHeaderWithTooLongIPv4DestinationAddress) {
+    std::shared_ptr<TCPSegmentInterface> t = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+
+    std::vector<unsigned char> test_src = {0, 1, 2, 3, 5};
+    std::vector<unsigned char> test_dest = {4, 5, 6, 7};
+
+    try {
+        t->set_ipv4_pseudo_header(test_src, test_dest);
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "source_ip_address must be of size 4");
+    }
+}
+
+TEST(TCPSegment, settingIpv4PseudoHeaderWithTooShortIPv4DestinationAddress) {
+    std::shared_ptr<TCPSegmentInterface> t = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+
+    std::vector<unsigned char> test_src = {0, 1, 2};
+    std::vector<unsigned char> test_dest = {4, 5, 6, 7};
+
+    try {
+        t->set_ipv4_pseudo_header(test_src, test_dest);
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "source_ip_address must be of size 4");
+    }
+}
+
+TEST(TCPSegment, settingIpv4PseudoHeaderWithTooLongIPv4SourceAddress) {
+    std::shared_ptr<TCPSegmentInterface> t = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+
+    std::vector<unsigned char> test_src = {0, 1, 2, 3};
+    std::vector<unsigned char> test_dest = {4, 5, 6, 7, 5};
+
+    try {
+        t->set_ipv4_pseudo_header(test_src, test_dest);
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "destination_ip_address must be of size 4");
+    }
+}
+
+TEST(TCPSegment, settingIpv4PseudoHeaderWithTooShortIPv4SourceAddress) {
+    std::shared_ptr<TCPSegmentInterface> t = std::shared_ptr<TCPSegmentInterface>(new TCPSegment());
+
+    std::vector<unsigned char> test_src = {0, 1, 2, 3};
+    std::vector<unsigned char> test_dest = {4, 5, 6};
+
+    try {
+        t->set_ipv4_pseudo_header(test_src, test_dest);
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "destination_ip_address must be of size 4");
+    }
+}
+
