@@ -1,0 +1,14 @@
+#include "SimulatorAppConfigReader.h"
+
+SimulatorAppConfigReader::SimulatorAppConfigReader()
+{
+
+}
+
+void SimulatorAppConfigReader::readAppConfig(std::string filename) {
+    boost::property_tree::ptree rtree;
+    boost::property_tree::read_json(filename, rtree);
+    std::string pathrtree.get<std::string>(jsonpath({transmitter_key, INIT_CONNECTION_KEY}));
+    
+}
+

@@ -1,0 +1,36 @@
+{
+    "PROTOCOL_STACK" : ["TCP", "IPv4", "Ethernet"],
+    "CONNECTION_OFFSET_SEC" : 9,
+    "CONNECTION_OFFSET_USEC" : 1397525,
+    "CONNECTION_END" : 75,
+    "REPEATS_AFTER" : 54000, 
+    "APPLICATION_DATA" : "../../SimulatorConfig/ApplicationDataConfigs/appdata_tcpstream1.json",
+    "CLIENT" : {
+        "INIT_CONNECTION" : true,
+        "END_CONNECTION" : true,
+        "IP_INFO" : {
+            "IP_ADDRESS" : "192.168.0.1",
+            "TTL" : 128
+        },
+        "TCP_INFO" : {
+            "SOURCE_PORT" : 49672,
+            "MSS" : 1460,
+            "PACKETS_SENT" : 0,
+            "WINDOW_SIZES" : [64240, 1026, 1026, 1026, 1023, 1022, 1026, 1026]
+        }
+    },
+    "SERVER" : {
+        "INIT_CONNECTION" : false,
+        "END_CONNECTION" : false,
+        "IP_INFO" : {
+            "IP_ADDRESS" : "184.25.158.197",
+            "TTL" : 47
+        },
+        "TCP_INFO" : {
+            "SOURCE_PORT" : 443,
+            "MSS" : 1460,
+            "PACKETS_SENT" : 0,
+            "WINDOW_SIZES" : [64240, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501, 501]
+        }
+    }
+}

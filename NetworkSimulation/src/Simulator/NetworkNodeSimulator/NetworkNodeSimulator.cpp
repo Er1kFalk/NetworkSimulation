@@ -132,7 +132,6 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event,
     std::shared_ptr<IPv4Event> e = std::shared_ptr<IPv4Event>(new IPv4Event);
     initial_protocol_state->set_payload(payload);
 
-
     e->set_ipv4_packet(initial_protocol_state);
     e->set_id(calling_event->get_id());
     e->set_transmitter(calling_event->get_transmitter());
