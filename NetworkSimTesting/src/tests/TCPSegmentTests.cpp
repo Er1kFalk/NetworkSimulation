@@ -1,7 +1,13 @@
 #include "TCPSegmentTests.h"
 #include "../../../NetworkSimulation/src/HeaderGenerators/TCPSegment/TCPSegment.h"
+#include "../../../NetworkSimulation/src/UtilityLibraries/ProtocolUtils/ProtocolUtils.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include "Helpers/TCPSegmentHelper.h"
+
+namespace TCPSegmentTestsVars {
+    TCPSegmentHelperNS::TCPSegmentHelper packet_helper;
+}
 
 /*
 set_source_port
@@ -282,6 +288,44 @@ TEST(TCPSegment, settingIpv4PseudoHeaderWithTooShortIPv4SourceAddress) {
         t->set_ipv4_pseudo_header(test_src, test_dest);
     } catch (std::invalid_argument e) {
         EXPECT_STREQ(e.what(), "destination_ip_address must be of size 4");
+    }
+}
+
+/*
+set_checksum()
+*/
+
+TEST(TCPSegment, settingTCPChecksum) {
+    TCPSegmentHelperNS::defaultPacketArgs args;
+    std::shared_ptr<TCPSegmentInterface> t = TCPSegmentTestsVars::packet_helper.get_stdpacket(args);
+    t->set_ipv4_pseudo_header({0,1,2,3}, {4,5,6,7});
+
+    // Check that checksum is wrong when it hasn't been set
+    std::vector<unsigned char> test_no_checksum = t->get_ipv4_pseudo_header();
+    for (unsigned char c : t->header_payload_to_array()) {test_no_checksum.push_back(c);}
+    if (test_no_checksum.size() % 2 != 0) test_no_checksum.push_back(0); // checksum is calculated over padded array
+    EXPECT_FALSE(ProtocolUtils::verify_internet_checksum(test_no_checksum, 0)); // 0 since checksum is included in the array
+
+    t->set_checksum();
+
+    // it should now be the case that the tcp pseudo header + tcp header w. data has a verified checksum
+    std::vector<unsigned char> test_with_checksum = t->get_ipv4_pseudo_header();
+    for (unsigned char c : t->header_payload_to_array()) {test_with_checksum.push_back(c);}
+    if (test_with_checksum.size() % 2 != 0) test_with_checksum.push_back(0);
+
+    EXPECT_TRUE(ProtocolUtils::verify_internet_checksum(test_with_checksum, 0));
+}
+
+TEST(TCPSegment, settingTCPChecksumWithoutPseuodHeader) {
+    TCPSegmentHelperNS::defaultPacketArgs args;
+    std::shared_ptr<TCPSegmentInterface> t = TCPSegmentTestsVars::packet_helper.get_stdpacket(args);
+    ASSERT_NE(t->get_ipv4_pseudo_header().size(), 12); // pseudo header is not set
+
+    try {
+        t->set_checksum();
+        FAIL();
+    } catch (std::invalid_argument e){
+        EXPECT_STREQ(e.what(), "cannot calculate checksum when ipv4 pseudo header not set");
     }
 }
 

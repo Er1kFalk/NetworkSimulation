@@ -107,16 +107,16 @@ void TCPSegment::set_checksum() {
         throw std::invalid_argument("cannot calculate checksum when ipv4 pseudo header not set");
     }
 
+    // calculate checksum over tcp pseudo header + header + data
     std::vector<unsigned char> data_to_calculate_checksum_over = ipv4_pseudo_header;
-
-    // add tcp to it
     std::vector<unsigned char> tcp_segment = header_payload_to_array();
-    if (tcp_segment.size() % 2 != 0) { // pad it with 0 if uneven
-        tcp_segment.push_back(0);
-    }
-    assert(tcp_segment.size() % 2 == 0);
-
     for (unsigned char c : tcp_segment) {data_to_calculate_checksum_over.push_back(c);}
+
+    if (data_to_calculate_checksum_over.size() % 2 != 0) { // pad it with 0 if uneven (since checksum is calculated over 16-bit chunks)
+        data_to_calculate_checksum_over.push_back(0);
+    }
+    assert(data_to_calculate_checksum_over.size() % 2 == 0);
+
 
     this->tcp_header = BitOperations::int16_into_char_vector(ProtocolUtils::calculate_internet_checksum(data_to_calculate_checksum_over), this->tcp_header, 16);
 }

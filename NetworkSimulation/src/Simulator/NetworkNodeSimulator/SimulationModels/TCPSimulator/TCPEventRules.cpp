@@ -41,7 +41,7 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     std::shared_ptr<TCPSegmentInterface> client = e->get_current_client_state()->get_current_segment();
     std::shared_ptr<TCPSegmentInterface> server = e->get_current_server_state()->get_current_segment();
 
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+    auto genfile = e->get_parent()->get_generatorfile_by_id(e->get_id());
 
     client->set_source_port(genfile.client.tcp_info.source_port);
     client->set_destination_port(genfile.server.tcp_info.source_port);
@@ -69,7 +69,7 @@ void SendSyn::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
 
     e->set_transmitter(GFStructs::TransmittingNow::Client);
 
-    uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0; // in microseconds
+    uint32_t rtt = e->get_parent()->get_np()->get_rtt()*1000.0; // in microseconds
 
     TCPEventPtr tcpevent = e->copy();
     tcpevent->set_event_rules({TCPEventRulePtr(new ReceiveSynAck)});
@@ -89,7 +89,7 @@ void ReceiveSynAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedul
     e->get_current_client_state()->add_bytes_received(1);
     e->get_current_server_state()->add_bytes_sent(1);
 
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+    auto genfile = e->get_parent()->get_generatorfile_by_id(e->get_id());
 
 
     syn_ack_segment->set_acknowledgement_nr(e->get_current_server_state()->get_bytes_received() + e->get_current_client_state()->get_initial_seq_nr());
@@ -123,7 +123,7 @@ void SendInitialAck::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
     current_server_state->set_options({});
 
     auto generator = std::shared_ptr<RandomUtils>(new RandomUtils());
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+    auto genfile = e->get_parent()->get_generatorfile_by_id(e->get_id());
     uint32_t choose_index = generator->generate_uniform_number() * (double) (genfile.client.tcp_info.window_sizes.size()-1);
     current_client_state->set_window_size(genfile.client.tcp_info.window_sizes[choose_index]);
     current_client_state->recalculate_fields();
@@ -157,7 +157,7 @@ void ClientSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
 
     TCPEventPtr tcpevent = e->copy();
     tcpevent->set_event_rules({TCPEventRulePtr(new ServerSendAck)});
-    uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0;
+    uint32_t rtt = e->get_parent()->get_np()->get_rtt()*1000.0;
     scheduler->schedule(tcpevent, 0, rtt);
 }
 
@@ -188,7 +188,7 @@ void ServerSendData::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> schedu
     // schedule an ack event (by client)
     TCPEventPtr tcpevent = e->copy();
     tcpevent->set_event_rules({TCPEventRulePtr(new ClientSendAck)});
-    uint32_t rtt = scheduler->get_parent()->get_np()->get_rtt()*1000.0;
+    uint32_t rtt = e->get_parent()->get_np()->get_rtt()*1000.0;
     scheduler->schedule(tcpevent, 0, rtt);
 }
 
@@ -224,7 +224,7 @@ void TCPReset::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
     e->get_current_client_state()->get_current_segment()->set_rst_flag(true);
     e->get_current_client_state()->get_current_segment()->set_fin_flag(true);
 
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+    auto genfile = e->get_parent()->get_generatorfile_by_id(e->get_id());
     e->get_current_client_state()->get_current_segment()->set_ipv4_pseudo_header(genfile.client.ip_info.ip_address, genfile.server.ip_info.ip_address);
     e->get_current_client_state()->get_current_segment()->recalculate_fields();
 
@@ -238,7 +238,7 @@ void PassClientStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler>
     packet->set_df_flag(true);
     packet->set_protocol(0x06); // determined by upper layer protocol
 
-    scheduler->get_parent()->receive_message(e, e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
+    e->get_parent()->receive_message(e, e->get_current_client_state()->get_current_segment()->copy(), packet, 0, 0);
 }
 
 void PassServerStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
@@ -248,5 +248,5 @@ void PassServerStateToIPv4::handle(TCPEventPtr e, std::shared_ptr<BaseScheduler>
     packet->set_df_flag(true);
     packet->set_protocol(0x06); // determined by upper layer protocol
 
-    scheduler->get_parent()->receive_message(e, e->get_current_server_state()->get_current_segment()->copy(), packet, 0, 0);
+    e->get_parent()->receive_message(e, e->get_current_server_state()->get_current_segment()->copy(), packet, 0, 0);
 }

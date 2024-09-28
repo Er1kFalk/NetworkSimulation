@@ -76,6 +76,9 @@ ADD_LIBRARY(SIMLIBS
 
 add_executable(NetworkSimulation
     ${LIBRARIES}
+    SimulatorConfig/AppConfig.json
+    src/ConfigReader/SimulatorAppConfigReader/SimulatorAppConfigReader.h src/ConfigReader/SimulatorAppConfigReader/SimulatorAppConfigReader.cpp
+    src/ConfigReader/SimulatorAppConfigReader/AppConfigFileStruct.h
 )
 set_target_properties(
     NetworkSimulation 

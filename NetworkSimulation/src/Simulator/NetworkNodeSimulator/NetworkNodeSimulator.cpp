@@ -39,6 +39,7 @@ void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::Generato
 
     auto event = std::shared_ptr<TCPEvent>(new TCPEvent(client_state, server_state, NetworkLayer::IPv4));
     event->set_id(id);
+    event->set_parent(shared_from_this());
 
     for (GFStructs::TransmittingNow t : gf.application_info.send_order) {
         event->add_to_send_order(t);
@@ -60,8 +61,6 @@ void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::Generato
 
 void NetworkNodeSimulator::initialize() {
     scheduler = std::shared_ptr<BaseScheduler>(new BaseScheduler());
-    scheduler->set_parent(shared_from_this());
-
     auto genfiles = confreader->get_generatorfiles();
     for (uint32_t i = 0; i < genfiles.size(); i++) {
 
@@ -96,7 +95,7 @@ void NetworkNodeSimulator::run() {
     }
 }
 
-NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time) {
+NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<GeneratorFileConfigReader> confreader, uint32_t max_gen_time) {
     this->np = np;
     this->time_sec = 0;
     this->time_us = 0;
@@ -125,7 +124,7 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event,
 
     e->set_ethernet_frame(etherframe);
     e->set_event_rules({EthernetEventRulePtr(new SendEthernetData)});
-
+    e->set_parent(shared_from_this());
     scheduler->schedule(e, time_s, time_us);
 }
 
@@ -139,11 +138,12 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event,
     e->set_transmitter(calling_event->get_transmitter());
     e->set_llayer(LinkLayer::Ethernet);
     e->set_event_rules({std::shared_ptr<IPv4EventRule>(new SendIPv4DataClient)});
+    e->set_parent(shared_from_this());
     scheduler->schedule(e, time_s, time_us);
 }
 
 GFStructs::GeneratorFile NetworkNodeSimulator::get_generatorfile_by_id(uint32_t id) {
-    auto key = generatorfiles.find(id);
+    std::map<uint32_t, GFStructs::GeneratorFile>::iterator key = generatorfiles.find(id);
     if (key == generatorfiles.end()) {
         throw std::invalid_argument("No generator file by this id");
     } else {
