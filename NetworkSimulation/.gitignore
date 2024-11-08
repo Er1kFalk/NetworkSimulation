@@ -4,3 +4,5 @@ src/CppToolkit-PCAP/.vscode
 /.project
 /build-debug/
 /archived/
+/build
+.vscode
