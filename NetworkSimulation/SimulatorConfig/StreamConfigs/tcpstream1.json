@@ -4,7 +4,7 @@
     "CONNECTION_OFFSET_USEC" : 1397525,
     "CONNECTION_END" : 75,
     "REPEATS_AFTER" : 54000, 
-    "APPLICATION_DATA" : "../../SimulatorConfig/ApplicationDataConfigs/appdata_tcpstream1.json",
+    "APPLICATION_DATA" : "../SimulatorConfig/ApplicationDataConfigs/appdata_tcpstream1.json",
     "CLIENT" : {
         "INIT_CONNECTION" : true,
         "END_CONNECTION" : true,

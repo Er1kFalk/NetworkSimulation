@@ -22,8 +22,8 @@
 #include <pcap/pcap.h>
 
 
-int main(int argc, char *argv[]) {
-    SimulatorAppConfigReader appConfig("../../SimulatorConfig/AppConfig.json");
+int main() {
+    SimulatorAppConfigReader appConfig("../SimulatorConfig/AppConfig.json");
 	std::string filename;
 	int simulation_time;
 	double rtt_mean;
@@ -40,6 +40,11 @@ int main(int argc, char *argv[]) {
 	std::cin >> rtt_stddev;
 
     auto n1configs = std::shared_ptr<GeneratorFileConfigReader>(new GeneratorFileConfigReader(appConfig.getFile().streamConfigPath));
+
+    if (n1configs->get_generatorfiles().size() == 0)  {
+    	std::cout << "No generator files were provided";
+    }
+
 
 	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter(filename, wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
 	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({rtt_mean,rtt_stddev}));

@@ -110,14 +110,14 @@ NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np
 receiver redirecting to pcap
 */
 
-void NetworkNodeSimulator::receive_message(std::vector<unsigned char> data, uint32_t time_s, uint32_t time_us) {
-    this->pcapwriter->write_packet(data, time_s, time_us);
+void NetworkNodeSimulator::receive_message(std::vector<unsigned char> data) {
+    this->pcapwriter->write_packet(data, scheduler->get_scheduler_time_sec(), scheduler->get_scheduler_time_us());
 }
 
 /*
 receiver redirecting to ethernet
 */
-void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
+void NetworkNodeSimulator::receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
     std::shared_ptr<EthernetEvent> e = std::shared_ptr<EthernetEvent>(new EthernetEvent);
     std::shared_ptr<EthernetFrameInterface> etherframe = initial_protocol_state;
     etherframe->set_payload(payload);

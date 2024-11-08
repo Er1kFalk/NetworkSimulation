@@ -49,12 +49,12 @@ public:
     receiver redirecting to pcap
     */
 
-   void receive_message(std::vector<unsigned char> data, uint32_t time_s, uint32_t time_us);
+   void receive_message(std::vector<unsigned char> data);
 
     /*
     receiver redirecting to ethernet
     */
-    void receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
+    void receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
 
     /*
     receiver redirecting to ipv4

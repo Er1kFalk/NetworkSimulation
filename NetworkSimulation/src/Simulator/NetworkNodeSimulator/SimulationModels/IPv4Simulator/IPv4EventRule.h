@@ -9,22 +9,22 @@ class BaseScheduler;
 class IPv4EventRule {
 
 public:
-    virtual void handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) = 0;
+    virtual void handle(IPv4EventPtr e) = 0;
 };
 
 class SendIPv4DataClient : public IPv4EventRule {
 public:
-    void handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+    void handle(IPv4EventPtr e) override;
 };
 
 class ReceiveIPv4Data : public IPv4EventRule {
 public:
-    void handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+    void handle(IPv4EventPtr e) override;
 };
 
 class PassIPv4DataToEthernet : public IPv4EventRule {
 public:
-    void handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+    void handle(IPv4EventPtr e) override;
 };
 
 #endif

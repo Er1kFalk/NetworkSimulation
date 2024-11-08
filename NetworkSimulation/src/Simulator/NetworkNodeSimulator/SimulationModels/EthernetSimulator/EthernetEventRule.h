@@ -10,13 +10,13 @@ class BaseScheduler;
 class EthernetEventRule {
 
 public:
-    virtual void handle(EthernetEventPtr e, std::shared_ptr<BaseScheduler> scheduler) = 0;
+    virtual void handle(EthernetEventPtr e) = 0;
 };
 
 class SendEthernetData : public EthernetEventRule {
 
 public:
-    void handle(EthernetEventPtr e, std::shared_ptr<BaseScheduler> scheduler) override;
+    void handle(EthernetEventPtr e) override;
 };
 
 #endif

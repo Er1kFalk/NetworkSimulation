@@ -1,5 +1,7 @@
 #include "BaseScheduler.h"
 #include "Event.h"
+#include <exception>
+
 
 void BaseScheduler::dispatch_next_event() {
     auto eq = events.top();
@@ -8,6 +10,8 @@ void BaseScheduler::dispatch_next_event() {
     this->scheduler_time_sec = std::get<1>(eq);
     this->scheduler_time_us = std::get<2>(eq);
     
+    auto schedulerPtr = shared_from_this();
+
     event->apply_rules(shared_from_this());
     events.pop();
 }

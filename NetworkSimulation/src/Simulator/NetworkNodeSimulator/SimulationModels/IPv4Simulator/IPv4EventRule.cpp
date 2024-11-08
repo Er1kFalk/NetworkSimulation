@@ -5,12 +5,12 @@
 #include "../BaseScheduler/BaseScheduler.h"
 #include "../../NetworkNodeSimulator.h"
 
-void ReceiveIPv4Data::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+void ReceiveIPv4Data::handle(IPv4EventPtr e) {
     std::shared_ptr<IPv4PacketInterface> packet = e->get_ipv4_packet();
     
 }
 
-void SendIPv4DataClient::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+void SendIPv4DataClient::handle(IPv4EventPtr e) {
     std::shared_ptr<IPv4PacketInterface> packet = e->get_ipv4_packet();
     packet->set_version();
     packet->set_identification(0); // should be random
@@ -36,9 +36,9 @@ void SendIPv4DataClient::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> s
     // to ethernet
 }
 
-void PassIPv4DataToEthernet::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+void PassIPv4DataToEthernet::handle(IPv4EventPtr e) {
     std::shared_ptr<EthernetFrameInterface> etherframe = std::shared_ptr<EthernetFrameInterface>(new EthernetFrame());
     etherframe->set_ethertype({0x08, 0x00});
 
-    e->get_parent()->receive_message(e, e->get_ipv4_packet()->copy(), etherframe, 0, 0);
+    e->get_parent()->receive_message(e->get_ipv4_packet()->copy(), etherframe, 0, 0);
 }

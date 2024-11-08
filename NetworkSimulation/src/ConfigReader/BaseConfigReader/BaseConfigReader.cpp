@@ -18,7 +18,7 @@ std::string BaseConfigReader::jsonpath(std::vector<std::string> v) {
     assert(v.size() >= 2);
 
     std::string jsonpath = v[0];
-    for (int i = 1; i < v.size(); i++) {
+    for (long unsigned int i = 1; i < v.size(); i++) {
         jsonpath += NEST_OPERATOR + v[i];
     }
 
