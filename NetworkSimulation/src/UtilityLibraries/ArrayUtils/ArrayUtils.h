@@ -9,6 +9,7 @@
 #include <array>
 #include <cstdlib>
 #include <random>
+#include <ctime>
 
 #ifndef ARRAYUTILS_H_
 #define ARRAYUTILS_H_

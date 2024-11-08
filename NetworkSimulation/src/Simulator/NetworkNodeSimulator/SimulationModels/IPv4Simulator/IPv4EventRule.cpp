@@ -5,19 +5,19 @@
 #include "../BaseScheduler/BaseScheduler.h"
 #include "../../NetworkNodeSimulator.h"
 
-void ReceiveIPv4Data::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+void ReceiveIPv4Data::handle(IPv4EventPtr e) {
     std::shared_ptr<IPv4PacketInterface> packet = e->get_ipv4_packet();
     
 }
 
-void SendIPv4DataClient::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+void SendIPv4DataClient::handle(IPv4EventPtr e) {
     std::shared_ptr<IPv4PacketInterface> packet = e->get_ipv4_packet();
     packet->set_version();
     packet->set_identification(0); // should be random
     packet->set_mf_flag(false); // ip - if df = 0
     packet->set_fragment_offset(0);
     
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(e->get_id());
+    auto genfile = e->get_parent()->get_generatorfile_by_id(e->get_id());
 
     if (e->get_transmitter() == GFStructs::TransmittingNow::Client) {
         packet->set_source(genfile.client.ip_info.ip_address);
@@ -36,9 +36,9 @@ void SendIPv4DataClient::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> s
     // to ethernet
 }
 
-void PassIPv4DataToEthernet::handle(IPv4EventPtr e, std::shared_ptr<BaseScheduler> scheduler) {
+void PassIPv4DataToEthernet::handle(IPv4EventPtr e) {
     std::shared_ptr<EthernetFrameInterface> etherframe = std::shared_ptr<EthernetFrameInterface>(new EthernetFrame());
     etherframe->set_ethertype({0x08, 0x00});
 
-    scheduler->get_parent()->receive_message(e, e->get_ipv4_packet()->copy(), etherframe, 0, 0);
+    e->get_parent()->receive_message(e->get_ipv4_packet()->copy(), etherframe, 0, 0);
 }

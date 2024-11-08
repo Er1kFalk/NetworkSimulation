@@ -22,59 +22,58 @@ TEST (StringUtils, to_lower) {
 	EXPECT_THAT(lower, testing::StrEq(all_lower_case)) << TestUtils::generate_error_msg("ALL LOWER CASE", errmsg);;
 }
 
-TEST (StringUtils, is_hex_symbol) {
-	std::vector<char> accepted_values = {'a', 'b', 'c', 'd', 'e', 'f', // hex values
-			'A', 'B', 'C', 'D', 'E', 'F',
-			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-	for (char c : accepted_values) {
-		EXPECT_TRUE(StringUtils::is_hex_symbol(c)) << TestUtils::generate_error_msg(std::string("HEX VALUE: ") + c, "Passed a hex value, but function told us that it wasn't a hex value.");
-	}
-
-	std::vector<char> some_other_values = {'g', '^', 'k', '+', 'z', 'I'};
-
-	for (char c : some_other_values) {
-		EXPECT_FALSE(StringUtils::is_hex_symbol(c)) << TestUtils::generate_error_msg(std::string("NON HEX VALUE: ") + c, "Passed a NON hex value, but function told us that it WAS a hex value.");
-	}
+TEST (StringUtils, is_valid_ipv4_WhereIPIsTooLong) {
+    std::string test = "192.168.111.1111";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
 }
 
-// tests if char_repeats_in_string on the strings given by tests (helper function for below test)
-// does_repeat specifies the char that repeats in the tests, and repeat_freq specifies the frequency of repetitions
-// does_not_repeat specifies a char that does not repeat
-void char_repeats_in_string_helper_tester(std::string testname, std::vector<std::string> tests, char does_repeat, int repeat_freq, char does_not_repeat) {
-	for (std::string s : tests) {
-		EXPECT_TRUE(StringUtils::char_repeats_in_string(s, does_repeat, repeat_freq)) << TestUtils::generate_error_msg(testname, "");
-		EXPECT_FALSE(StringUtils::char_repeats_in_string(s, does_repeat, repeat_freq+1)) << TestUtils::generate_error_msg(testname, "");
-		EXPECT_FALSE(StringUtils::char_repeats_in_string(s, does_repeat, repeat_freq-1)) << TestUtils::generate_error_msg(testname, "");
-		EXPECT_FALSE(StringUtils::char_repeats_in_string(s, does_not_repeat, repeat_freq)) << TestUtils::generate_error_msg(testname, "");
-	}
+TEST (StringUtils, is_valid_ipv4_WhereAddressHasTooManyDots) {
+    std::string test = "192.168.1.1.1";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
 }
 
-TEST (StringUtils, char_repeats_in_string_1) {
-	// for strings seperated by : every 2 chars
-	std::vector<std::string> colon_2_char_sep = {
-			"ff:ff:ff:ff",
-			"23:as:gf:ds",
-			"ss:34:ff:ff"
-	};
+TEST (StringUtils, is_valid_ipv4_WhereAddressHasLetters) {
+    std::string test = "192.16a.1.1";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
+}
 
-	// check that it also works for strings separted by > 2 chars
-	std::vector<std::string> colon_5_char_sep = {
-			"fffff:fffff:fffff:fffff",
-			"2321d:asda3:gfdsa:ds23a",
-			"ssfds:34sdf:fffff:ff32d"
-	};
+TEST (StringUtils, is_valid_ipv4_WhereAddressHasMoreThan3NumbersBetweenDots) {
+    std::string test = "127.0.1111.1";
+    EXPECT_FALSE(StringUtils::is_valid_ipv4(test));
+}
 
-	// check that it works for other seperators
-	std::vector<std::string> dot_5_char_sep = {
-			"fffff.fffff.fffff.fffff",
-			"2321d.asda3.gfdsa.ds23a",
-			"ssfds.34sdf.fffff.ff32d"
-	};
+TEST (StringUtils, is_valid_ipv4_WhereAddressIsValid) {
+    std::string test1 = "192.168.1.1";
+    std::string test2 = "127.0.0.1";
+    std::string test3 = "1.111.0.111";
+    std::string test4 = "111.444.555.666";
 
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test1));
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test2));
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test3));
+    EXPECT_TRUE(StringUtils::is_valid_ipv4(test4));
+}
 
-	char_repeats_in_string_helper_tester("STRING WITH COLON EVERY 2 CHARS", colon_2_char_sep, ':', 2, '4');
-	char_repeats_in_string_helper_tester("STRING WITH COLON EVERY 5 CHARS", colon_5_char_sep, ':', 5, 'g');
-	char_repeats_in_string_helper_tester("STRING WITH DOT EVERY 5 CHARS", colon_5_char_sep, ':', 5, 'l');
-    EXPECT_FALSE(StringUtils::char_repeats_in_string(dot_5_char_sep[0], '.', 24));
+TEST (StringUtils, string_to_ipv4_addressWhereAddressIsValid) {
+    std::string test1 = "192.168.1.1";
+    std::string test2 = "127.0.0.1";
+    std::string test3 = "1.111.0.111";
+    std::string test4 = "111.444.555.666";
+
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test1), testing::ElementsAreArray({192, 168, 1, 1}));
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test2), testing::ElementsAreArray({127, 0, 0, 1}));
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test3), testing::ElementsAreArray({1, 111, 0, 111}));
+    EXPECT_THAT(StringUtils::string_to_ipv4_address(test4), testing::ElementsAreArray({111, 444, 555, 666}));
+}
+
+TEST (StringUtils, string_to_ipv4_addressWhereAddressIsInValid) {
+    std::string test1 = "192.1684.2.1";
+
+    try {
+        StringUtils::string_to_ipv4_address(test1);
+        FAIL();
+    } catch (std::invalid_argument e) {
+        EXPECT_STREQ(e.what(), "You did not provide a valid IPv4 address");
+    }
 }
 

@@ -23,6 +23,7 @@ add_library(NetworkSimulationLibrary
 
 add_executable(NetworkSimTesting
     ${SOURCES_TEST}
+    src/tests/Helpers/TCPSegmentHelper.h
 )
 target_include_directories(NetworkSimTesting PRIVATE ${SRCDIR_TEST} ${SRCDIR_NETWORKSIM})
 target_link_libraries(NetworkSimTesting NetworkSimulationLibrary -lgtest -lgcov -lpcap)

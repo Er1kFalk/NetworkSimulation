@@ -7,6 +7,8 @@
 #include "Simulator/NetworkNodeSimulator/NetworkNodeSimulator.h"
 #include "Simulator/NetworkProperties.h"
 #include "PCAPWriter/PCAPWriter.h"
+#include "ConfigReader/GeneratorFileConfigReader/GeneratorFileConfigReader.h"
+#include "ConfigReader/SimulatorAppConfigReader/SimulatorAppConfigReader.h"
 
 #include <bits/stdc++.h>
 
@@ -20,16 +22,13 @@
 #include <pcap/pcap.h>
 
 
-int main(int argc, char *argv[]) {
-	std::vector<std::string> args;
+int main() {
+    SimulatorAppConfigReader appConfig("../SimulatorConfig/AppConfig.json");
 	std::string filename;
 	int simulation_time;
 	double rtt_mean;
 	double rtt_stddev;
 
-	for (int i = 0; i < argc; i++) {
-		args.push_back(std::string(argv[i]));
-	}
 
 	std::cout << "Enter output filename (include .pcap extension) : ";
 	std::cin >> filename;
@@ -40,7 +39,12 @@ int main(int argc, char *argv[]) {
 	std::cout << std::endl << "Enter round trip time standard deviation (ms) for the network: ";
 	std::cin >> rtt_stddev;
 
-	auto n1configs = std::shared_ptr<ConfigReader>(new ConfigReader(args));
+    auto n1configs = std::shared_ptr<GeneratorFileConfigReader>(new GeneratorFileConfigReader(appConfig.getFile().streamConfigPath));
+
+    if (n1configs->get_generatorfiles().size() == 0)  {
+    	std::cout << "No generator files were provided";
+    }
+
 
 	auto writer = std::shared_ptr<PCAPWriter>(new PCAPWriter(filename, wayne::PCAP::linkTypes::LINKTYPE_ETHERNET));
 	std::shared_ptr<NetworkProperties> np = std::shared_ptr<NetworkProperties>(new NetworkProperties({rtt_mean,rtt_stddev}));

@@ -39,6 +39,7 @@ void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::Generato
 
     auto event = std::shared_ptr<TCPEvent>(new TCPEvent(client_state, server_state, NetworkLayer::IPv4));
     event->set_id(id);
+    event->set_parent(shared_from_this());
 
     for (GFStructs::TransmittingNow t : gf.application_info.send_order) {
         event->add_to_send_order(t);
@@ -60,8 +61,6 @@ void NetworkNodeSimulator::initialize_tcp_event(uint32_t id, GFStructs::Generato
 
 void NetworkNodeSimulator::initialize() {
     scheduler = std::shared_ptr<BaseScheduler>(new BaseScheduler());
-    scheduler->set_parent(shared_from_this());
-
     auto genfiles = confreader->get_generatorfiles();
     for (uint32_t i = 0; i < genfiles.size(); i++) {
 
@@ -96,7 +95,7 @@ void NetworkNodeSimulator::run() {
     }
 }
 
-NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time) {
+NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<GeneratorFileConfigReader> confreader, uint32_t max_gen_time) {
     this->np = np;
     this->time_sec = 0;
     this->time_us = 0;
@@ -111,21 +110,21 @@ NetworkNodeSimulator::NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np
 receiver redirecting to pcap
 */
 
-void NetworkNodeSimulator::receive_message(std::vector<unsigned char> data, uint32_t time_s, uint32_t time_us) {
-    this->pcapwriter->write_packet(data, time_s, time_us);
+void NetworkNodeSimulator::receive_message(std::vector<unsigned char> data) {
+    this->pcapwriter->write_packet(data, scheduler->get_scheduler_time_sec(), scheduler->get_scheduler_time_us());
 }
 
 /*
 receiver redirecting to ethernet
 */
-void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
+void NetworkNodeSimulator::receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us) {
     std::shared_ptr<EthernetEvent> e = std::shared_ptr<EthernetEvent>(new EthernetEvent);
     std::shared_ptr<EthernetFrameInterface> etherframe = initial_protocol_state;
     etherframe->set_payload(payload);
 
     e->set_ethernet_frame(etherframe);
     e->set_event_rules({EthernetEventRulePtr(new SendEthernetData)});
-
+    e->set_parent(shared_from_this());
     scheduler->schedule(e, time_s, time_us);
 }
 
@@ -133,17 +132,17 @@ void NetworkNodeSimulator::receive_message(std::shared_ptr<Event> calling_event,
     std::shared_ptr<IPv4Event> e = std::shared_ptr<IPv4Event>(new IPv4Event);
     initial_protocol_state->set_payload(payload);
 
-
     e->set_ipv4_packet(initial_protocol_state);
     e->set_id(calling_event->get_id());
     e->set_transmitter(calling_event->get_transmitter());
     e->set_llayer(LinkLayer::Ethernet);
     e->set_event_rules({std::shared_ptr<IPv4EventRule>(new SendIPv4DataClient)});
+    e->set_parent(shared_from_this());
     scheduler->schedule(e, time_s, time_us);
 }
 
 GFStructs::GeneratorFile NetworkNodeSimulator::get_generatorfile_by_id(uint32_t id) {
-    auto key = generatorfiles.find(id);
+    std::map<uint32_t, GFStructs::GeneratorFile>::iterator key = generatorfiles.find(id);
     if (key == generatorfiles.end()) {
         throw std::invalid_argument("No generator file by this id");
     } else {

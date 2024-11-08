@@ -86,6 +86,8 @@ public:
     std::vector<unsigned char> header_to_array() override;
     std::vector<unsigned char> header_payload_to_array() override;
 
+    std::vector<unsigned char> get_ipv4_pseudo_header() override {return this->ipv4_pseudo_header;}
+
     void set_payload(std::shared_ptr<CommunicationProtocol> payload) override {this->payload = payload;}
     std::shared_ptr<CommunicationProtocol> get_payload () override {return this->payload;}
     void recalculate_fields() override;

@@ -12,7 +12,7 @@ void TCPEvent::apply_rules(std::shared_ptr<BaseScheduler> scheduler) {
     for (auto rule : event_rules) {
         rule->handle(shared_from_this(), scheduler);
     }
-    auto genfile = scheduler->get_parent()->get_generatorfile_by_id(this->get_id());
+    auto genfile = this->get_parent()->get_generatorfile_by_id(this->get_id());
     auto nwlayer = genfile.protocol_stack.find(GFStructs::LayerModel::Network)->second;
     pass_to_layer[{nwlayer, get_transmitter()}]->handle(shared_from_this(), scheduler);
 }

@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "../../ConfigReader/ConfigReader.h"
+#include "../../ConfigReader/GeneratorFileConfigReader/GeneratorFileConfigReader.h"
 
 class NetworkProperties;
 class BaseScheduler;
@@ -30,11 +30,11 @@ private:
     uint32_t time_us; // microseconds
     uint32_t max_gen_time; // seconds
     std::shared_ptr<PCAPWriter> pcapwriter;
-    std::shared_ptr<ConfigReader> confreader;
+    std::shared_ptr<GeneratorFileConfigReader> confreader;
     std::map<uint32_t, GFStructs::GeneratorFile> generatorfiles;
 
 public:
-    NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<ConfigReader> confreader, uint32_t max_gen_time);
+    NetworkNodeSimulator(std::shared_ptr<NetworkProperties> np, std::shared_ptr<PCAPWriter> pcapwriter, std::shared_ptr<GeneratorFileConfigReader> confreader, uint32_t max_gen_time);
 
     void initialize_tcp_event(uint32_t id, GFStructs::GeneratorFile gf);
     void initialize_ipv4_event(uint32_t id, GFStructs::GeneratorFile gf);
@@ -49,12 +49,12 @@ public:
     receiver redirecting to pcap
     */
 
-   void receive_message(std::vector<unsigned char> data, uint32_t time_s, uint32_t time_us);
+   void receive_message(std::vector<unsigned char> data);
 
     /*
     receiver redirecting to ethernet
     */
-    void receive_message(std::shared_ptr<Event> calling_event, std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
+    void receive_message(std::shared_ptr<CommunicationProtocol> payload, std::shared_ptr<EthernetFrameInterface> initial_protocol_state, uint32_t time_s, uint32_t time_us);
 
     /*
     receiver redirecting to ipv4

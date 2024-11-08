@@ -1,2 +1,6 @@
 /Default/
 src/CppToolkit-PCAP/.vscode
+/.cproject
+/.project
+/build-debug/
+/archived/
